@@ -1,0 +1,11 @@
+[Unit]
+Description=Queue daemon
+
+[Service]
+EnvironmentFile=/etc/queued.conf
+Type=forking
+ExecStart=/usr/bin/queued -jd $JOBDIR --priority $PRIORITY -q $QUEUEFILE -u $STARTASUSER -wd $WORKDIR
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
