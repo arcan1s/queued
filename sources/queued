@@ -120,6 +120,7 @@ cd /
       [ -d "$WORKDIR/$FILE" ] && continue
       FILE_EXT="${FILE##*.}"
       [ "$FILE_EXT" = "pr" ] && continue
+      [ "$FILE_EXT" = "user" ] && continue
       [ -e "$QUEUEFILE" ] && grep --quiet "$WORKDIR/$FILE" "$QUEUEFILE" && continue
       echo "[II] Adding file '$FILE' to list"
       if [ -e "$WORKDIR/$FILE".pr ]; then
@@ -168,10 +169,10 @@ cd /
       CURJOB=$(tail -1 "$QUEUEFILE" | awk -F "==" '{print $2}')
       [ -z "$CURJOB" ] && break
       sed -i '$d' "$QUEUEFILE"
-      [ -e "$CURJOB".pr ] && mv "$CURJOB".pr "$JOBDIR/$(basename "$CURJOB")".pr
-      mv "$CURJOB" "$JOBDIR/$(basename "$CURJOB")" 2> /dev/null || break
+      [ -e "$CURJOB".user ] && CUR_USER="$(cat "$CURJOB".user)" || CUR_USER="$STARTASUSER"
+      mv "$CURJOB"* "$JOBDIR/" 2> /dev/null || break
       echo "[II] Running job '$CURJOB'"
-      su -c "/bin/sh "$JOBDIR/$(basename "$CURJOB")"" $STARTASUSER &> "$JOBDIR/$(basename "$CURJOB")".log &
+      su -c "/bin/sh "$JOBDIR/$(basename "$CURJOB")" &> "$JOBDIR/$(basename "$CURJOB")".log" $CUR_USER &
     )
     else
       echo "[II] You have a running job"
