@@ -11,11 +11,21 @@ GPLv3
 
 help message
 ------------
+* queued:
     queued [ -c /etc/queued.conf ] [ -v | --version ] [ -h | --help ]
 
     Parametrs:
       -c               PATH     - path to configuration file. Default is `/etc/queued.conf`
       -v   --version            - show version and exit
+      -h   --help               - show this help and exit
+    
+* add_queued:
+    add_queued [ -c /etc/queued.conf ] [ -p NUM ] [ -u USER ] [ -h | --help ] /path/to/script
+
+    Parameters:
+      -c               PATH     - path to configuration file. Default is '/etc/queued.conf'
+      -p               NUM      - job priority
+      -u               USER     - username
       -h   --help               - show this help and exit
 
 Configuration
@@ -28,10 +38,12 @@ How-to run jobs
 * create priority file (`script.sh.pr`) with the job priority if it is needed
 * create user file (`script.sh.user`) with the job username if it is needed
 * copy files to `$WORKDIR`
+Also you may use `add_queued`.
 
 See also
 --------
     man 1 queued
+    man 1 add_queued
     man 5 queued.conf
 
 Instruction

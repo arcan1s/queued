@@ -10,7 +10,7 @@ url="https://github.com/arcan1s/queued"
 license=("GPLv3")
 depends=('bash')
 source=(https://github.com/arcan1s/queued/releases/download/V.${pkgver}/${pkgname}-${pkgver}-src.tar.xz)
-md5sums=('a5e1af503128283cda85ca21d08b6853')
+md5sums=('94e7c73190939aaf6b63cb7bd2592a7c')
 backup=('etc/queued.conf')
 
 package()
