@@ -1,4 +1,4 @@
-.TH queued 1  "December 24, 2013" "version 1.1.0" "USER COMMANDS"
+.TH queued 1  "December 24, 2013" "version 1.2.0" "USER COMMANDS"
 .SH NAME
 queued - daemon for starting jobs to queue of calculations
 .SH SYNOPSIS
@@ -10,7 +10,8 @@ is a simple daemon written on BASH for starting jobs to queue of calculations in
 .SH OPTIONS
 .TP
 -c /etc/queued.conf
-Full path to configuration file. Default is '/etc/queued.conf'.
+Full path to configuration file. Default is 
+.B /etc/queued.conf.
 .TP
 -h, --help
 Show help and exit.
@@ -71,6 +72,7 @@ to determine errors:
   [EE] - error
 .fi
 .SH SEE ALSO
+.BR add_queued (1)
 .BR queued.conf (5)
 .SH AUTHOR
 Evgeniy Alexeev aka arcanis <\fIesalexeev@gmail.com\fR>

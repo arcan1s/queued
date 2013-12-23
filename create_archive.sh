@@ -8,6 +8,7 @@ mkdir -p ${ARCHIVE}/usr/share/man/{man1,man5}
 mkdir -p ${ARCHIVE}/etc
 
 cp sources/queued ${ARCHIVE}/usr/bin/
+cp sources/add_queued ${ARCHIVE}/usr/bin/
 cp sources/queued.service ${ARCHIVE}/usr/lib/systemd/system/
 cp sources/queued.conf ${ARCHIVE}/etc/
 cp sources/*.1 ${ARCHIVE}/usr/share/man/man1/

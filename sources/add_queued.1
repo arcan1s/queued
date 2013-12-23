@@ -1,0 +1,32 @@
+.TH add_queued 1  "December 24, 2013" "version 1.2.0" "USER COMMANDS"
+.SH NAME
+add_queued
+.SH SYNOPSIS
+.B add_queued
+[ -c /etc/queued.conf ] [ -p NUM ] [ -u USER ] [ -h | --help ] /path/to/script
+.SH DESCRIPTION
+.B add_queued
+is a script to add job for
+.BR queued (1)
+.SH OPTIONS
+.TP
+/path/to/script
+Path to the job script
+.TP
+-c /etc/queued.conf
+Full path to configuration file. Default is
+.B /etc/queued.conf.
+.TP
+-p NUM
+priority of the job
+.TP
+-u USER
+username for the job running
+.TP
+-h, --help
+Show help and exit.
+.SH SEE ALSO
+.BR queued (1)
+.BR queued.conf (5)
+.SH AUTHOR
+Evgeniy Alexeev aka arcanis <\fIesalexeev@gmail.com\fR>
