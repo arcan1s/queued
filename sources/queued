@@ -1,22 +1,25 @@
 #!/bin/bash
 
+# functions
+error_mes() {
+  case "$1" in
+    "config"  ) echo "[EE] Configuration file is not set";;
+    "file"    ) echo "[EE]: '$2' is a file";;
+    "flag"    ) echo "[EE] Unknown flag";;
+    "number"  ) echo "[EE]: '$2' is not a number";;
+    "unknown" ) echo "[EE] Unknown error";;
+  esac
+  exit 1
+}
 func_help() {
   echo -e "Simple daemon written on BASH for starting jobs to queue of calculations"
-  echo -e "\nUsage: queued [ -jd | --jobdir /var/lib/queued/job ] [ --priority 0 ]"
-  echo -e "              [ -q | --queuefile /var/lib/queued/queue ] [ -u | --user root ]"
-  echo -e "              [ -wd | --workdir /var/lib/queued/work ] [ -v | --version ]"
-  echo -e "              [ -h | --help ]"
+  echo -e "\nUsage: queued [ -c /etc/queued.conf ] [ -v | --version ] [ -h | --help ]"
   echo -e "\nParametrs:"
-  echo -e "  -jd  --jobdir    PATH     - path to job directory. Default is '/var/lib/queued/job'"
-  echo -e "       --priority  NUM      - defalut priority. Default is '0'"
-  echo -e "  -q   --queuefile PATH     - path to queue file. Default is '/var/lib/queued/queue'"
-  echo -e "  -u   --user      USERNAME - start jobs by user. Default is 'root'"
-  echo -e "  -wd  --workdir   PATH     - path to work directory. Default is '/var/lib/queued/work'"
+  echo -e "  -c               PATH     - path to configuration file. Default is '/etc/queued.conf'"
   echo -e "\n  -v   --version            - show version and exit"
   echo -e "  -h   --help               - show this help and exit"
   exit 0
 }
-
 func_ver() {
   echo -e "                         queued                         "
   echo -e "Simple daemon for starting jobs to queue of calculations"
@@ -25,87 +28,61 @@ func_ver() {
   echo -e "E-mail :                        esalexeev (at) gmail.com"
   exit 0
 }
-
-isnum () {
+isnum() {
     (t=$(( 0$1+0 ))) 2>/dev/null
 }
+start_job() {
+    echo "[II] Running job '$CURJOB' (priority '$CURJOB_PRIOR') as '$CURJOB_USER'"
+    su -c "/bin/sh "$JOBDIR/$(basename "$CURJOB")" &> "$JOBDIR/$(basename "$CURJOB")".log" $CURJOB_USER &
+}
 
+
+CONF_FILE="/etc/queued.conf"
+# parametrs parsing
+until [ -z $1 ]; do
+  case "$1" in
+    "-h" | "--help"    ) func_help;;
+    "-v" | "--version" ) func_ver;;
+    "-c"               ) [ -z "$2" ] && error_mes "config" || CONF_FILE="$2" && shift;;
+    *                  ) error_mes "flag";;
+  esac
+  shift
+done
 # default values
 JOBDIR="/var/lib/queued/job"
 PRIORITY=0
 QUEUEFILE="/var/lib/queued/queue"
+SLEEPTIME=5
 STARTASUSER="root"
 WORKDIR="/var/lib/queued/work"
-# parametrs parsing
-until [ -z $1 ]; do
-  if [ "$1" = "-h" ]; then
-    func_help; fi
-  if [ "$1" = "--help" ]; then
-    func_help; fi
-  if [ "$1" = "-v" ]; then
-    func_ver; fi
-  if [ "$1" = "--version" ]; then
-    func_ver; fi
-  if [ "$1" = "-jd" ]; then
-    JOBDIR="$2"
-    shift; fi
-  if [ "$1" = "--jobdir" ]; then
-    JOBDIR="$2"
-    shift; fi
-  if [ "$1" = "--priority" ]; then
-    PRIORITY="$2"
-    shift; fi
-  if [ "$1" = "-q" ]; then
-    QUEUEFILE="$2"
-    shift; fi
-  if [ "$1" = "--queuefile" ]; then
-    QUEUEFILE="$2"
-    shift; fi
-  if [ "$1" = "-u" ]; then
-    STARTASUSER="$2"
-    shift; fi
-  if [ "$1" = "--user" ]; then
-    STARTASUSER="$2"
-    shift; fi
-  if [ "$1" = "-wd" ]; then
-    WORKDIR="$2"
-    shift; fi
-  if [ "$1" = "--workdir" ]; then
-    WORKDIR="$2"
-    shift; fi
-  shift
-done
+echo "[II] Reading configuration from '$CONF_FILE'"
+for VAR in "$(cat "$CONF_FILE")"; do eval "$VAR"; done
 
+
+# prepare
 # creating directories if doesn't exist
-if [ ! -d "$JOBDIR" ]; then
-  if [ -e "$JOBDIR" ]; then
-    echo "[EE]: '$JOBDIR' is a file"
-    exit 1
-  fi
-  echo "[II]: Create directory '$JOBDIR'"
-  mkdir -m777 -p "$JOBDIR" || (echo "[EE] Unknown error"; exit 1)
+if [ ! -d "$JOBDIR/done" ]; then
+  [ -e "$JOBDIR/done" ] && error_mes "file" "$JOBDIR/done"
+  echo "[II]: Create directory '$JOBDIR/done'"
+  mkdir -m777 -p "$JOBDIR/done" || error_mes "unknown"
 fi
 if [ ! -d "$WORKDIR" ]; then
-  if [ -e "$WORKDIR" ]; then
-    echo "[EE]: '$WORKDIR' is a file"
-    exit 1
-  fi
+  [ -e "$WORKDIR" ] && error_mes "file" "$WORKDIR"
   echo "[II]: Create directory '$WORKDIR'"
-  mkdir -m777 -p "$WORKDIR" || (echo "[EE] Unknown error"; exit 1)
+  mkdir -m777 -p "$WORKDIR" || error_mes "unknown"
 fi
 if [ ! -d "$(dirname "$QUEUEFILE")" ]; then
-  if [ -e "$(dirname "$QUEUEFILE")" ]; then
-    echo "[EE]: '$(dirname "$QUEUEFILE")' is a file"
-    exit 1
-  fi
+  [ -e "$(dirname "$QUEUEFILE")" ] && error_mes "file" "$(dirname "$QUEUEFILE")"
   echo "[II]: Create directory '$(dirname "$QUEUEFILE")'"
-  mkdir -m777 -p "$(dirname "$QUEUEFILE")" || (echo "[EE] Unknown error"; exit 1)
+  mkdir -m777 -p "$(dirname "$QUEUEFILE")" || error_mes "unknown"
   echo "[II]: Create file '$QUEUEFILE'"
-  touch "$QUEUEFILE" || (echo "[EE] Unknown error"; exit 1)
+  touch "$QUEUEFILE" || error_mes "unknown"
   chmod 777 "$QUEUEFILE"
 fi
 # check priority
-isnum "$PRIORITY" || (echo "[EE]: '$PRIORITY' isn't a number"; exit 1)
+isnum "$PRIORITY" || error_mes "number" "$PRIORITY"
+# check sleep time
+isnum "$SLEEPTIME" && SLEEPTIME=$(($SLEEPTIME*60)) || error_mes "number" "$SLEEPTIME"
 
 
 # work block
@@ -139,11 +116,11 @@ cd /
     CALC=0
     for FILE in $(ls "$JOBDIR/"); do
       [ -d "$JOBDIR/$FILE" ] && continue
-      pgrep "$JOBDIR/$FILE" &> /dev/null && CALC=$(($CALC+1))
+      (ps aux | grep "$JOBDIR/$FILE" | grep --quiet --invert-match "grep") && CALC=$(($CALC+1))
     done
     
     # running job
-    if [ "$CALC" = "0" ]; then
+    if [[ "$CALC" = "0" ]]; then
       CURJOB_PRIOR=$(head -1 "$QUEUEFILE" | awk -F "==" '{print $1}')
       CURJOB=$(head -1 "$QUEUEFILE" | awk -F "==" '{print $2}')
       for JOB in $(cat "$QUEUEFILE"); do
@@ -157,13 +134,13 @@ cd /
       if [ -z "$CURJOB" ]; then
         echo "[II] You haven't job"
       else
-        mv "$CURJOB"* "$JOBDIR/" && (echo "[II] Running job '$CURJOB' (priority '$CURJOB_PRIOR') as '$CURJOB_USER'"; su -c "/bin/sh "$JOBDIR/$(basename "$CURJOB")" &> "$JOBDIR/$(basename "$CURJOB")".log" $CURJOB_USER ) || echo "[WW] Missing files for job '$CURJOB'"
+        mv "$CURJOB"* "$JOBDIR/" && start_job || echo "[WW] Missing files for job '$CURJOB'"
       fi
     else
       echo "[II] You have a running job"
     fi
     
-    # wait for 60 seconds
-    sleep 60
+    # wait
+    sleep $SLEEPTIME
   done
 ) &
