@@ -40,6 +40,7 @@ How-to run jobs
 * create priority file (`script.sh.pr`) with the job priority if it is needed
 * create user file (`script.sh.user`) with the job username if it is needed
 * copy files to `$WORKDIR`
+
 Also you may use `add_queued`.
 
 See also
