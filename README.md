@@ -41,6 +41,7 @@ Dependencies
 Installation
 ------------
 * download sources
-* copy source to `/`:
+* run `install.sh` from source directory:
 
-        sudo cp ../queued/* /
+        cd queued
+        sudo ./install.sh "/path/to/root"
