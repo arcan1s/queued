@@ -7,14 +7,10 @@ Daemon for starting jobs to queue of calculations. To start deamon just run `sys
 
 help message
 ------------
-    queued [ -jd | --jobdir /var/lib/queued/job ] [ --priority 0 ] [ -q | --queuefile /var/lib/queued/queue ] [ -u | --user root ] [ -wd | --workdir /var/lib/queued/work ] [-v | --version ] [ -h | --help ]
+    queued [ -c /etc/queued.conf ] [ -v | --version ] [ -h | --help ]
 
     Parametrs:
-      -jd  --jobdir    PATH     - path to job directory. Default is '/var/lib/queued/job'
-           --priority  NUM      - defalut priority. Default is '0'
-      -q   --queuefile PATH     - path to queue file. Default is '/var/lib/queued/queue'
-      -u   --user      USERNAME - start jobs by user. Default is 'root'
-      -wd  --workdir   PATH     - path to work directory. Default is '/var/lib/queued/work'
+      -c               PATH     - path to configuration file. Default is `/etc/queued.conf`
       -v   --version            - show version and exit
       -h   --help               - show this help and exit
 
@@ -29,6 +25,10 @@ How-to run jobs
 * create user file (`script.sh.user`) with the job username if it is needed
 * copy files to `$WORKDIR`
 
+See also
+--------
+    man 1 queued
+    man 5 queued.conf
 
 Instruction
 ===========
