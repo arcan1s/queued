@@ -2,15 +2,15 @@
 # Maintainer: Evgeniy "arcanis" Alexeev <esalexeev@gmail.com>
 
 pkgname=queued
-pkgver=1.0.0
+pkgver=1.1.0
 pkgrel=1
 pkgdesc="Daemon for starting jobs to queue of calculations"
 arch=('any')
 url="https://github.com/arcan1s/queued"
 license=("GPL")
 makedeps=('git')
-source=(https://github.com/arcan1s/queued/releases/download/V.${pkgver}/${pkgname}-${pkgver}.tar.xz)
-md5sums=('d93c8cf20804b07b47645b0c43d45d3d')
+source=(https://github.com/arcan1s/queued/releases/download/V.${pkgver}/${pkgname}-${pkgver}-src.tar.xz)
+md5sums=('c7f710d8779e7cd780f7e8043735cae7')
 backup=('etc/queued.conf')
 
 package()
