@@ -20,7 +20,7 @@ func_help() {
 func_ver() {
   echo -e "                         queued                         "
   echo -e "Simple daemon for starting jobs to queue of calculations"
-  echo -e "Version : 1.0.0                          License : GPLv3"
+  echo -e "Version : 1.1.0                          License : GPLv3"
   echo -e "Author :                     Evgeniy Alexeev aka arcanis"
   echo -e "E-mail :                        esalexeev (at) gmail.com"
   exit 0
@@ -100,6 +100,9 @@ if [ ! -d "$(dirname "$QUEUEFILE")" ]; then
   fi
   echo "[II]: Create directory '$(dirname "$QUEUEFILE")'"
   mkdir -m777 -p "$(dirname "$QUEUEFILE")" || (echo "[EE] Unknown error"; exit 1)
+  echo "[II]: Create file '$QUEUEFILE'"
+  touch "$QUEUEFILE" || (echo "[EE] Unknown error"; exit 1)
+  chmod 777 "$QUEUEFILE"
 fi
 # check priority
 isnum "$PRIORITY" || (echo "[EE]: '$PRIORITY' isn't a number"; exit 1)
@@ -108,7 +111,6 @@ isnum "$PRIORITY" || (echo "[EE]: '$PRIORITY' isn't a number"; exit 1)
 # work block
 # change cwd
 cd /
-# output to /dev/null
 < /dev/null > /dev/null 2>&1 &
 
 # forking
@@ -130,30 +132,7 @@ cd /
         CURJOB_PRIOR="$PRIORITY"
       fi
       echo "[II] Setting priority to '$CURJOB_PRIOR'"
-      if [ ! -e "$QUEUEFILE" ]; then
-        echo "$CURJOB_PRIOR==$WORKDIR/$FILE" > "$QUEUEFILE"
-        chmod 777 "$QUEUEFILE"
-      else
-        if [[ $(cat "$QUEUEFILE") = "" ]]; then
-          echo "$CURJOB_PRIOR==$WORKDIR/$FILE" >> "$QUEUEFILE"
-        else
-          LASTLINE=""
-          for JOB in $(cat "$QUEUEFILE"); do
-            JOB_PRIOR=$(echo "$JOB" | awk -F "==" '{print $1}')
-            if [[ $JOB_PRIOR < $CURJOB_PRIOR ]]; then
-              LASTLINE="$JOB"
-              continue
-            fi
-            if [ -z "$LASTLINE" ]; then
-              sed -i '1i '"$CURJOB_PRIOR==$WORKDIR/$FILE" "$QUEUEFILE"
-            else
-              sed -i '/'$LASTLINE'/a '"$CURJOB_PRIOR==$WORKDIR/$FILE" "$QUEUEFILE"
-            fi
-            break
-          done
-          grep --quiet "$WORKDIR/$FILE" "$QUEUEFILE" || echo "$CURJOB_PRIOR==$WORKDIR/$FILE" >> "$QUEUEFILE"
-        fi
-      fi
+      echo "$CURJOB_PRIOR==$WORKDIR/$FILE" >> "$QUEUEFILE"
     done
     
     # check running job
@@ -165,15 +144,21 @@ cd /
     
     # running job
     if [ "$CALC" = "0" ]; then
-    (
-      CURJOB=$(tail -1 "$QUEUEFILE" | awk -F "==" '{print $2}')
-      [ -z "$CURJOB" ] && break
-      sed -i '$d' "$QUEUEFILE"
-      [ -e "$CURJOB".user ] && CUR_USER="$(cat "$CURJOB".user)" || CUR_USER="$STARTASUSER"
-      mv "$CURJOB"* "$JOBDIR/" 2> /dev/null || break
-      echo "[II] Running job '$CURJOB'"
-      su -c "/bin/sh "$JOBDIR/$(basename "$CURJOB")" &> "$JOBDIR/$(basename "$CURJOB")".log" $CUR_USER &
-    )
+      CURJOB_PRIOR=$(head -1 "$QUEUEFILE" | awk -F "==" '{print $1}')
+      CURJOB=$(head -1 "$QUEUEFILE" | awk -F "==" '{print $2}')
+      for JOB in $(cat "$QUEUEFILE"); do
+        if [[ "$(echo "$JOB" | awk -F "==" '{print $1}')" > "$CURJOB_PRIOR" ]]; then
+          CURJOB_PRIOR=$(echo "$JOB" | awk -F "==" '{print $1}')
+          CURJOB=$(echo "$JOB" | awk -F "==" '{print $2}')
+        fi
+      done
+      [ -e "$CURJOB".user ] && CURJOB_USER="$(cat "$CURJOB".user)" || CURJOB_USER="$STARTASUSER"
+      sed '/'"$(basename "$CURJOB")"'/d' -i "$QUEUEFILE"
+      if [ -z "$CURJOB" ]; then
+        echo "[II] You haven't job"
+      else
+        mv "$CURJOB"* "$JOBDIR/" && (echo "[II] Running job '$CURJOB' (priority '$CURJOB_PRIOR') as '$CURJOB_USER'"; su -c "/bin/sh "$JOBDIR/$(basename "$CURJOB")" &> "$JOBDIR/$(basename "$CURJOB")".log" $CURJOB_USER ) || echo "[WW] Missing files for job '$CURJOB'"
+      fi
     else
       echo "[II] You have a running job"
     fi
