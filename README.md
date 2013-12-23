@@ -5,6 +5,10 @@ Information
 -----------
 Daemon for starting jobs to queue of calculations. To start deamon just run `systemctl start queued` as root.
 
+License
+-------
+GPLv3
+
 help message
 ------------
     queued [ -c /etc/queued.conf ] [ -v | --version ] [ -h | --help ]
