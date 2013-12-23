@@ -12,21 +12,23 @@ GPLv3
 help message
 ------------
 * queued:
-    queued [ -c /etc/queued.conf ] [ -v | --version ] [ -h | --help ]
 
-    Parametrs:
-      -c               PATH     - path to configuration file. Default is `/etc/queued.conf`
-      -v   --version            - show version and exit
-      -h   --help               - show this help and exit
-    
+        queued [ -c /etc/queued.conf ] [ -v | --version ] [ -h | --help ]
+
+        Parametrs:
+            -c               PATH     - path to configuration file. Default is `/etc/queued.conf`
+            -v   --version            - show version and exit
+            -h   --help               - show this help and exit
+
 * add_queued:
-    add_queued [ -c /etc/queued.conf ] [ -p NUM ] [ -u USER ] [ -h | --help ] /path/to/script
 
-    Parameters:
-      -c               PATH     - path to configuration file. Default is '/etc/queued.conf'
-      -p               NUM      - job priority
-      -u               USER     - username
-      -h   --help               - show this help and exit
+        add_queued [ -c /etc/queued.conf ] [ -p NUM ] [ -u USER ] [ -h | --help ] /path/to/script
+
+        Parameters:
+            -c               PATH     - path to configuration file. Default is '/etc/queued.conf'
+            -p               NUM      - job priority
+            -u               USER     - username
+            -h   --help               - show this help and exit
 
 Configuration
 -------------
