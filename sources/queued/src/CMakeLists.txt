@@ -1,0 +1,20 @@
+# set files
+file (GLOB_RECURSE SUBPROJECT_SOURCES "*.cpp")
+file (GLOB_RECURSE SUBPROJECT_HEADERS "*.h" "${PROJECT_LIBRARY_DIR}/*h")
+
+# include_path
+include_directories ("${PROJECT_LIBRARY_DIR}/include"
+                     "${CMAKE_CURRENT_BINARY_DIR}"
+                     "${CMAKE_BINARY_DIR}"
+                     "${Qt_INCLUDE}")
+
+qt5_wrap_cpp (SUBPROJECT_MOC_SOURCES "${SUBPROJECT_HEADERS}")
+
+add_library ("${SUBPROJECT}" SHARED "${SUBPROJECT_SOURCES}" "${SUBPROJECT_HEADERS}"
+        "${SUBPROJECT_MOC_SOURCES}")
+set_target_properties ("${SUBPROJECT}" PROPERTIES
+        SOVERSION "${PROJECT_VERSION_MAJOR}"
+        VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+target_link_libraries ("${SUBPROJECT}" "${Qt_LIBRARIES}")
+# install properties
+install (TARGETS "${SUBPROJECT}" DESTINATION "${LIB_INSTALL_DIR}")

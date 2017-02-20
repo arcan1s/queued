@@ -31,6 +31,7 @@
 
 
 typedef QHash<long long, QueuedProcess *> QueuedProcessMap;
+typedef QHash<long long, QMetaObject::Connection> QueuedProcessConnectionMap;
 
 /**
  * @brief implementation over QProcess to run processes
@@ -103,6 +104,10 @@ private slots:
                       const long long _index);
 
 private:
+    /**
+     * @brief connection map
+     */
+    QueuedProcessConnectionMap m_connections;
     /**
      * @brief action on exit
      */

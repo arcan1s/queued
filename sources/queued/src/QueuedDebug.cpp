@@ -13,20 +13,32 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file Queued.h
- * Header of Queued library
+ * @file QueuedDebug.cpp
+ * Source code of queued library
  * @author Evgeniy Alekseev
- * @copyright MIT
+ * @copyright GPLv3
  * @bug https://github.com/arcan1s/queued/issues
  */
 
 
-#ifndef QUEUED_H
-#define QUEUED_H
+#include "queued/Queued.h"
 
-#include "QueuedDatabase.h"
-#include "QueuedDebug.h"
-#include "QueuedProcess.h"
-#include "QueuedProcessManager.h"
+#include "version.h"
 
-#endif /* QUEUED_H */
+
+Q_LOGGING_CATEGORY(LOG_CTL, "org.queued.control", QtMsgType::QtWarningMsg)
+Q_LOGGING_CATEGORY(LOG_DBUS, "org.queued.dbus", QtMsgType::QtWarningMsg)
+Q_LOGGING_CATEGORY(LOG_LIB, "org.queued.library", QtMsgType::QtWarningMsg)
+Q_LOGGING_CATEGORY(LOG_PL, "org.queued.plugin", QtMsgType::QtWarningMsg)
+Q_LOGGING_CATEGORY(LOG_SERV, "org.queued.server", QtMsgType::QtWarningMsg)
+
+
+/**
+ * @fn getBuildData
+ */
+QStringList QueuedDebug::getBuildData()
+{
+    QStringList metadata;
+
+    return metadata;
+}

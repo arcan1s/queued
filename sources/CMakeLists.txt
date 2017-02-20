@@ -9,7 +9,7 @@ if (POLICY CMP0063)
     cmake_policy(SET CMP0063 OLD)
 endif ()
 
-project(awesomewidgets)
+project(queued)
 set(PROJECT_AUTHOR "Evgeniy Alekseev")
 set(PROJECT_CONTACT "esalexeev@gmail.com")
 set(PROJECT_LICENSE "MIT")
