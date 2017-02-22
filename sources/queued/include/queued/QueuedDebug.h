@@ -48,6 +48,10 @@ Q_DECLARE_LOGGING_CATEGORY(LOG_PL)
  */
 Q_DECLARE_LOGGING_CATEGORY(LOG_SERV)
 
+/**
+ * @defgroup QueuedDebug
+ * @brief Queued debug functions
+ */
 namespace QueuedDebug
 {
 /**

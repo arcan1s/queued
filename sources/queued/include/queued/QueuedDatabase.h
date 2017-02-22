@@ -29,8 +29,6 @@
 #include <QSqlDatabase>
 
 
-typedef QHash<QString, QStringList> QueuedDBSchema;
-
 /**
  * @brief queued adaptor to databases
  */
@@ -38,13 +36,6 @@ class QueuedDatabase : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString path READ path)
-
-    // TODO add fields SQL parameters (type whatever), Qt specific types
-    const QueuedDBSchema DBSchema = {
-        {"users",
-         {"_id", "name", "uid", "gid", "password_sha512", "email", "cpu", "gpu",
-          "memory", "gpumemory", "storage"}},
-        {"tasks", {"_id", "userId", "command", "arguments", "workDirectory"}}};
 
 public:
     /**

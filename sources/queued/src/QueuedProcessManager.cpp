@@ -142,5 +142,8 @@ void QueuedProcessManager::taskFinished(const int _exitCode,
     qCDebug(LOG_LIB) << "Process" << _index << "finished with code" << _exitCode
                      << "and status" << _exitStatus;
 
+    emit(taskStopTimeReceived(_index, QDateTime::currentDateTimeUtc()));
     // TODO implementation
+    // TODO emit signal for new task here
+    // emit(taskStartTimeReceived(_index, QDateTime::currentDateTimeUtc()));
 }

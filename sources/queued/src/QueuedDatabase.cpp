@@ -27,6 +27,8 @@
 #include <QSqlQuery>
 #include <QSqlRecord>
 
+#include "queued/QueuedDatabaseSchema.h"
+
 
 /**
  * @fn QueuedDatabase
@@ -80,7 +82,8 @@ void QueuedDatabase::open(const QString _hostname, const int _port,
 void QueuedDatabase::checkDatabase()
 {
     QStringList tables = m_database.tables();
-    for (auto table : DBSchema.keys()) {
+    QStringList schemaTables = QueuedDB::DBSchema.keys();
+    for (auto &table : schemaTables) {
         // create table if does not exist
         if (!tables.contains(table))
             createTable(table);
@@ -113,13 +116,16 @@ void QueuedDatabase::createSchema(const QString _table)
         columns.append(record.fieldName(i));
 
     // check and append if any
-    for (auto column : DBSchema[_table]) {
+    QStringList schemaColumns = QueuedDB::DBSchema[_table].keys();
+    for (auto &column : schemaColumns) {
         if (columns.contains(column))
             continue;
+        QueuedDBField field = QueuedDB::DBSchema[_table][column];
         QSqlQuery query
-            = m_database.exec(QString("ALTER TABLE '%1' add column `%2`")
+            = m_database.exec(QString("ALTER TABLE '%1' ADD `%2` %3")
                                   .arg(_table)
-                                  .arg(column));
+                                  .arg(column)
+                                  .arg(field.sqlDescription));
         QSqlError error = query.lastError();
         if (error.isValid())
             qCCritical(LOG_LIB) << "Could not insert column" << column

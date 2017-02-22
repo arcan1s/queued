@@ -24,13 +24,22 @@
 #ifndef QUEUEDPROCESSMANAGER_H
 #define QUEUEDPROCESSMANAGER_H
 
+#include <QDateTime>
 #include <QHash>
 #include <QObject>
 
 #include "queued/QueuedProcess.h"
 
 
+/**
+ * @typedef QueuedProcessMap
+ * map of indices to QueuedProcess pointers
+ */
 typedef QHash<long long, QueuedProcess *> QueuedProcessMap;
+/**
+ * @typedef QueuedProcessConnectionMap
+ * map of indices to related QMetaObject::Connection
+ */
 typedef QHash<long long, QMetaObject::Connection> QueuedProcessConnectionMap;
 
 /**
@@ -91,6 +100,20 @@ public:
      * @param _index         task index
      */
     void remove(const long long _index);
+
+signals:
+    /**
+     * @brief signal which will be called on task start
+     * @param _index         task index
+     * @param _time          task start time
+     */
+    void taskStartTimeReceived(const long long _index, const QDateTime _time);
+    /**
+     * @brief signal which will be called on task end
+     * @param _index         task index
+     * @param _time          task stop time
+     */
+    void taskStopTimeReceived(const long long _index, const QDateTime _time);
 
 private slots:
     /**
