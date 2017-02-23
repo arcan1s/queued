@@ -27,6 +27,8 @@
 #include <QProcess>
 #include <QVariant>
 
+#include "QueuedEnums.h"
+
 
 /**
  * @struct QueuedProcessDefinition
@@ -46,8 +48,8 @@ typedef struct {
     QString cmd;
     QStringList args;
     QString workingDirectory;
-    int uid;
-    int gid;
+    unsigned int uid;
+    unsigned int gid;
 } QueuedProcessDefinitions;
 
 
@@ -61,28 +63,6 @@ class QueuedProcess : public QProcess
     Q_PROPERTY(QString name READ name)
 
 public:
-    /**
-     * @enum LimitType
-     * @brief available limit types
-     * @var LimitType::CPUThreads
-     * limit on CPU threads count
-     * @var LimitType::GPUThreads
-     * limit on GPU threads count
-     * @var LimitType::Memory
-     * limit on physical memory
-     * @var LimitType::GPUMemory
-     * limit on GPU memory
-     * @var LimitType::Storage
-     * limit on storage
-     */
-    enum class LimitType {
-        CPUThreads = 1,
-        GPUThreads = 2,
-        Memory = 4,
-        GPUMemory = 8,
-        Storage = 16
-    };
-
     /**
      * @brief QueuedProcess class constructor
      * @param parent         pointer to parent item
@@ -110,20 +90,20 @@ public:
      * @brief remove limit
      * @param _limitType     limit type
      */
-    virtual void removeLimit(const LimitType _limitType);
+    virtual void removeLimit(const QueuedEnums::LimitType _limitType);
     /**
      * @brief set limit
      * @param _limitType     limit type
      * @param _value         limit value
      */
-    virtual void setLimit(const LimitType _limitType,
-                          const QVariant _value = QVariant());
+    virtual void setLimit(const QueuedEnums::LimitType _limitType,
+                          const QVariant &_value = QVariant());
     /**
      * @brief equal operator implementation
      * @param _other         other object
      * @return true if objects are equal
      */
-    bool operator==(const QueuedProcess _other);
+    bool operator==(const QueuedProcess &_other);
 
 protected:
     /**
@@ -149,7 +129,7 @@ private:
     /**
      * @brief limits array
      */
-    QMap<LimitType, long long> m_limits;
+    QMap<QueuedEnums::LimitType, long long> m_limits;
     /**
      * @brief convert QString memory value to integer
      * @param _value         value to convert

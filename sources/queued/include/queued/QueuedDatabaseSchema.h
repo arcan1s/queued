@@ -55,13 +55,14 @@ typedef QHash<QString, QHash<QString, QueuedDBField>> QueuedDBSchema;
  */
 namespace QueuedDB
 {
+/**
+ * @brief database schema
+ */
 const QueuedDBSchema DBSchema = {
     {"users",
      {{"_id",
        {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
       {"name", {"name", "TEXT NOT NULL DEFAULT '0'", QVariant::String}},
-      {"uid", {"uid", "INT NOT NULL DEFAULT 0", QVariant::UInt}},
-      {"gid", {"gid", "INT NOT NULL DEFAULT 0", QVariant::UInt}},
       {"passwordSHA512", {"passwordSHA512", "TEXT", QVariant::String}},
       {"email", {"email", "TEXT", QVariant::String}},
       {"cpu", {"cpu", "INT", QVariant::LongLong}},
@@ -69,7 +70,7 @@ const QueuedDBSchema DBSchema = {
       {"memory", {"memory", "INT", QVariant::LongLong}},
       {"gpumemory", {"gpumemory", "INT", QVariant::LongLong}},
       {"storage", {"storage", "INT", QVariant::LongLong}},
-      {"permissions", {"permissions", "INT", QVariant::LongLong}}}},
+      {"permissions", {"permissions", "INT", QVariant::UInt}}}},
     {"tasks",
      {{"_id",
        {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
@@ -77,7 +78,7 @@ const QueuedDBSchema DBSchema = {
       {"command", {"command", "TEXT", QVariant::String}},
       {"arguments", {"arguments", "TEXT", QVariant::String}},
       {"workDirectory", {"workDirectory", "TEXT", QVariant::String}},
-      {"nice", {"nice", "INT", QVariant::Int}},
+      {"nice", {"nice", "INT", QVariant::UInt}},
       {"startTime", {"startTime", "INT", QVariant::LongLong}},
       {"endTime", {"endTime", "INT", QVariant::LongLong}}}}};
 };

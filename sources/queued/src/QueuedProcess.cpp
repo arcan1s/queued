@@ -77,7 +77,7 @@ QString QueuedProcess::name() const
 /**
  * @fn removeLimit
  */
-void QueuedProcess::removeLimit(const LimitType _limitType)
+void QueuedProcess::removeLimit(const QueuedEnums::LimitType _limitType)
 {
     qCDebug(LOG_LIB) << "Remove limit" << static_cast<int>(_limitType);
 
@@ -88,7 +88,8 @@ void QueuedProcess::removeLimit(const LimitType _limitType)
 /**
  * @fn setLimit
  */
-void QueuedProcess::setLimit(const LimitType _limitType, const QVariant _value)
+void QueuedProcess::setLimit(const QueuedEnums::LimitType _limitType,
+                             const QVariant &_value)
 {
     qCDebug(LOG_LIB) << "Set limit" << static_cast<int>(_limitType) << "to"
                      << _value;
@@ -111,7 +112,7 @@ void QueuedProcess::setLimit(const LimitType _limitType, const QVariant _value)
 /**
  * @fn operator==
  */
-bool QueuedProcess::operator==(const QueuedProcess _other)
+bool QueuedProcess::operator==(const QueuedProcess &_other)
 {
     return name() == _other.name();
 }

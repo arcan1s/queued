@@ -115,20 +115,44 @@ void QueuedProcessManager::remove(const long long _index)
     if (!m_processes.contains(_index))
         return;
 
-    QueuedProcess *process = m_processes.take(_index);
+    QueuedProcess *pr = m_processes.take(_index);
     auto connection = m_connections.take(_index);
     disconnect(connection);
 
     switch (m_onExit) {
     case OnExitAction::Kill:
-        process->kill();
+        pr->kill();
         break;
     case OnExitAction::Terminate:
-        process->terminate();
+        pr->terminate();
         break;
     }
 
-    process->deleteLater();
+    pr->deleteLater();
+}
+
+
+/**
+ * @fn stop
+ */
+void QueuedProcessManager::stop(const long long _index)
+{
+    qCDebug(LOG_LIB) << "Stop task" << _index;
+
+    auto pr = process(_index);
+    if (!pr) {
+        qCWarning(LOG_LIB) << "No task" << _index << "found";
+        return;
+    }
+
+    switch (m_onExit) {
+    case OnExitAction::Kill:
+        pr->kill();
+        break;
+    case OnExitAction::Terminate:
+        pr->terminate();
+        break;
+    }
 }
 
 

@@ -28,7 +28,7 @@
 #include <QHash>
 #include <QObject>
 
-#include "queued/QueuedProcess.h"
+#include "QueuedProcess.h"
 
 
 /**
@@ -100,6 +100,11 @@ public:
      * @param _index         task index
      */
     void remove(const long long _index);
+    /**
+     * @brief force stop task
+     * @param _index         task index
+     */
+    void stop(const long long _index);
 
 signals:
     /**

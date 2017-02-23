@@ -14,6 +14,7 @@ const char SPECIAL_THANKS[] = "";
 
 // configuration
 // use define here instead of normal const definition for moc
+#cmakedefine BUILD_DOCS
 #cmakedefine BUILD_FUTURE
 #cmakedefine BUILD_LOAD
 #cmakedefine BUILD_TESTING
@@ -53,6 +54,7 @@ const char COVERITY_EXECUTABLE[] = "@COVERITY_EXECUTABLE@";
 const char COVERITY_URL[] = "@COVERITY_URL@";
 const char CPPCHECK_EXECUTABLE[] = "@CPPCHECK_EXECUTABLE@";
 // additional functions
+const char PROP_DOCS[] = "@BUILD_DOCS@";
 const char PROP_FUTURE[] = "@BUILD_FUTURE@";
 const char PROP_LOAD[] = "@BUILD_LOAD@";
 const char PROP_TEST[] = "@BUILD_TESTING@";

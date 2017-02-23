@@ -26,6 +26,7 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <queued/QueuedDatabaseSchema.h>
 
 #include "queued/QueuedDatabaseSchema.h"
 
@@ -55,24 +56,27 @@ QueuedDatabase::~QueuedDatabase()
 
 
 /**
- * @fn open
+ * @fn add
  */
-void QueuedDatabase::open(const QString _hostname, const int _port,
-                          const QString _username, const QString _password)
+bool QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
 {
-    qCDebug(LOG_LIB) << "Open database at" << _hostname << _port << "as user"
-                     << _username;
+    qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
 
-    if (!_hostname.isEmpty())
-        m_database.setHostName(_hostname);
-    if (_port > 0)
-        m_database.setPort(_port);
-    bool status = _username.isEmpty() ? m_database.open()
-                                      : m_database.open(_username, _password);
+    auto payload = getQueryPayload(_table, _value);
+    // build query
+    QSqlQuery query
+        = m_database.exec(QString("INSERT INTO %1 (%2) VALUES (%3)")
+                              .arg(_table)
+                              .arg(payload.first.join(QChar(',')))
+                              .arg(payload.second.join(QChar(','))));
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
+                            << _table << "message" << error.text();
+        return false;
+    }
 
-    qCDebug(LOG_LIB) << "Open database status" << status;
-    if (status)
-        return checkDatabase();
+    return true;
 }
 
 
@@ -94,6 +98,151 @@ void QueuedDatabase::checkDatabase()
 
 
 /**
+ * @fn createAdministrator
+ */
+void QueuedDatabase::createAdministrator(const QString &_user,
+                                         const QString &_password)
+{
+    qCDebug(LOG_LIB) << "Check for user" << _user;
+    QString table("users");
+
+    QSqlQuery query = m_database.exec(
+        QString("SELECT * FROM '%1' WHERE name='%2'").arg(table).arg(_user));
+    QSqlError error = query.lastError();
+    if (error.isValid())
+        qCWarning(LOG_LIB) << "Could not get record" << _user << "from" << table
+                           << "message" << error.text();
+    else if (query.size() > 0)
+        return;
+
+    qCInfo(LOG_LIB) << "Create administrator user" << _user;
+    QVariantHash payload = {
+        {"name", _user},
+        {"password", _password},
+        {"permissions", static_cast<int>(QueuedEnums::Permission::SuperAdmin)}};
+
+    if (!add(table, payload))
+        qCCritical(LOG_LIB) << "Could not create administrator";
+}
+
+
+/**
+ * @fn get
+ */
+QList<QVariantHash> QueuedDatabase::get(const QString &_table)
+{
+    qCDebug(LOG_LIB) << "Get records in table" << _table;
+
+    QList<QVariantHash> output;
+    QSqlQuery query = m_database.exec(
+        QString("SELECT * FROM '%1' ORDER BY _id DESC").arg(_table));
+
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCWarning(LOG_LIB) << "Could not get records from" << _table
+                           << "message" << error.text();
+        return output;
+    }
+    QSqlRecord record = query.record();
+
+    QStringList columns = QueuedDB::DBSchema[_table].keys();
+    auto dbColumns = getColumnsInRecord(columns, record);
+    while (query.next()) {
+        QVariantHash entry;
+        for (auto &column : columns)
+            entry[column] = query.value(dbColumns[column]);
+        output.append(entry);
+    }
+
+    return output;
+}
+
+
+/**
+ * @fn get
+ */
+QVariantHash QueuedDatabase::get(const QString &_table, const long long _id)
+{
+    qCDebug(LOG_LIB) << "Get record" << _id << "in table" << _table;
+
+    QVariantHash output;
+    QSqlQuery query = m_database.exec(
+        QString("SELECT * FROM '%1' WHERE _id=%2").arg(_table).arg(_id));
+
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCWarning(LOG_LIB) << "Could not get record" << _id << "from" << _table
+                           << "message" << error.text();
+        return output;
+    }
+    QSqlRecord record = query.record();
+
+    QStringList columns = QueuedDB::DBSchema[_table].keys();
+    auto dbColumns = getColumnsInRecord(columns, record);
+    while (query.next()) {
+        output.clear();
+        for (auto &column : columns)
+            output[column] = query.value(dbColumns[column]);
+    }
+
+    return output;
+}
+
+
+/**
+ * @fn modify
+ */
+bool QueuedDatabase::modify(const QString &_table, const long long _id,
+                            const QVariantHash &_value)
+{
+    qCDebug(LOG_LIB) << "Modify record" << _id << "in table" << _table
+                     << "with value" << _value;
+
+    auto payload = getQueryPayload(_table, _value);
+    QStringList stringPayload;
+    for (int i = 0; i < payload.first.count(); i++)
+        stringPayload.append(QString("%1='%2'")
+                                 .arg(payload.first.at(i))
+                                 .arg(payload.second.at(i)));
+    // build query
+    QSqlQuery query = m_database.exec(QString("UPDATE %1 SET %2 WHERE _id=%3")
+                                          .arg(_table)
+                                          .arg(stringPayload.join(QChar(',')))
+                                          .arg(_id));
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
+                            << _table << "message" << error.text();
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
+ * @fn open
+ */
+void QueuedDatabase::open(const QString &_hostname, const int _port,
+                          const QString &_username, const QString &_password)
+{
+    qCDebug(LOG_LIB) << "Open database at" << _hostname << _port << "as user"
+                     << _username;
+
+    if (!_hostname.isEmpty())
+        m_database.setHostName(_hostname);
+    if (_port > 0)
+        m_database.setPort(_port);
+    bool status = _username.isEmpty() ? m_database.open()
+                                      : m_database.open(_username, _password);
+
+    qCDebug(LOG_LIB) << "Open database status" << status;
+    if (status)
+        return checkDatabase();
+}
+
+
+/**
  * @fn path
  */
 QString QueuedDatabase::path() const
@@ -105,7 +254,7 @@ QString QueuedDatabase::path() const
 /**
  * @fn createSchema
  */
-void QueuedDatabase::createSchema(const QString _table)
+void QueuedDatabase::createSchema(const QString &_table)
 {
     qCDebug(LOG_LIB) << "Create schema for" << _table;
 
@@ -138,7 +287,7 @@ void QueuedDatabase::createSchema(const QString _table)
 /**
  * @fn createTable
  */
-void QueuedDatabase::createTable(const QString _table)
+void QueuedDatabase::createTable(const QString &_table)
 {
     qCDebug(LOG_LIB) << "Create table" << _table;
 
@@ -149,4 +298,48 @@ void QueuedDatabase::createTable(const QString _table)
     if (error.isValid())
         qCCritical(LOG_LIB) << "Could not create table" << _table
                             << "error:" << error.text();
+}
+
+
+/**
+ * @fn getColumnsInRecord
+ */
+QHash<QString, int>
+QueuedDatabase::getColumnsInRecord(const QStringList &_columns,
+                                   const QSqlRecord &_record) const
+{
+    qCDebug(LOG_LIB) << "Search for columns" << _columns;
+
+    return std::accumulate(
+        _columns.begin(), _columns.end(), QHash<QString, int>(),
+        [&_record](QHash<QString, int> &map, const QString &column) {
+            map[column] = _record.indexOf(column);
+            return map;
+        });
+}
+
+
+/**
+ * @fn getQueryPayload
+ */
+QPair<QStringList, QStringList>
+QueuedDatabase::getQueryPayload(const QString &_table,
+                                const QVariantHash &_value) const
+{
+    qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
+
+    QStringList keys;
+    QStringList values;
+    QStringList schemaColumns = QueuedDB::DBSchema[_table].keys();
+    for (auto &key : _value.keys()) {
+        if (!schemaColumns.contains(key)) {
+            qCWarning(LOG_LIB) << "No key" << key << "found in schema of"
+                               << _table;
+            continue;
+        }
+        keys.append(key);
+        values.append(QString("'%1'").arg(_value[key].toString()));
+    }
+
+    return {keys, values};
 }

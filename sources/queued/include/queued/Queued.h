@@ -26,7 +26,9 @@
 
 #include "QueuedDatabase.h"
 #include "QueuedDebug.h"
+#include "QueuedEnums.h"
 #include "QueuedProcess.h"
 #include "QueuedProcessManager.h"
+#include "QueuedUser.h"
 
 #endif /* QUEUED_H */
