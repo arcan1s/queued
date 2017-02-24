@@ -54,9 +54,9 @@ public:
      * @brief add record to database
      * @param _table         table name
      * @param _value         value to insert
-     * @return true on success
+     * @return index of inserted record or -1 if no insertion
      */
-    bool add(const QString &_table, const QVariantHash &_value);
+    long long add(const QString &_table, const QVariantHash &_value);
     /**
      * @brief check and create database
      */
@@ -133,6 +133,12 @@ private:
     QHash<QString, int> getColumnsInRecord(const QStringList &_columns,
                                            const QSqlRecord &_record) const;
     /**
+     * @brief last insertion ID
+     * @param _table         table name
+     * @return last insertion id from table
+     */
+    long long lastInsertionId(const QString &_table) const;
+    /**
      * @brief additional function to get payload for query
      * @param _table         table name for search
      * @param _value         value to build payload
@@ -141,5 +147,6 @@ private:
     QPair<QStringList, QStringList>
     getQueryPayload(const QString &_table, const QVariantHash &_value) const;
 };
+
 
 #endif /* QUEUEDDATABASE_H */

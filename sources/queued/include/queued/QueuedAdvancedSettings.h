@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file Queued.h
+ * @file QueuedAdvancedSettings.h
  * Header of Queued library
  * @author Evgeniy Alekseev
  * @copyright MIT
@@ -21,18 +21,39 @@
  */
 
 
-#ifndef QUEUED_H
-#define QUEUED_H
+#ifndef QUEUEDADVANCEDSETTINGS_H
+#define QUEUEDADVANCEDSETTINGS_H
 
-#include "QueuedAdvancedSettings.h"
+#include <QObject>
+
 #include "QueuedConfiguration.h"
-#include "QueuedDatabase.h"
-#include "QueuedDebug.h"
-#include "QueuedEnums.h"
-#include "QueuedProcess.h"
-#include "QueuedProcessManager.h"
-#include "QueuedSettings.h"
-#include "QueuedTokenManager.h"
-#include "QueuedUser.h"
 
-#endif /* QUEUED_H */
+
+/**
+ * @brief implementation over database stored settings
+ */
+class QueuedAdvancedSettings : public QObject
+{
+    Q_OBJECT
+
+public:
+    /**
+     * @brief QueuedAdvancedSettings class constructor
+     * @param parent         pointer to parent item
+     */
+    explicit QueuedAdvancedSettings(QObject *parent);
+    /**
+     * @brief QueuedAdvancedSettings class destructor
+     */
+    virtual ~QueuedAdvancedSettings();
+    /**
+     * @brief upload configuration from database in to internal format
+     * @param _value         configuration values from database
+     */
+    void setValues(const QList<QVariantHash> &_values);
+
+private:
+};
+
+
+#endif /* QUEUEDADVANCEDSETTINGS_H */

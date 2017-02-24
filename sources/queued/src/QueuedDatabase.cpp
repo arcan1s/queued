@@ -58,7 +58,7 @@ QueuedDatabase::~QueuedDatabase()
 /**
  * @fn add
  */
-bool QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
+long long QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
 {
     qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
 
@@ -73,10 +73,10 @@ bool QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
     if (error.isValid()) {
         qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
                             << _table << "message" << error.text();
-        return false;
+        return -1;
     }
 
-    return true;
+    return lastInsertionId(_table);
 }
 
 
@@ -269,7 +269,7 @@ void QueuedDatabase::createSchema(const QString &_table)
     for (auto &column : schemaColumns) {
         if (columns.contains(column))
             continue;
-        QueuedDBField field = QueuedDB::DBSchema[_table][column];
+        QueuedDB::QueuedDBField field = QueuedDB::DBSchema[_table][column];
         QSqlQuery query
             = m_database.exec(QString("ALTER TABLE '%1' ADD `%2` %3")
                                   .arg(_table)
@@ -316,6 +316,29 @@ QueuedDatabase::getColumnsInRecord(const QStringList &_columns,
             map[column] = _record.indexOf(column);
             return map;
         });
+}
+
+
+/**
+ * @fn lastInsertionId
+ */
+long long QueuedDatabase::lastInsertionId(const QString &_table) const
+{
+    qCDebug(LOG_LIB) << "Get last row ID from" << _table;
+
+    QSqlQuery query
+        = m_database.exec(QString("SELECT max(_id) FROM '%1'").arg(_table));
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCCritical(LOG_LIB) << "Could not get last insertion ID";
+        return -1;
+    }
+
+    long long id;
+    while (query.next())
+        id = query.value(0).toLongLong();
+
+    return id;
 }
 
 

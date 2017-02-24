@@ -13,26 +13,43 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file Queued.h
- * Header of Queued library
+ * @file QueuedAdvancedSettings.cpp
+ * Source code of queued library
  * @author Evgeniy Alekseev
- * @copyright MIT
+ * @copyright GPLv3
  * @bug https://github.com/arcan1s/queued/issues
  */
 
 
-#ifndef QUEUED_H
-#define QUEUED_H
+#include "queued/Queued.h"
 
-#include "QueuedAdvancedSettings.h"
-#include "QueuedConfiguration.h"
-#include "QueuedDatabase.h"
-#include "QueuedDebug.h"
-#include "QueuedEnums.h"
-#include "QueuedProcess.h"
-#include "QueuedProcessManager.h"
-#include "QueuedSettings.h"
-#include "QueuedTokenManager.h"
-#include "QueuedUser.h"
 
-#endif /* QUEUED_H */
+/**
+ * @class QueuedAdvancedSettings
+ */
+/**
+ * @fn QueuedAdvancedSettings
+ */
+QueuedAdvancedSettings::QueuedAdvancedSettings(QObject *parent)
+    : QObject(parent)
+{
+    qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
+}
+
+
+/**
+ * @fn ~QueuedAdvancedSettings
+ */
+QueuedAdvancedSettings::~QueuedAdvancedSettings()
+{
+    qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
+}
+
+
+/**
+ * @fn setValues
+ */
+void QueuedAdvancedSettings::setValues(const QList<QVariantHash> &_values)
+{
+    qCDebug(LOG_LIB) << "Set values from" << _values;
+}

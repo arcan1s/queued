@@ -99,7 +99,7 @@ void QueuedProcess::setLimit(const QueuedEnums::LimitType _limitType,
 
     bool status = false;
     long long intValue = _value.type() == QVariant::String
-                             ? convertMemory(_value.toString(), status)
+                             ? convertMemory(_value.toString(), &status)
                              : _value.toLongLong(&status);
 
     if (!status)
@@ -141,21 +141,21 @@ void QueuedProcess::run()
 /**
  * @fn convertMemory
  */
-long long QueuedProcess::convertMemory(QString _value, bool &_status) const
+long long QueuedProcess::convertMemory(QString _value, bool *_status) const
 {
     qCDebug(LOG_LIB) << "Convert memory value" << _value;
 
     long long intValue;
     if (_value.endsWith(QString("K")))
-        intValue = _value.remove(QString("K")).toLongLong(&_status) * 1024;
+        intValue = _value.remove(QString("K")).toLongLong(_status) * 1024;
     else if (_value.endsWith(QString("M")))
         intValue
-            = _value.remove(QString("M")).toLongLong(&_status) * 1024 * 1024;
+            = _value.remove(QString("M")).toLongLong(_status) * 1024 * 1024;
     else if (_value.endsWith(QString("G")))
-        intValue = _value.remove(QString("G")).toLongLong(&_status) * 1024
-                   * 1024 * 1024;
+        intValue = _value.remove(QString("G")).toLongLong(_status) * 1024 * 1024
+                   * 1024;
     else
-        intValue = _value.toInt(&_status);
+        intValue = _value.toInt(_status);
 
     qCInfo(LOG_LIB) << "Converted value" << intValue;
     return intValue;

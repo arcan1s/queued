@@ -32,7 +32,8 @@
 /**
  * @fn QueuedUser
  */
-QueuedUser::QueuedUser(QObject *parent, const QueuedUserDefinitions &definitions,
+QueuedUser::QueuedUser(QObject *parent,
+                       const QueuedUserDefinitions &definitions,
                        const long long index)
     : QObject(parent)
     , m_definitions(definitions)

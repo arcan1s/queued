@@ -32,17 +32,6 @@
 
 
 /**
- * @typedef QueuedProcessMap
- * map of indices to QueuedProcess pointers
- */
-typedef QHash<long long, QueuedProcess *> QueuedProcessMap;
-/**
- * @typedef QueuedProcessConnectionMap
- * map of indices to related QMetaObject::Connection
- */
-typedef QHash<long long, QMetaObject::Connection> QueuedProcessConnectionMap;
-
-/**
  * @brief implementation over QProcess to run processes
  */
 class QueuedProcessManager : public QObject
@@ -51,6 +40,18 @@ class QueuedProcessManager : public QObject
     Q_PROPERTY(OnExitAction onExit READ onExit)
 
 public:
+    /**
+ * @typedef QueuedProcessMap
+ * map of indices to QueuedProcess pointers
+ */
+    typedef QHash<long long, QueuedProcess *> QueuedProcessMap;
+    /**
+     * @typedef QueuedProcessConnectionMap
+     * map of indices to related QMetaObject::Connection
+     */
+    typedef QHash<long long, QMetaObject::Connection>
+        QueuedProcessConnectionMap;
+
     /**
      * @enum OnExitAction
      * @brief action with child process on destruction
@@ -77,8 +78,9 @@ public:
      * @param _definitions   process definitions
      * @return pointer to created task
      */
-    QueuedProcess *add(const long long _index,
-                       const QueuedProcessDefinitions _definitions);
+    QueuedProcess *
+    add(const long long _index,
+        const QueuedProcess::QueuedProcessDefinitions _definitions);
     /**
      * @brief default action on exit
      * @return default action from possible ones
@@ -145,5 +147,6 @@ private:
      */
     QueuedProcessMap m_processes;
 };
+
 
 #endif /* QUEUEDPROCESS_H */

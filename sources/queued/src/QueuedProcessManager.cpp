@@ -52,9 +52,9 @@ QueuedProcessManager::~QueuedProcessManager()
 /**
  * @fn add
  */
-QueuedProcess *
-QueuedProcessManager::add(const long long _index,
-                          const QueuedProcessDefinitions _definitions)
+QueuedProcess *QueuedProcessManager::add(
+    const long long _index,
+    const QueuedProcess::QueuedProcessDefinitions _definitions)
 {
     qCDebug(LOG_LIB) << "Add new process" << _definitions.cmd << "with index"
                      << _index;
@@ -99,7 +99,7 @@ QueuedProcess *QueuedProcessManager::process(const long long _index)
 /**
  * @fn processes
  */
-QueuedProcessMap QueuedProcessManager::processes()
+QueuedProcessManager::QueuedProcessMap QueuedProcessManager::processes()
 {
     return m_processes;
 }

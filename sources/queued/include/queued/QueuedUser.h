@@ -31,41 +31,6 @@
 
 
 /**
- * @struct QueuedUserDefinition
- * @brief structure to define user
- * @var name
- * user name
- * @var email
- * user email
- * @var passwordSHA512
- * password hash, may be empty
- * @var permissions
- * user permissions
- * @var cpuLimit
- * user limit by CPU
- * @var gpuLimit
- * user limit by GPU
- * @var memoryLimit
- * user limit by memory
- * @var gpumemoryLimit
- * user limit by GPU memory
- * @var storageLimit
- * user limit by storage
- */
-typedef struct {
-    QString name;
-    QString email;
-    QString passwordSHA512;
-    unsigned int permissions;
-    long long cpuLimit;
-    long long gpuLimit;
-    long long memoryLimit;
-    long long gpumemoryLimit;
-    long long storageLimit;
-} QueuedUserDefinitions;
-
-
-/**
  * @brief representation of user in queued
  */
 class QueuedUser : public QObject
@@ -92,6 +57,40 @@ class QueuedUser : public QObject
                    NOTIFY userUpdated)
 
 public:
+    /**
+     * @struct QueuedUserDefinition
+     * @brief structure to define user
+     * @var name
+     * user name
+     * @var email
+     * user email
+     * @var passwordSHA512
+     * password hash, may be empty
+     * @var permissions
+     * user permissions
+     * @var cpuLimit
+     * user limit by CPU
+     * @var gpuLimit
+     * user limit by GPU
+     * @var memoryLimit
+     * user limit by memory
+     * @var gpumemoryLimit
+     * user limit by GPU memory
+     * @var storageLimit
+     * user limit by storage
+     */
+    typedef struct {
+        QString name;
+        QString email;
+        QString passwordSHA512;
+        unsigned int permissions;
+        long long cpuLimit;
+        long long gpuLimit;
+        long long memoryLimit;
+        long long gpumemoryLimit;
+        long long storageLimit;
+    } QueuedUserDefinitions;
+
     /**
      * @brief QueuedUser class constructor
      * @param parent         pointer to parent item

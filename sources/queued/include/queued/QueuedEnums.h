@@ -32,6 +32,7 @@
 namespace QueuedEnums
 {
 /**
+ * @ingroup QueuedEnums
  * @enum LimitType
  * @brief available limit types
  * @var LimitType::CPUThreads
@@ -54,9 +55,8 @@ enum LimitType {
 };
 Q_DECLARE_FLAGS(LimitTypes, LimitType)
 Q_DECLARE_OPERATORS_FOR_FLAGS(LimitTypes)
-
-
 /**
+ * @ingroup QueuedEnums
  * @enum Permissions
  * @brief available user permissions
  * @var Permissions::Admin

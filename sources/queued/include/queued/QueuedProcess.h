@@ -31,29 +31,6 @@
 
 
 /**
- * @struct QueuedProcessDefinition
- * @brief structure to define process
- * @var cmd
- * command line
- * @var args
- * command line arguments
- * @var workingDirectory
- * path to working directory
- * @var uid
- * UID of process
- * @var gid
- * GID of process
- */
-typedef struct {
-    QString cmd;
-    QStringList args;
-    QString workingDirectory;
-    unsigned int uid;
-    unsigned int gid;
-} QueuedProcessDefinitions;
-
-
-/**
  * @brief implementation over QProcess to run processes
  */
 class QueuedProcess : public QProcess
@@ -63,6 +40,28 @@ class QueuedProcess : public QProcess
     Q_PROPERTY(QString name READ name)
 
 public:
+    /**
+     * @struct QueuedProcessDefinition
+     * @brief structure to define process
+     * @var cmd
+     * command line
+     * @var args
+     * command line arguments
+     * @var workingDirectory
+     * path to working directory
+     * @var uid
+     * UID of process
+     * @var gid
+     * GID of process
+     */
+    typedef struct {
+        QString cmd;
+        QStringList args;
+        QString workingDirectory;
+        unsigned int uid;
+        unsigned int gid;
+    } QueuedProcessDefinitions;
+
     /**
      * @brief QueuedProcess class constructor
      * @param parent         pointer to parent item
@@ -129,14 +128,15 @@ private:
     /**
      * @brief limits array
      */
-    QMap<QueuedEnums::LimitType, long long> m_limits;
+    QHash<QueuedEnums::LimitType, long long> m_limits;
     /**
      * @brief convert QString memory value to integer
      * @param _value         value to convert
-     * @param _status        convertion status
+     * @param _status        conversion status
      * @return converted integer
      */
-    long long convertMemory(QString _value, bool &_status) const;
+    long long convertMemory(QString _value, bool *_status) const;
 };
+
 
 #endif /* QUEUEDPROCESS_H */

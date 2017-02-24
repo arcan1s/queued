@@ -55,6 +55,7 @@ Q_DECLARE_LOGGING_CATEGORY(LOG_SERV)
 namespace QueuedDebug
 {
 /**
+ * @ingroup QueuedDebug
  * @brief default log format
  */
 const char LOG_FORMAT[] = "[%{time "
@@ -64,6 +65,7 @@ const char LOG_FORMAT[] = "[%{time "
                           "%{message}";
 
 /**
+ * @ingroup QueuedDebug
  * @brief additional method to get build details declared in version.h
  */
 QStringList getBuildData();

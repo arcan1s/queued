@@ -19,6 +19,13 @@ const char SPECIAL_THANKS[] = "";
 #cmakedefine BUILD_LOAD
 #cmakedefine BUILD_TESTING
 
+// paths
+const char BIN_INSTALL_DIR[] = "@BIN_INSTALL_DIR@";
+const char DATA_INSTALL_DIR[] = "@DATA_INSTALL_DIR@";
+const char INCLUDE_INSTALL_DIR[] = "@INCLUDE_INSTALL_DIR@";
+const char LIB_INSTALL_DIR[] = "@LIB_INSTALL_DIR@";
+const char ROOT_INSTALL_DIR[] = "@CMAKE_INSTALL_PREFIX@";
+
 // links
 const char HOMEPAGE[] = "https://arcanis.me/projects/queued";
 const char REPOSITORY[] = "https://github.com/arcan1s/queued";
