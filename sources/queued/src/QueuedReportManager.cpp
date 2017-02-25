@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file QueuedAdvancedSettings.cpp
+ * @file QueuedReportManager.cpp
  * Source code of queued library
  * @author Evgeniy Alekseev
  * @copyright GPLv3
@@ -25,57 +25,24 @@
 
 
 /**
- * @class QueuedAdvancedSettings
+ * @class QueuedReportManager
  */
 /**
- * @fn QueuedAdvancedSettings
+ * @fn QueuedReportManager
  */
-QueuedAdvancedSettings::QueuedAdvancedSettings(QObject *parent)
+QueuedReportManager::QueuedReportManager(QObject *parent,
+                                         QueuedDatabase *database)
     : QObject(parent)
+    , m_database(database)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 }
 
 
 /**
- * @fn ~QueuedAdvancedSettings
+ * @fn ~QueuedReportManager
  */
-QueuedAdvancedSettings::~QueuedAdvancedSettings()
+QueuedReportManager::~QueuedReportManager()
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
-}
-
-
-/**
- * @fn get
- */
-QVariant QueuedAdvancedSettings::get(const QString &_key) const
-{
-    qCDebug(LOG_LIB) << "Looking for key" << _key;
-
-    return m_values[_key];
-}
-
-
-/**
- * @fn set
- */
-void QueuedAdvancedSettings::set(const QString &_key, const QVariant &_value)
-{
-    qCDebug(LOG_LIB) << "Set value" << _value << "for key" << _key;
-
-    m_values[_key] = _value;
-    emit(valueUpdated(_key, _value));
-}
-
-
-/**
- * @fn set
- */
-void QueuedAdvancedSettings::set(const QList<QVariantHash> &_values)
-{
-    qCDebug(LOG_LIB) << "Set values from" << _values;
-
-    for (auto &pair : _values)
-        set(pair[QString("key")].toString(), pair[QString("value")]);
 }

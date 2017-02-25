@@ -82,6 +82,11 @@ public:
     add(const long long _index,
         const QueuedProcess::QueuedProcessDefinitions _definitions);
     /**
+     * @brief add tasks from database
+     * @param _processes     database stored tasks
+     */
+    void add(const QList<QVariantHash> &_processes);
+    /**
      * @brief default action on exit
      * @return default action from possible ones
      */
@@ -141,7 +146,7 @@ private:
     /**
      * @brief action on exit
      */
-    OnExitAction m_onExit = OnExitAction::Kill;
+    OnExitAction m_onExit = OnExitAction::Terminate;
     /**
      * @brief processes list
      */

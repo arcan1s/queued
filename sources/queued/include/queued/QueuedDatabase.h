@@ -70,9 +70,11 @@ public:
     /**
      * @brief get all records from table
      * @param _table         table name
+     * @param _condition     optional condition string
      * @return list of records from table
      */
-    QList<QVariantHash> get(const QString &_table);
+    QList<QVariantHash> get(const QString &_table,
+                            const QString &_condition = QString());
     /**
      * @brief get record from table with given id
      * @param _table         table name

@@ -26,7 +26,6 @@
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
-#include <queued/QueuedDatabaseSchema.h>
 
 #include "queued/QueuedDatabaseSchema.h"
 
@@ -129,13 +128,17 @@ void QueuedDatabase::createAdministrator(const QString &_user,
 /**
  * @fn get
  */
-QList<QVariantHash> QueuedDatabase::get(const QString &_table)
+QList<QVariantHash> QueuedDatabase::get(const QString &_table,
+                                        const QString &_condition)
 {
-    qCDebug(LOG_LIB) << "Get records in table" << _table;
+    qCDebug(LOG_LIB) << "Get records in table" << _table << "with condition"
+                     << _condition;
 
     QList<QVariantHash> output;
-    QSqlQuery query = m_database.exec(
-        QString("SELECT * FROM '%1' ORDER BY _id DESC").arg(_table));
+    QSqlQuery query
+        = m_database.exec(QString("SELECT * FROM '%1' ORDER BY _id DESC %1")
+                              .arg(_table)
+                              .arg(_condition));
 
     QSqlError error = query.lastError();
     if (error.isValid()) {
@@ -165,27 +168,16 @@ QVariantHash QueuedDatabase::get(const QString &_table, const long long _id)
 {
     qCDebug(LOG_LIB) << "Get record" << _id << "in table" << _table;
 
-    QVariantHash output;
-    QSqlQuery query = m_database.exec(
-        QString("SELECT * FROM '%1' WHERE _id=%2").arg(_table).arg(_id));
-
-    QSqlError error = query.lastError();
-    if (error.isValid()) {
-        qCWarning(LOG_LIB) << "Could not get record" << _id << "from" << _table
-                           << "message" << error.text();
-        return output;
+    auto output = get(_table, QString("WHERE _id=%1").arg(_id));
+    if (output.count() == 0) {
+        qCWarning(LOG_LIB) << "Could not find records for" << _id;
+        return QVariantHash();
+    } else if (output.count() == 1) {
+        return output.at(0);
+    } else {
+        qCWarning(LOG_LIB) << "Too many records found for" << _id;
+        return output.at(0);
     }
-    QSqlRecord record = query.record();
-
-    QStringList columns = QueuedDB::DBSchema[_table].keys();
-    auto dbColumns = getColumnsInRecord(columns, record);
-    while (query.next()) {
-        output.clear();
-        for (auto &column : columns)
-            output[column] = query.value(dbColumns[column]);
-    }
-
-    return output;
 }
 
 

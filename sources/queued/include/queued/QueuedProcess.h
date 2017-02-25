@@ -24,6 +24,7 @@
 #ifndef QUEUEDPROCESS_H
 #define QUEUEDPROCESS_H
 
+#include <QDateTime>
 #include <QProcess>
 #include <QVariant>
 
@@ -43,9 +44,9 @@ public:
     /**
      * @struct QueuedProcessDefinition
      * @brief structure to define process
-     * @var cmd
+     * @var command
      * command line
-     * @var args
+     * @var arguments
      * command line arguments
      * @var workingDirectory
      * path to working directory
@@ -53,13 +54,25 @@ public:
      * UID of process
      * @var gid
      * GID of process
+     * @var nice
+     * nice level of process
+     * @var startTime
+     * process start time
+     * @var endTime
+     * process end time
+     * @var user
+     * task owner ID
      */
     typedef struct {
-        QString cmd;
-        QStringList args;
+        QString command;
+        QStringList arguments;
         QString workingDirectory;
         unsigned int uid;
         unsigned int gid;
+        unsigned int nice;
+        QDateTime startTime;
+        QDateTime endTime;
+        long long user;
     } QueuedProcessDefinitions;
 
     /**
@@ -115,6 +128,11 @@ public slots:
      * @brief run process
      */
     void run();
+    /**
+     * @brief set end time
+     * @param _time          process end time
+     */
+     void setEndTime(const QDateTime &_time);
 
 private:
     /**

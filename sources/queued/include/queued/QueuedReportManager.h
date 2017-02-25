@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file Queued.h
+ * @file QueuedReportManager.h
  * Header of Queued library
  * @author Evgeniy Alekseev
  * @copyright MIT
@@ -21,21 +21,39 @@
  */
 
 
-#ifndef QUEUED_H
-#define QUEUED_H
+#ifndef QUEUEDREPORTMANAGER_H
+#define QUEUEDREPORTMANAGER_H
 
-#include "QueuedAdvancedSettings.h"
-#include "QueuedConfiguration.h"
-#include "QueuedCore.h"
-#include "QueuedDatabase.h"
-#include "QueuedDebug.h"
-#include "QueuedEnums.h"
-#include "QueuedProcess.h"
-#include "QueuedProcessManager.h"
-#include "QueuedReportManager.h"
-#include "QueuedSettings.h"
-#include "QueuedTokenManager.h"
-#include "QueuedUser.h"
-#include "QueuedUserManager.h"
+#include <QObject>
 
-#endif /* QUEUED_H */
+
+class QueuedDatabase;
+
+/**
+ * @brief report manager for queued
+ */
+class QueuedReportManager : public QObject
+{
+    Q_OBJECT
+
+public:
+    /**
+     * @brief QueuedReportManager class constructor
+     * @param parent         pointer to parent item
+     * @param database       pointer to database object
+     */
+    explicit QueuedReportManager(QObject *parent, QueuedDatabase *database);
+    /**
+     * @brief QueuedReportManager class destructor
+     */
+    virtual ~QueuedReportManager();
+
+private:
+    /**
+     * @brief pointer to database object
+     */
+    QueuedDatabase *m_database = nullptr;
+};
+
+
+#endif /* QUEUEDREPORTMANAGER_H */

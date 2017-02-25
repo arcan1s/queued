@@ -22,6 +22,7 @@
 
 
 #include "queued/Queued.h"
+#include <queued/Queued.h>
 
 
 /**
@@ -56,8 +57,8 @@ QueuedProcess *QueuedProcessManager::add(
     const long long _index,
     const QueuedProcess::QueuedProcessDefinitions _definitions)
 {
-    qCDebug(LOG_LIB) << "Add new process" << _definitions.cmd << "with index"
-                     << _index;
+    qCDebug(LOG_LIB) << "Add new process" << _definitions.command
+                     << "with index" << _index;
 
     if (m_processes.contains(_index))
         return m_processes[_index];
@@ -73,6 +74,36 @@ QueuedProcess *QueuedProcessManager::add(
         });
 
     return process;
+}
+
+
+/**
+ * @fn add
+ */
+void QueuedProcessManager::add(const QList<QVariantHash> &_processes)
+{
+    qCDebug(LOG_LIB) << "Add tasks from" << _processes;
+
+    for (auto &pr : _processes) {
+        QueuedProcess::QueuedProcessDefinitions defs;
+        // parameters
+        defs.command = pr[QString("command")].toString();
+        defs.arguments
+            = pr[QString("arguments")].toString().split(QChar('\x01'));
+        defs.workingDirectory = pr[QString("workDirectory")].toString();
+        defs.nice = pr[QString("nice")].toUInt();
+        // user data
+        defs.uid = pr[QString("uid")].toUInt();
+        defs.gid = pr[QString("gid")].toUInt();
+        defs.user = pr[QString("user")].toLongLong();
+        // metadata
+        defs.startTime = QDateTime::fromString(
+            pr[QString("startTime")].toString(), Qt::ISODate);
+        defs.endTime = QDateTime::fromString(pr[QString("endTime")].toString(),
+                                             Qt::ISODate);
+
+        add(pr[QString("_id")].toLongLong(), defs);
+    }
 }
 
 
@@ -124,6 +155,7 @@ void QueuedProcessManager::remove(const long long _index)
         pr->kill();
         break;
     case OnExitAction::Terminate:
+    default:
         pr->terminate();
         break;
     }
@@ -150,6 +182,7 @@ void QueuedProcessManager::stop(const long long _index)
         pr->kill();
         break;
     case OnExitAction::Terminate:
+    default:
         pr->terminate();
         break;
     }
@@ -166,7 +199,12 @@ void QueuedProcessManager::taskFinished(const int _exitCode,
     qCDebug(LOG_LIB) << "Process" << _index << "finished with code" << _exitCode
                      << "and status" << _exitStatus;
 
-    emit(taskStopTimeReceived(_index, QDateTime::currentDateTimeUtc()));
+    auto pr = process(_index);
+    if (pr) {
+        auto endTime = QDateTime::currentDateTimeUtc();
+        pr->setEndTime(endTime);
+        emit(taskStopTimeReceived(_index, endTime));
+    }
     // TODO implementation
     // TODO emit signal for new task here
     // emit(taskStartTimeReceived(_index, QDateTime::currentDateTimeUtc()));

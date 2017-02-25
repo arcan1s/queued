@@ -25,8 +25,7 @@
 #define QUEUEDADVANCEDSETTINGS_H
 
 #include <QObject>
-
-#include "QueuedConfiguration.h"
+#include <QVariant>
 
 
 /**
@@ -47,12 +46,31 @@ public:
      */
     virtual ~QueuedAdvancedSettings();
     /**
+     * @brief get value
+     * @param _key           key to search in
+     * @return value by key if found
+     */
+    QVariant get(const QString &_key) const;
+    /**
+     * @brief set value
+     * @param _key           key to change
+     * @param _value         value to change
+     */
+    void set(const QString &_key, const QVariant &_value);
+    /**
      * @brief upload configuration from database in to internal format
      * @param _value         configuration values from database
      */
-    void setValues(const QList<QVariantHash> &_values);
+    void set(const QList<QVariantHash> &_values);
+
+signals:
+    void valueUpdated(const QString &_key, const QVariant &_value);
 
 private:
+    /**
+     * @brief stored values
+     */
+    QVariantHash m_values;
 };
 
 

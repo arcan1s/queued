@@ -81,14 +81,13 @@ QString QueuedTokenManager::registerToken(const QDateTime _validUntil)
 
 
 /**
- * @fn setValues
+ * @fn set
  */
-void QueuedTokenManager::setValues(const QList<QVariantHash> &_values)
+void QueuedTokenManager::set(const QList<QVariantHash> &_values)
 {
     qCDebug(LOG_LIB) << "Set values from" << _values;
 
     QDateTime now = QDateTime::currentDateTimeUtc();
-    m_tokens.clear();
     for (auto &token : _values) {
         QDateTime validUntil = QDateTime::fromString(
             token[QString("validUntil")].toString(), Qt::ISODate);

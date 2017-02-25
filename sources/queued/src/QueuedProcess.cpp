@@ -24,6 +24,7 @@
 #include "queued/Queued.h"
 
 #include <unistd.h>
+#include <queued/Queued.h>
 
 
 /**
@@ -41,8 +42,8 @@ QueuedProcess::QueuedProcess(QObject *parent,
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
-    setArguments(m_definitions.args);
-    setProgram(m_definitions.cmd);
+    setArguments(m_definitions.arguments);
+    setProgram(m_definitions.command);
     setWorkingDirectory(m_definitions.workingDirectory);
 }
 
@@ -133,8 +134,19 @@ void QueuedProcess::setupChildProcess()
  */
 void QueuedProcess::run()
 {
-    // TODO set limits to child process and etc
+    m_definitions.startTime = QDateTime::currentDateTimeUtc();
     return start();
+}
+
+
+/**
+ * @fn setEndTime
+ */
+ void QueuedProcess::setEndTime(const QDateTime &_time)
+{
+    qCDebug(LOG_LIB) << "Set end time to" << _time;
+
+    m_definitions.endTime = _time;
 }
 
 

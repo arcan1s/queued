@@ -61,7 +61,7 @@ public:
      * @brief upload tokens from database
      * @param _value         tokens from database
      */
-    void setValues(const QList<QVariantHash> &_values);
+    void set(const QList<QVariantHash> &_values);
 
 public slots:
     /**

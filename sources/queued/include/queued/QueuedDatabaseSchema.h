@@ -35,6 +35,26 @@
 namespace QueuedDB
 {
 /**
+ * @ingroup QueuedDB
+ * @brief settings table name
+ */
+const char SETTINGS_TABLE[] = "settings";
+/**
+* @ingroup QueuedDB
+* @brief tasks table name
+*/
+const char TASKS_TABLE[] = "tasks";
+/**
+* @ingroup QueuedDB
+* @brief tokens table name
+*/
+const char TOKENS_TABLE[] = "tokens";
+/**
+* @ingroup QueuedDB
+* @brief users table name
+*/
+const char USERS_TABLE[] = "users";
+/**
  *@ingroup QueuedDB
 * @struct QueuedDBField
 * @brief describes database column
@@ -61,12 +81,12 @@ typedef QHash<QString, QHash<QString, QueuedDBField>> QueuedDBSchema;
  * @brief database schema
  */
 const QueuedDBSchema DBSchema = {
-    {"settings",
+    {SETTINGS_TABLE,
      {{"_id",
        {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
-      {"key", {"key", "TEXT NOT NULL DEFAULT '0'", QVariant::String}},
+      {"key", {"key", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String}},
       {"value", {"value", "TEXT", QVariant::String}}}},
-    {"tasks",
+    {TASKS_TABLE,
      {{"_id",
        {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
       {"userId", {"userId", "INT NOT NULL DEFAULT 0", QVariant::LongLong}},
@@ -74,20 +94,24 @@ const QueuedDBSchema DBSchema = {
       {"arguments", {"arguments", "TEXT", QVariant::String}},
       {"workDirectory", {"workDirectory", "TEXT", QVariant::String}},
       {"nice", {"nice", "INT", QVariant::UInt}},
+      {"uid", {"uid", "INT", QVariant::UInt}},
+      {"gid", {"gid", "INT", QVariant::UInt}},
       {"startTime", {"startTime", "INT", QVariant::LongLong}},
       {"endTime", {"endTime", "INT", QVariant::LongLong}}}},
-    {"tokens",
+    {TOKENS_TABLE,
      {{"_id",
        {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
-      {"token", {"token", "TEXT NOT NULL DEFAULT '0'", QVariant::String}},
+      {"token",
+       {"token", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String}},
       {"validUntil",
        {"validUntil", "TEXT NOT NULL DEFAULT '0'", QVariant::String}}}},
-    {"users",
+    {USERS_TABLE,
      {{"_id",
        {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
-      {"name", {"name", "TEXT NOT NULL DEFAULT '0'", QVariant::String}},
+      {"name", {"name", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String}},
       {"passwordSHA512", {"passwordSHA512", "TEXT", QVariant::String}},
       {"email", {"email", "TEXT", QVariant::String}},
+      {"lastLogin", {"lastLogin", "TEXT", QVariant::String}},
       {"cpu", {"cpu", "INT", QVariant::LongLong}},
       {"gpu", {"gpu", "INT", QVariant::LongLong}},
       {"memory", {"memory", "INT", QVariant::LongLong}},
