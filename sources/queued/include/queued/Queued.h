@@ -30,6 +30,7 @@
 #include "QueuedDatabase.h"
 #include "QueuedDebug.h"
 #include "QueuedEnums.h"
+#include "QueuedLimits.h"
 #include "QueuedProcess.h"
 #include "QueuedProcessManager.h"
 #include "QueuedReportManager.h"

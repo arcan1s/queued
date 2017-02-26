@@ -54,6 +54,13 @@ public:
     virtual ~QueuedUserManager();
     /**
      * @brief add user
+     * @param _properties    user properties from database
+     * @param _id            user ID
+     * @return pointer to created user
+     */
+    QueuedUser *add(const QVariantHash &_properties, const long long _id);
+    /**
+     * @brief add user
      * @param _definitions   user definitions
      * @param _id            user ID
      * @return pointer to created user
@@ -77,6 +84,12 @@ public:
     bool authorize(const QString &_user, const QString &_token,
                    const QueuedEnums::Permission _service);
     /**
+     * @brief get UID and GID from user ID
+     * @param _id            user id
+     * @return pair of {uid, gid}
+     */
+    QPair<unsigned int, unsigned int> ids(const long long _id);
+    /**
      * @brief load tokens
      * @param _tokens        tokens list from database
      */
@@ -86,6 +99,12 @@ public:
      * @param _users         users list from database
      */
     void loadUsers(const QList<QVariantHash> &_users);
+    /**
+     * @brief user by ID
+     * @param _id            user id for search
+     * @return user by id or nullptr if no user found
+     */
+    QueuedUser *user(const long long _id);
     /**
      * @brief user by name
      * @param _name          user name for search
@@ -103,6 +122,14 @@ public:
      * @param _expiry        token expiration in days
      */
     void setTokenExpiration(const long long &_expiry);
+
+signals:
+    /**
+     * @brief signal which emits on each user successfully login
+     * @param _id            user ID
+     * @param _time          user login time
+     */
+    void userLoggedIn(const long long _id, const QDateTime &_time);
 
 private:
     /**

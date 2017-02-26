@@ -25,6 +25,11 @@
 
 #include <QCryptographicHash>
 
+extern "C" {
+#include <pwd.h>
+#include <sys/types.h>
+}
+
 
 /**
  * @class QueuedUser
@@ -91,6 +96,24 @@ bool QueuedUser::hasPermission(const QueuedEnums::Permission _permission)
     else
         return static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
             .testFlag(_permission);
+}
+
+
+/**
+ * @fn ids
+ */
+QPair<unsigned int, unsigned int> QueuedUser::ids()
+{
+    QPair<unsigned int, unsigned int> system = {1, 1};
+
+    auto pwd = getpwnam(name().toLocal8Bit().constData());
+    if (!pwd) {
+        qCWarning(LOG_LIB) << "No user found by name" << name();
+        return system;
+    }
+    system = {pwd->pw_uid, pwd->pw_gid};
+
+    return system;
 }
 
 
@@ -164,47 +187,11 @@ unsigned int QueuedUser::permissions() const
 
 
 /**
- * @fn cpuLimit
+ * @fn limits
  */
-long long QueuedUser::cpuLimit() const
+QueuedLimits::Limits QueuedUser::limits() const
 {
-    return m_definitions.cpuLimit;
-}
-
-
-/**
- * @fn gpuLimit
- */
-long long QueuedUser::gpuLimit() const
-{
-    return m_definitions.gpuLimit;
-}
-
-
-/**
- * @fn memoryLimit
- */
-long long QueuedUser::memoryLimit() const
-{
-    return m_definitions.memoryLimit;
-}
-
-
-/**
- * @fn gpumemoryLimit
- */
-long long QueuedUser::gpumemoryLimit() const
-{
-    return m_definitions.gpumemoryLimit;
-}
-
-
-/**
- * @fn storageLimit
- */
-long long QueuedUser::storageLimit() const
-{
-    return m_definitions.storageLimit;
+    return m_definitions.limits;
 }
 
 
@@ -253,57 +240,13 @@ void QueuedUser::setPermissions(const unsigned int _permissions)
 
 
 /**
- * @fn setCpuLimit
+ * @fn setLimits
  */
-void QueuedUser::setCpuLimit(const long long _cpuLimit)
+void QueuedUser::setLimits(const QueuedLimits::Limits &_limits)
 {
-    qCDebug(LOG_LIB) << "New user cpu limit" << _cpuLimit;
+    qCDebug(LOG_LIB) << "New user limits" << _limits.toString();
 
-    m_definitions.cpuLimit = _cpuLimit;
-}
-
-
-/**
- * @fn setGpuLimit
- */
-void QueuedUser::setGpuLimit(const long long _gpuLimit)
-{
-    qCDebug(LOG_LIB) << "New user gpu limit" << _gpuLimit;
-
-    m_definitions.gpuLimit = _gpuLimit;
-}
-
-
-/**
- * @fn setMemoryLimit
- */
-void QueuedUser::setMemoryLimit(const long long _memoryLimit)
-{
-    qCDebug(LOG_LIB) << "New user memory limit" << _memoryLimit;
-
-    m_definitions.memoryLimit = _memoryLimit;
-}
-
-
-/**
- * @fn setGpumemoryLimit
- */
-void QueuedUser::setGpumemoryLimit(const long long _gpumemoryLimit)
-{
-    qCDebug(LOG_LIB) << "New user gpu memory limit" << _gpumemoryLimit;
-
-    m_definitions.gpumemoryLimit = _gpumemoryLimit;
-}
-
-
-/**
- * @fn setStorageLimit
- */
-void QueuedUser::setStorageLimit(const long long _storageLimit)
-{
-    qCDebug(LOG_LIB) << "New user storage limit" << _storageLimit;
-
-    m_definitions.storageLimit = _storageLimit;
+    m_definitions.limits = _limits;
 }
 
 

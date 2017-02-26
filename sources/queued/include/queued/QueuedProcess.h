@@ -26,9 +26,8 @@
 
 #include <QDateTime>
 #include <QProcess>
-#include <QVariant>
 
-#include "QueuedEnums.h"
+#include "QueuedLimits.h"
 
 
 /**
@@ -62,6 +61,8 @@ public:
      * process end time
      * @var user
      * task owner ID
+     * @var limits
+     * task limits
      */
     typedef struct {
         QString command;
@@ -73,6 +74,7 @@ public:
         QDateTime startTime;
         QDateTime endTime;
         long long user;
+        QueuedLimits::Limits limits;
     } QueuedProcessDefinitions;
 
     /**
@@ -99,18 +101,6 @@ public:
      */
     QString name() const;
     /**
-     * @brief remove limit
-     * @param _limitType     limit type
-     */
-    virtual void removeLimit(const QueuedEnums::LimitType _limitType);
-    /**
-     * @brief set limit
-     * @param _limitType     limit type
-     * @param _value         limit value
-     */
-    virtual void setLimit(const QueuedEnums::LimitType _limitType,
-                          const QVariant &_value = QVariant());
-    /**
      * @brief equal operator implementation
      * @param _other         other object
      * @return true if objects are equal
@@ -132,7 +122,7 @@ public slots:
      * @brief set end time
      * @param _time          process end time
      */
-     void setEndTime(const QDateTime &_time);
+    void setEndTime(const QDateTime &_time);
 
 private:
     /**
@@ -143,17 +133,6 @@ private:
      * @brief index of process
      */
     long long m_index = -1;
-    /**
-     * @brief limits array
-     */
-    QHash<QueuedEnums::LimitType, long long> m_limits;
-    /**
-     * @brief convert QString memory value to integer
-     * @param _value         value to convert
-     * @param _status        conversion status
-     * @return converted integer
-     */
-    long long convertMemory(QString _value, bool *_status) const;
 };
 
 

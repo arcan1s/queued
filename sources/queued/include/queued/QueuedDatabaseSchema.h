@@ -96,6 +96,7 @@ const QueuedDBSchema DBSchema = {
       {"nice", {"nice", "INT", QVariant::UInt}},
       {"uid", {"uid", "INT", QVariant::UInt}},
       {"gid", {"gid", "INT", QVariant::UInt}},
+      {"limits", {"limits", "TEXT", QVariant::String}},
       {"startTime", {"startTime", "INT", QVariant::LongLong}},
       {"endTime", {"endTime", "INT", QVariant::LongLong}}}},
     {TOKENS_TABLE,
@@ -112,11 +113,7 @@ const QueuedDBSchema DBSchema = {
       {"passwordSHA512", {"passwordSHA512", "TEXT", QVariant::String}},
       {"email", {"email", "TEXT", QVariant::String}},
       {"lastLogin", {"lastLogin", "TEXT", QVariant::String}},
-      {"cpu", {"cpu", "INT", QVariant::LongLong}},
-      {"gpu", {"gpu", "INT", QVariant::LongLong}},
-      {"memory", {"memory", "INT", QVariant::LongLong}},
-      {"gpumemory", {"gpumemory", "INT", QVariant::LongLong}},
-      {"storage", {"storage", "INT", QVariant::LongLong}},
+      {"limits", {"limits", "TEXT", QVariant::String}},
       {"permissions", {"permissions", "INT", QVariant::UInt}}}}};
 };
 

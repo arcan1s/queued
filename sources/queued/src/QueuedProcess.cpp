@@ -23,8 +23,11 @@
 
 #include "queued/Queued.h"
 
-#include <unistd.h>
 #include <queued/Queued.h>
+
+extern "C" {
+#include <unistd.h>
+}
 
 
 /**
@@ -76,41 +79,6 @@ QString QueuedProcess::name() const
 
 
 /**
- * @fn removeLimit
- */
-void QueuedProcess::removeLimit(const QueuedEnums::LimitType _limitType)
-{
-    qCDebug(LOG_LIB) << "Remove limit" << static_cast<int>(_limitType);
-
-    m_limits.remove(_limitType);
-}
-
-
-/**
- * @fn setLimit
- */
-void QueuedProcess::setLimit(const QueuedEnums::LimitType _limitType,
-                             const QVariant &_value)
-{
-    qCDebug(LOG_LIB) << "Set limit" << static_cast<int>(_limitType) << "to"
-                     << _value;
-
-    if (!_value.isValid())
-        return removeLimit(_limitType);
-
-    bool status = false;
-    long long intValue = _value.type() == QVariant::String
-                             ? convertMemory(_value.toString(), &status)
-                             : _value.toLongLong(&status);
-
-    if (!status)
-        removeLimit(_limitType);
-    else
-        m_limits[_limitType] = intValue;
-}
-
-
-/**
  * @fn operator==
  */
 bool QueuedProcess::operator==(const QueuedProcess &_other)
@@ -142,33 +110,9 @@ void QueuedProcess::run()
 /**
  * @fn setEndTime
  */
- void QueuedProcess::setEndTime(const QDateTime &_time)
+void QueuedProcess::setEndTime(const QDateTime &_time)
 {
     qCDebug(LOG_LIB) << "Set end time to" << _time;
 
     m_definitions.endTime = _time;
-}
-
-
-/**
- * @fn convertMemory
- */
-long long QueuedProcess::convertMemory(QString _value, bool *_status) const
-{
-    qCDebug(LOG_LIB) << "Convert memory value" << _value;
-
-    long long intValue;
-    if (_value.endsWith(QString("K")))
-        intValue = _value.remove(QString("K")).toLongLong(_status) * 1024;
-    else if (_value.endsWith(QString("M")))
-        intValue
-            = _value.remove(QString("M")).toLongLong(_status) * 1024 * 1024;
-    else if (_value.endsWith(QString("G")))
-        intValue = _value.remove(QString("G")).toLongLong(_status) * 1024 * 1024
-                   * 1024;
-    else
-        intValue = _value.toInt(_status);
-
-    qCInfo(LOG_LIB) << "Converted value" << intValue;
-    return intValue;
 }

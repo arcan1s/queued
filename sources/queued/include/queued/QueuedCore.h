@@ -26,6 +26,8 @@
 
 #include <QObject>
 
+#include "QueuedLimits.h"
+
 
 class QueuedAdvancedSettings;
 class QueuedDatabase;
@@ -53,14 +55,63 @@ public:
      */
     virtual ~QueuedCore();
     /**
+     * @brief add new task
+     * @param _command       command line
+     * @param _arguments     command arguments
+     * @param _workingDirectory working directory
+     * @param _nice          nice level
+     * @param _userId        task owner user ID
+     * @param _limits        task defined limits
+     * @return true on successfully addition
+     */
+    bool addTask(const QString &_command, const QStringList &_arguments,
+                 const QString &_workingDirectory, const unsigned int _nice,
+                 const long long _userId, const QueuedLimits::Limits &_limits);
+    /**
+     * @brief add new user
+     * @param _name          user name
+     * @param _email         user email
+     * @param _password      user password
+     * @param _permissions   user permissions
+     * @param _limits        user limits
+     * @return true on successfully addition
+     */
+    bool addUser(const QString &_name, const QString &_email,
+                 const QString &_password, const unsigned int _permissions,
+                 const QueuedLimits::Limits &_limits);
+    /**
      * @brief deinit subclasses
      */
     void deinit();
+    /**
+     * @brief edit user
+     * @param _id            user ID to edit
+     * @param _userData      user data to edit
+     * @remark ref
+     * @return
+     */
+    bool editUser(const long long _id, const QVariantHash &_userData);
     /**
      * @brief init subclasses
      * @param _configuration path to configuration file
      */
     void init(const QString &_configuration);
+
+private slots:
+    /**
+     * @brief update process time
+     * @param _id            task id
+     * @param _startTime     task start time or empty
+     * @param _endTime       task end time or empty
+     */
+    void updateTaskTime(const long long _id, const QDateTime &_startTime,
+                        const QDateTime &_endTime);
+    /**
+     * @brief update user login time
+     * @param _id            user ID
+     * @param _time          user login time
+     */
+    void updateUserLoginTime(const long long _id, const QDateTime &_time);
 
 private:
     /**
@@ -87,6 +138,11 @@ private:
      * @brief pointer to user manager
      */
     QueuedUserManager *m_users = nullptr;
+    // additional properties
+    /**
+     * @brief connection list
+     */
+    QList<QMetaObject::Connection> m_connections;
 };
 
 

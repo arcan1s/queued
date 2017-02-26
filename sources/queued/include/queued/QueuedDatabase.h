@@ -51,13 +51,6 @@ public:
      */
     virtual ~QueuedDatabase();
     /**
-     * @brief add record to database
-     * @param _table         table name
-     * @param _value         value to insert
-     * @return index of inserted record or -1 if no insertion
-     */
-    long long add(const QString &_table, const QVariantHash &_value);
-    /**
      * @brief check and create database
      */
     void checkDatabase();
@@ -83,15 +76,6 @@ public:
      */
     QVariantHash get(const QString &_table, const long long _id);
     /**
-     * @brief modify record in table
-     * @param _table         table name
-     * @param _id            id for search
-     * @param _value         value to update
-     * @return true on successfully modification
-     */
-    bool modify(const QString &_table, const long long _id,
-                const QVariantHash &_value);
-    /**
      * @brief open database
      * @param _hostname      hostname to connect, may be empty
      * @param _port          port to connect, may be 0
@@ -106,6 +90,24 @@ public:
      * @return path to used database
      */
     QString path() const;
+
+public slots:
+    /**
+     * @brief add record to database
+     * @param _table         table name
+     * @param _value         value to insert
+     * @return index of inserted record or -1 if no insertion
+     */
+    long long add(const QString &_table, const QVariantHash &_value);
+    /**
+     * @brief modify record in table
+     * @param _table         table name
+     * @param _id            id for search
+     * @param _value         value to update
+     * @return true on successfully modification
+     */
+    bool modify(const QString &_table, const long long _id,
+                const QVariantHash &_value);
 
 private:
     /**

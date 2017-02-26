@@ -28,6 +28,7 @@
 #include <QVariant>
 
 #include "QueuedEnums.h"
+#include "QueuedLimits.h"
 
 
 /**
@@ -45,16 +46,8 @@ class QueuedUser : public QObject
     Q_PROPERTY(unsigned int permissions READ permissions WRITE setPermissions
                    NOTIFY userUpdated)
     // limits
-    Q_PROPERTY(
-        long long cpuLimit READ cpuLimit WRITE setCpuLimit NOTIFY userUpdated)
-    Q_PROPERTY(
-        long long gpuLimit READ gpuLimit WRITE setGpuLimit NOTIFY userUpdated)
-    Q_PROPERTY(long long memoryLimit READ memoryLimit WRITE setMemoryLimit
-                   NOTIFY userUpdated)
-    Q_PROPERTY(long long gpumemoryLimit READ gpumemoryLimit WRITE
-                   setGpumemoryLimit NOTIFY userUpdated)
-    Q_PROPERTY(long long storageLimit READ storageLimit WRITE setStorageLimit
-                   NOTIFY userUpdated)
+    Q_PROPERTY(QueuedLimits::Limits limits READ limits WRITE setLimits NOTIFY
+                   userUpdated)
 
 public:
     /**
@@ -68,27 +61,15 @@ public:
      * password hash, may be empty
      * @var permissions
      * user permissions
-     * @var cpuLimit
-     * user limit by CPU
-     * @var gpuLimit
-     * user limit by GPU
-     * @var memoryLimit
-     * user limit by memory
-     * @var gpumemoryLimit
-     * user limit by GPU memory
-     * @var storageLimit
-     * user limit by storage
+     * @var limits
+     * user defined limits
      */
     typedef struct {
         QString name;
         QString email;
         QString passwordSHA512;
         unsigned int permissions;
-        long long cpuLimit;
-        long long gpuLimit;
-        long long memoryLimit;
-        long long gpumemoryLimit;
-        long long storageLimit;
+        QueuedLimits::Limits limits;
     } QueuedUserDefinitions;
 
     /**
@@ -124,6 +105,11 @@ public:
      * @return true if user has permission otherwise return false
      */
     bool hasPermission(const QueuedEnums::Permission _permission);
+    /**
+     * @brief get UID and GID from user ID
+     * @return pair of {uid, gid}
+     */
+    QPair<unsigned int, unsigned int> ids();
     /**
      * @brief check if password is valid
      * @param _password     password as string
@@ -165,30 +151,10 @@ public:
     unsigned int permissions() const;
     // permissions
     /**
-     * @brief cpu limit
-     * @return cpu limit in cores
+     * @brief user limits
+     * @return user limits
      */
-    long long cpuLimit() const;
-    /**
-     * @brief gpu limit
-     * @return gpu limit in cores
-     */
-    long long gpuLimit() const;
-    /**
-     * @brief memory limit
-     * @return memory limit in bytes
-     */
-    long long memoryLimit() const;
-    /**
-     * @brief GPU memory limit
-     * @return GPU memory limit in bytes
-     */
-    long long gpumemoryLimit() const;
-    /**
-     * @brief storage limit
-     * @return storage limit in bytes
-     */
-    long long storageLimit() const;
+    QueuedLimits::Limits limits() const;
     // main properties
     /**
      * @brief set user email
@@ -212,30 +178,10 @@ public:
     void setPermissions(const unsigned int _permissions);
     // permissions
     /**
-     * @brief set cpu limit
-     * @param _cpuLimit      new cpu limit in cores
+     * @brief set limits
+     * @param _limit         new user limits
      */
-    void setCpuLimit(const long long _cpuLimit);
-    /**
-     * @brief set gpu limit
-     * @param _gpuLimit      new gpu limit in cores
-     */
-    void setGpuLimit(const long long _gpuLimit);
-    /**
-     * @brief set memory limit
-     * @param _memoryLimit   new memory limit in bytes
-     */
-    void setMemoryLimit(const long long _memoryLimit);
-    /**
-     * @brief set GPU memory limit
-     * @param _gpumemoryLimit new GPU memory limit in bytes
-     */
-    void setGpumemoryLimit(const long long _gpumemoryLimit);
-    /**
-     * @brief set storage limit
-     * @param _storageLimit  new storage limit in bytes
-     */
-    void setStorageLimit(const long long _storageLimit);
+    void setLimits(const QueuedLimits::Limits &_limits);
     /**
      * @brief equal operator implementation
      * @param _other         other object

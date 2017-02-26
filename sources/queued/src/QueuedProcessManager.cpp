@@ -53,9 +53,41 @@ QueuedProcessManager::~QueuedProcessManager()
 /**
  * @fn add
  */
+QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
+                                         const long long _index)
+{
+    qCDebug(LOG_LIB) << "Add new process" << _properties << "with index"
+                     << _index;
+
+    QueuedProcess::QueuedProcessDefinitions defs;
+    // parameters
+    defs.command = _properties[QString("command")].toString();
+    defs.arguments
+        = _properties[QString("arguments")].toString().split(QChar('\x01'));
+    defs.workingDirectory = _properties[QString("workDirectory")].toString();
+    defs.nice = _properties[QString("nice")].toUInt();
+    defs.limits
+        = QueuedLimits::Limits(_properties[QString("limits")].toString());
+    // user data
+    defs.uid = _properties[QString("uid")].toUInt();
+    defs.gid = _properties[QString("gid")].toUInt();
+    defs.user = _properties[QString("user")].toLongLong();
+    // metadata
+    defs.startTime = QDateTime::fromString(
+        _properties[QString("startTime")].toString(), Qt::ISODate);
+    defs.endTime = QDateTime::fromString(
+        _properties[QString("endTime")].toString(), Qt::ISODate);
+
+    return add(defs, _index);
+}
+
+
+/**
+ * @fn add
+ */
 QueuedProcess *QueuedProcessManager::add(
-    const long long _index,
-    const QueuedProcess::QueuedProcessDefinitions _definitions)
+    const QueuedProcess::QueuedProcessDefinitions _definitions,
+    const long long _index)
 {
     qCDebug(LOG_LIB) << "Add new process" << _definitions.command
                      << "with index" << _index;
@@ -78,41 +110,14 @@ QueuedProcess *QueuedProcessManager::add(
 
 
 /**
- * @fn add
+ * @fn loadProcesses
  */
-void QueuedProcessManager::add(const QList<QVariantHash> &_processes)
+void QueuedProcessManager::loadProcesses(const QList<QVariantHash> &_processes)
 {
     qCDebug(LOG_LIB) << "Add tasks from" << _processes;
 
-    for (auto &pr : _processes) {
-        QueuedProcess::QueuedProcessDefinitions defs;
-        // parameters
-        defs.command = pr[QString("command")].toString();
-        defs.arguments
-            = pr[QString("arguments")].toString().split(QChar('\x01'));
-        defs.workingDirectory = pr[QString("workDirectory")].toString();
-        defs.nice = pr[QString("nice")].toUInt();
-        // user data
-        defs.uid = pr[QString("uid")].toUInt();
-        defs.gid = pr[QString("gid")].toUInt();
-        defs.user = pr[QString("user")].toLongLong();
-        // metadata
-        defs.startTime = QDateTime::fromString(
-            pr[QString("startTime")].toString(), Qt::ISODate);
-        defs.endTime = QDateTime::fromString(pr[QString("endTime")].toString(),
-                                             Qt::ISODate);
-
-        add(pr[QString("_id")].toLongLong(), defs);
-    }
-}
-
-
-/**
- * @fn onExit
- */
-QueuedProcessManager::OnExitAction QueuedProcessManager::onExit() const
-{
-    return m_onExit;
+    for (auto &processData : _processes)
+        add(processData, processData[QString("_id")].toLongLong());
 }
 
 
@@ -150,7 +155,7 @@ void QueuedProcessManager::remove(const long long _index)
     auto connection = m_connections.take(_index);
     disconnect(connection);
 
-    switch (m_onExit) {
+    switch (onExit()) {
     case OnExitAction::Kill:
         pr->kill();
         break;
@@ -177,7 +182,7 @@ void QueuedProcessManager::stop(const long long _index)
         return;
     }
 
-    switch (m_onExit) {
+    switch (onExit()) {
     case OnExitAction::Kill:
         pr->kill();
         break;
@@ -186,6 +191,15 @@ void QueuedProcessManager::stop(const long long _index)
         pr->terminate();
         break;
     }
+}
+
+
+/**
+ * @fn onExit
+ */
+QueuedProcessManager::OnExitAction QueuedProcessManager::onExit() const
+{
+    return m_onExit;
 }
 
 

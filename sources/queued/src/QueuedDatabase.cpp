@@ -51,31 +51,8 @@ QueuedDatabase::QueuedDatabase(QObject *parent, const QString path,
 QueuedDatabase::~QueuedDatabase()
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
-}
 
-
-/**
- * @fn add
- */
-long long QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
-{
-    qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
-
-    auto payload = getQueryPayload(_table, _value);
-    // build query
-    QSqlQuery query
-        = m_database.exec(QString("INSERT INTO %1 (%2) VALUES (%3)")
-                              .arg(_table)
-                              .arg(payload.first.join(QChar(',')))
-                              .arg(payload.second.join(QChar(','))));
-    QSqlError error = query.lastError();
-    if (error.isValid()) {
-        qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
-                            << _table << "message" << error.text();
-        return -1;
-    }
-
-    return lastInsertionId(_table);
+    m_database.close();
 }
 
 
@@ -182,37 +159,6 @@ QVariantHash QueuedDatabase::get(const QString &_table, const long long _id)
 
 
 /**
- * @fn modify
- */
-bool QueuedDatabase::modify(const QString &_table, const long long _id,
-                            const QVariantHash &_value)
-{
-    qCDebug(LOG_LIB) << "Modify record" << _id << "in table" << _table
-                     << "with value" << _value;
-
-    auto payload = getQueryPayload(_table, _value);
-    QStringList stringPayload;
-    for (int i = 0; i < payload.first.count(); i++)
-        stringPayload.append(QString("%1='%2'")
-                                 .arg(payload.first.at(i))
-                                 .arg(payload.second.at(i)));
-    // build query
-    QSqlQuery query = m_database.exec(QString("UPDATE %1 SET %2 WHERE _id=%3")
-                                          .arg(_table)
-                                          .arg(stringPayload.join(QChar(',')))
-                                          .arg(_id));
-    QSqlError error = query.lastError();
-    if (error.isValid()) {
-        qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
-                            << _table << "message" << error.text();
-        return false;
-    }
-
-    return true;
-}
-
-
-/**
  * @fn open
  */
 void QueuedDatabase::open(const QString &_hostname, const int _port,
@@ -240,6 +186,62 @@ void QueuedDatabase::open(const QString &_hostname, const int _port,
 QString QueuedDatabase::path() const
 {
     return m_path;
+}
+
+
+/**
+ * @fn add
+ */
+long long QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
+{
+    qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
+
+    auto payload = getQueryPayload(_table, _value);
+    // build query
+    QSqlQuery query
+        = m_database.exec(QString("INSERT INTO %1 (%2) VALUES (%3)")
+                              .arg(_table)
+                              .arg(payload.first.join(QChar(',')))
+                              .arg(payload.second.join(QChar(','))));
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
+                            << _table << "message" << error.text();
+        return -1;
+    }
+
+    return lastInsertionId(_table);
+}
+
+
+/**
+ * @fn modify
+ */
+bool QueuedDatabase::modify(const QString &_table, const long long _id,
+                            const QVariantHash &_value)
+{
+    qCDebug(LOG_LIB) << "Modify record" << _id << "in table" << _table
+                     << "with value" << _value;
+
+    auto payload = getQueryPayload(_table, _value);
+    QStringList stringPayload;
+    for (int i = 0; i < payload.first.count(); i++)
+        stringPayload.append(QString("%1='%2'")
+                                 .arg(payload.first.at(i))
+                                 .arg(payload.second.at(i)));
+    // build query
+    QSqlQuery query = m_database.exec(QString("UPDATE %1 SET %2 WHERE _id=%3")
+                                          .arg(_table)
+                                          .arg(stringPayload.join(QChar(',')))
+                                          .arg(_id));
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCCritical(LOG_LIB) << "Could not modify record" << _value << "in table"
+                            << _table << "message" << error.text();
+        return false;
+    }
+
+    return true;
 }
 
 

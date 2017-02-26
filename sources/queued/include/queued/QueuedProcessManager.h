@@ -74,23 +74,25 @@ public:
     virtual ~QueuedProcessManager();
     /**
      * @brief add task
+     * @param _properties    task properties from database
      * @param _index         task index
+     * @return pointer to created task
+     */
+    QueuedProcess *add(const QVariantHash &_properties, const long long _index);
+    /**
+     * @brief add task
      * @param _definitions   process definitions
+     * @param _index         task index
      * @return pointer to created task
      */
     QueuedProcess *
-    add(const long long _index,
-        const QueuedProcess::QueuedProcessDefinitions _definitions);
+    add(const QueuedProcess::QueuedProcessDefinitions _definitions,
+        const long long _index);
     /**
      * @brief add tasks from database
      * @param _processes     database stored tasks
      */
-    void add(const QList<QVariantHash> &_processes);
-    /**
-     * @brief default action on exit
-     * @return default action from possible ones
-     */
-    OnExitAction onExit() const;
+    void loadProcesses(const QList<QVariantHash> &_processes);
     /**
      * @brief task
      * @param _index         task index
@@ -112,6 +114,11 @@ public:
      * @param _index         task index
      */
     void stop(const long long _index);
+    /**
+     * @brief default action on exit
+     * @return default action from possible ones
+     */
+    OnExitAction onExit() const;
 
 signals:
     /**
@@ -119,13 +126,13 @@ signals:
      * @param _index         task index
      * @param _time          task start time
      */
-    void taskStartTimeReceived(const long long _index, const QDateTime _time);
+    void taskStartTimeReceived(const long long _index, const QDateTime &_time);
     /**
      * @brief signal which will be called on task end
      * @param _index         task index
      * @param _time          task stop time
      */
-    void taskStopTimeReceived(const long long _index, const QDateTime _time);
+    void taskStopTimeReceived(const long long _index, const QDateTime &_time);
 
 private slots:
     /**

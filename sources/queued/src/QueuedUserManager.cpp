@@ -56,6 +56,26 @@ QueuedUserManager::~QueuedUserManager()
 /**
  * @fn add
  */
+QueuedUser *QueuedUserManager::add(const QVariantHash &_properties,
+                                   const long long _id)
+{
+    qCDebug(LOG_LIB) << "Add user" << _properties << "with ID" << _id;
+
+    QueuedUser::QueuedUserDefinitions defs;
+    defs.name = _properties[QString("name")].toString();
+    defs.email = _properties[QString("email")].toString();
+    defs.passwordSHA512 = _properties[QString("passwordSHA512")].toString();
+    defs.permissions = _properties[QString("permissions")].toUInt();
+    defs.limits
+        = QueuedLimits::Limits(_properties[QString("limits")].toString());
+
+    return add(defs, _id);
+}
+
+
+/**
+ * @fn add
+ */
 QueuedUser *
 QueuedUserManager::add(const QueuedUser::QueuedUserDefinitions &_definitions,
                        const long long _id)
@@ -82,19 +102,21 @@ QString QueuedUserManager::authorize(const QString &_user,
 {
     qCDebug(LOG_LIB) << "Authorize user" << _user;
 
-    if (!m_users.contains(_user)) {
+    auto userObj = user(_user);
+    if (!userObj) {
         qCInfo(LOG_LIB) << "No user found" << _user;
         return QString();
     }
 
-    bool status = m_users[_user]->isPasswordValid(_password);
+    bool status = userObj->isPasswordValid(_password);
     if (!status) {
         qCInfo(LOG_LIB) << "User password invalid for" << _user;
         return QString();
     }
 
-    QDateTime expiry
-        = QDateTime::currentDateTimeUtc().addDays(tokenExpiration());
+    auto time = QDateTime::currentDateTimeUtc();
+    QDateTime expiry = time.addDays(tokenExpiration());
+    emit(userLoggedIn(userObj->index(), time));
     return m_tokens->registerToken(expiry);
 }
 
@@ -124,6 +146,23 @@ bool QueuedUserManager::authorize(const QString &_user, const QString &_token,
 
 
 /**
+ * @fn ids
+ */
+QPair<unsigned int, unsigned int> QueuedUserManager::ids(const long long _id)
+{
+    qCDebug(LOG_LIB) << "Get ids for user" << _id;
+
+    auto userObj = user(_id);
+    if (!userObj) {
+        qCWarning(LOG_LIB) << "No user found for ID" << _id;
+        return {1, 1};
+    }
+
+    return userObj->ids();
+}
+
+
+/**
  * @fn loadTokens
  */
 void QueuedUserManager::loadTokens(const QList<QVariantHash> &_tokens)
@@ -142,21 +181,25 @@ void QueuedUserManager::loadUsers(const QList<QVariantHash> &_users)
     qCDebug(LOG_LIB) << "Set users from" << _users;
 
     // load now
-    for (auto &userdata : _users) {
-        QueuedUser::QueuedUserDefinitions defs;
-        defs.name = userdata[QString("name")].toString();
-        defs.email = userdata[QString("email")].toString();
-        defs.passwordSHA512 = userdata[QString("passwordSHA512")].toString();
-        defs.permissions = userdata[QString("permissions")].toUInt();
-        // limits
-        defs.cpuLimit = userdata[QString("cpuLimit")].toLongLong();
-        defs.gpuLimit = userdata[QString("gpuLimit")].toLongLong();
-        defs.memoryLimit = userdata[QString("memoryLimit")].toLongLong();
-        defs.gpumemoryLimit = userdata[QString("gpumemoryLimit")].toLongLong();
-        defs.storageLimit = userdata[QString("storageLimit")].toLongLong();
+    for (auto &userData : _users)
+        add(userData, userData[QString("_id")].toLongLong());
+}
 
-        add(defs, userdata[QString("_id")].toLongLong());
+
+/**
+ * @fn user
+ */
+QueuedUser *QueuedUserManager::user(const long long _id)
+{
+    qCDebug(LOG_LIB) << "Look for user" << _id;
+
+    for (auto &userObj : m_users.values()) {
+        if (userObj->index() != _id)
+            continue;
+        return userObj;
     }
+
+    return nullptr;
 }
 
 
@@ -167,7 +210,7 @@ QueuedUser *QueuedUserManager::user(const QString &_name)
 {
     qCDebug(LOG_LIB) << "Look for user" << _name;
 
-    return m_users.contains(_name) ? m_users[_name] : nullptr;
+    return m_users.value(_name, nullptr);
 }
 
 
