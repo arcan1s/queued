@@ -354,6 +354,10 @@ QueuedDatabase::getQueryPayload(const QString &_table,
                                << _table;
             continue;
         }
+        if (key == QString("_id")) {
+            qCWarning(LOG_LIB) << "Modifying record ID is not allowed";
+            continue;
+        }
         keys.append(key);
         values.append(QString("'%1'").arg(_value[key].toString()));
     }

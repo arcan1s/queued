@@ -64,7 +64,7 @@ QueuedUser *QueuedUserManager::add(const QVariantHash &_properties,
     QueuedUser::QueuedUserDefinitions defs;
     defs.name = _properties[QString("name")].toString();
     defs.email = _properties[QString("email")].toString();
-    defs.passwordSHA512 = _properties[QString("passwordSHA512")].toString();
+    defs.password = _properties[QString("password")].toString();
     defs.permissions = _properties[QString("permissions")].toUInt();
     defs.limits
         = QueuedLimits::Limits(_properties[QString("limits")].toString());
@@ -169,7 +169,7 @@ void QueuedUserManager::loadTokens(const QList<QVariantHash> &_tokens)
 {
     qCDebug(LOG_LIB) << "Set tokens from" << _tokens;
 
-    m_tokens->set(_tokens);
+    m_tokens->loadTokens(_tokens);
 }
 
 

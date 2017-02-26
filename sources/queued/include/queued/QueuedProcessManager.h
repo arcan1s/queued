@@ -37,7 +37,7 @@
 class QueuedProcessManager : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(OnExitAction onExit READ onExit)
+    Q_PROPERTY(OnExitAction onExit READ onExit WRITE setOnExitAction)
 
 public:
     /**
@@ -110,15 +110,26 @@ public:
      */
     void remove(const long long _index);
     /**
+     * @brief force start task
+     * @param _index         task index
+     */
+     void start(const long long _index);
+    /**
      * @brief force stop task
      * @param _index         task index
      */
     void stop(const long long _index);
+    // properties
     /**
      * @brief default action on exit
      * @return default action from possible ones
      */
     OnExitAction onExit() const;
+    /**
+     * @brief set on exit action
+     * @param _action        new on exit action
+     */
+    void setOnExitAction(const OnExitAction _action);
 
 signals:
     /**

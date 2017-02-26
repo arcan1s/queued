@@ -53,7 +53,18 @@ QVariant QueuedAdvancedSettings::get(const QString &_key) const
 {
     qCDebug(LOG_LIB) << "Looking for key" << _key;
 
-    return m_values[_key];
+    return m_values.value(_key.toLower(), QVariant());
+}
+
+
+/**
+ * @fn id
+ */
+long long QueuedAdvancedSettings::id(const QString &_key) const
+{
+    qCDebug(LOG_LIB) << "Looking for ID for key" << _key;
+
+    return m_ids.value(_key.toLower(), -1);
 }
 
 
@@ -64,7 +75,7 @@ void QueuedAdvancedSettings::set(const QString &_key, const QVariant &_value)
 {
     qCDebug(LOG_LIB) << "Set value" << _value << "for key" << _key;
 
-    m_values[_key] = _value;
+    m_values[_key.toLower()] = _value;
     emit(valueUpdated(_key, _value));
 }
 
@@ -76,6 +87,9 @@ void QueuedAdvancedSettings::set(const QList<QVariantHash> &_values)
 {
     qCDebug(LOG_LIB) << "Set values from" << _values;
 
-    for (auto &pair : _values)
-        set(pair[QString("key")].toString(), pair[QString("value")]);
+    for (auto &pair : _values) {
+        QString key = pair[QString("key")].toString().toLower();
+        m_ids[key] = pair[QString("_id")].toLongLong();
+        set(key, pair[QString("value")]);
+    }
 }

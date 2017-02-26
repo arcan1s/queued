@@ -122,7 +122,7 @@ QPair<unsigned int, unsigned int> QueuedUser::ids()
  */
 bool QueuedUser::isPasswordValid(const QString &_password) const
 {
-    return (m_definitions.passwordSHA512.toUtf8()
+    return (m_definitions.password.toUtf8()
             == QCryptographicHash::hash(_password.toUtf8(),
                                         QCryptographicHash::Sha512));
 }
@@ -173,7 +173,7 @@ QString QueuedUser::name() const
  */
 QString QueuedUser::password() const
 {
-    return m_definitions.passwordSHA512;
+    return m_definitions.password;
 }
 
 
@@ -224,7 +224,7 @@ void QueuedUser::setPassword(const QString _password)
 {
     qCDebug(LOG_LIB) << "New user passoword SHA" << _password;
 
-    m_definitions.passwordSHA512 = _password;
+    m_definitions.password = _password;
 }
 
 

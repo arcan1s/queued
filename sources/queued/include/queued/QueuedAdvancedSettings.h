@@ -52,6 +52,12 @@ public:
      */
     QVariant get(const QString &_key) const;
     /**
+     * @brief get database value ID
+     * @param _key           key to search in
+     * @return database id or -1 if not found
+     */
+    long long id(const QString &_key) const;
+    /**
      * @brief set value
      * @param _key           key to change
      * @param _value         value to change
@@ -71,6 +77,10 @@ private:
      * @brief stored values
      */
     QVariantHash m_values;
+    /**
+     * @brief ids of values
+     */
+    QHash<QString, long long> m_ids;
 };
 
 

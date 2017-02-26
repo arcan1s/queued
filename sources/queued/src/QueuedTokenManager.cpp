@@ -61,29 +61,9 @@ bool QueuedTokenManager::isTokenValid(const QString &_token)
 
 
 /**
- * @fn registerToken
+ * @fn loadTokens
  */
-QString QueuedTokenManager::registerToken(const QDateTime _validUntil)
-{
-    // generate from uuid
-    QString token
-        = QUuid::createUuid().toString().remove(QChar('{')).remove(QChar('}'));
-    qCInfo(LOG_LIB) << "Registered token" << token << "valid until"
-                    << _validUntil;
-
-    // append to internal storage
-    m_tokens[token] = _validUntil;
-    emit(tokenRegistered(token, _validUntil));
-
-    // and return requester
-    return token;
-}
-
-
-/**
- * @fn set
- */
-void QueuedTokenManager::set(const QList<QVariantHash> &_values)
+void QueuedTokenManager::loadTokens(const QList<QVariantHash> &_values)
 {
     qCDebug(LOG_LIB) << "Set values from" << _values;
 
@@ -100,6 +80,26 @@ void QueuedTokenManager::set(const QList<QVariantHash> &_values)
                            Qt::VeryCoarseTimer,
                            [this, tokenId]() { return expireToken(tokenId); });
     }
+}
+
+
+/**
+ * @fn registerToken
+ */
+QString QueuedTokenManager::registerToken(const QDateTime _validUntil)
+{
+    // generate from uuid
+    QString token
+        = QUuid::createUuid().toString().remove(QChar('{')).remove(QChar('}'));
+    qCInfo(LOG_LIB) << "Registered token" << token << "valid until"
+                    << _validUntil;
+
+    // append to internal storage
+    m_tokens[token] = _validUntil;
+    emit(tokenRegistered(token, _validUntil));
+
+    // and return requester
+    return token;
 }
 
 

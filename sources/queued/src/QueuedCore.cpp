@@ -66,11 +66,14 @@ bool QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
         _limits, m_users->user(_userId)->limits(),
         QueuedLimits::Limits(
             m_advancedSettings->get(QString("DefaultLimits")).toString()));
-    QVariantHash properties
-        = {{"userId", _userId},       {"command", _command},
-           {"arguments", _arguments}, {"workDirectory", _workingDirectory},
-           {"nice", _nice},           {"uid", ids.first},
-           {"gid", ids.second},       {"limits", taskLimits.toString()}};
+    QVariantHash properties = {{"user", _userId},
+                               {"command", _command},
+                               {"commandArguments", _arguments},
+                               {"workDirectory", _workingDirectory},
+                               {"nice", _nice},
+                               {"uid", ids.first},
+                               {"gid", ids.second},
+                               {"limits", taskLimits.toString()}};
     auto id = m_database->add(QueuedDB::TASKS_TABLE, properties);
     if (id == -1) {
         qCWarning(LOG_LIB) << "Could not add task" << _command;
@@ -95,7 +98,7 @@ bool QueuedCore::addUser(const QString &_name, const QString &_email,
 
     QVariantHash properties
         = {{"name", _name},
-           {"passwordSHA512", QueuedUser::hashFromPassword(_password)},
+           {"password", QueuedUser::hashFromPassword(_password)},
            {"email", _email},
            {"permissions", _permissions},
            {"limits", _limits.toString()}};
@@ -133,6 +136,136 @@ void QueuedCore::deinit()
         delete m_settings;
     if (m_advancedSettings)
         delete m_advancedSettings;
+}
+
+
+/**
+ * @fn editOption
+ */
+bool QueuedCore::editOption(const QString &_key, const QVariant &_value)
+{
+    qCDebug(LOG_LIB) << "Set key" << _key << "to" << _value;
+
+    long long id = m_advancedSettings->id(_key);
+    QVariantHash payload = {
+        {"key", _key}, {"value", _value},
+    };
+
+    bool status = false;
+    if (id == -1) {
+        id = m_database->add(QueuedDB::SETTINGS_TABLE, payload);
+        qCInfo(LOG_LIB) << "Added new key with ID" << id;
+        status = (id != -1);
+    } else {
+        status = m_database->modify(QueuedDB::SETTINGS_TABLE, id, payload);
+        qCInfo(LOG_LIB) << "Value for" << _key
+                        << "has been modified with status" << status;
+    }
+
+    if (status)
+        m_advancedSettings->set(_key, _value);
+    return status;
+}
+
+
+/**
+ * @fn editTask
+ */
+bool QueuedCore::editTask(const long long _id, const QVariantHash &_taskData)
+{
+    qCDebug(LOG_LIB) << "Edit task with ID" << _id;
+
+    auto task = m_processes->process(_id);
+    if (!task) {
+        qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
+        return false;
+    }
+
+    // modify record in database first
+    bool status = m_database->modify(QueuedDB::TASKS_TABLE, _id, _taskData);
+    if (!status) {
+        qCWarning(LOG_LIB) << "Could not modify task record" << _id
+                           << "in database, do not edit it in memory";
+        return false;
+    }
+
+    // modify values stored in memory
+    for (auto &property : _taskData.keys())
+        task->setProperty(property.toLocal8Bit().constData(),
+                          _taskData[property]);
+
+    return true;
+}
+
+
+/**
+ * @fn editUser
+ */
+bool QueuedCore::editUser(const long long _id, const QVariantHash &_userData)
+{
+    qCDebug(LOG_LIB) << "Edit user with ID" << _id;
+
+    auto user = m_users->user(_id);
+    if (!user) {
+        qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
+        return false;
+    }
+
+    // modify record in database first
+    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, _userData);
+    if (!status) {
+        qCWarning(LOG_LIB) << "Could not modify user record" << _id
+                           << "in database, do not edit it in memory";
+        return false;
+    }
+
+    // modify values stored in memory
+    for (auto &property : _userData.keys())
+        user->setProperty(property.toLocal8Bit().constData(),
+                          _userData[property]);
+
+    return true;
+}
+
+
+/**
+ * @fn editUserPermission
+ */
+bool QueuedCore::editUserPermission(const long long _id,
+                                    const QueuedEnums::Permission &_permission,
+                                    const bool _add)
+{
+    qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission)
+                     << "for user" << _id << "add" << _add;
+
+    auto user = m_users->user(_id);
+    if (!user) {
+        qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
+        return false;
+    }
+
+    if (_add)
+        user->addPermissions(_permission);
+    else
+        user->removePermissions(_permission);
+    unsigned int permissions = user->permissions();
+    qCInfo(LOG_LIB) << "New user permissions";
+
+    // modify in database now
+    QVariantHash payload = {{"permissions", permissions}};
+    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, payload);
+    if (!status) {
+        qCWarning(LOG_LIB) << "Could not modify user record" << _id
+                           << "in database, do not edit it in memory";
+        // rollback in-memory values
+        if (_add)
+            user->removePermissions(_permission);
+        else
+            user->addPermissions(_permission);
+        return false;
+    }
+
+    return true;
 }
 
 
@@ -189,6 +322,33 @@ void QueuedCore::init(const QString &_configuration)
                    [this](const long long _index, const QDateTime &_time) {
                        return updateTaskTime(_index, QDateTime(), _time);
                    });
+
+    // settings update notifier
+    m_connections += connect(
+        m_advancedSettings,
+        SIGNAL(valueUpdated(const QString &, const QVariant &)), this,
+        SLOT(updateSettings(const QString &, const QVariant &)));
+}
+
+
+/**
+ * @fn updateSettings
+ */
+void QueuedCore::updateSettings(const QString &_key, const QVariant &_value)
+{
+    qCDebug(LOG_LIB) << "Received update for" << _key << "with value" << _value;
+
+    // FIXME propbably there is a better way to change settings
+    QString key = _key.toLower();
+    if (key == QString("defaultlimits"))
+        ;
+    else if (key == QString("tokenexpiration"))
+        m_users->setTokenExpiration(_value.toLongLong());
+    else if (key == QString("onexitaction"))
+        m_processes->setOnExitAction(
+            static_cast<QueuedProcessManager::OnExitAction>(_value.toInt()));
+    else
+        qCInfo(LOG_LIB) << "Unused key" << _key;
 }
 
 

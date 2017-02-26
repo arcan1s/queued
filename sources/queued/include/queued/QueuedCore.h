@@ -26,6 +26,7 @@
 
 #include <QObject>
 
+#include "QueuedEnums.h"
 #include "QueuedLimits.h"
 
 
@@ -84,13 +85,40 @@ public:
      */
     void deinit();
     /**
+     * @brief edit advanced settings
+     * @param _key           advanced settings key
+     * @param _value         advanced settings value
+     * @return true on successful option edition
+     */
+    bool editOption(const QString &_key, const QVariant &_value);
+    /**
+     * @brief edit task
+     * @param _id            task ID to edit
+     * @param _taskData      task data to edit
+     * @remark _taskData should contain only fields defined in schema, any other
+     * fields will be ignored. No need to pass all properties here
+     * @return true on successful task edition
+     */
+    bool editTask(const long long _id, const QVariantHash &_taskData);
+    /**
      * @brief edit user
      * @param _id            user ID to edit
      * @param _userData      user data to edit
-     * @remark ref
-     * @return
+     * @remark _userData should contain only fields defined in schema, any other
+     * fields will be ignored. No need to pass all properties here
+     * @return true on successful user edition
      */
     bool editUser(const long long _id, const QVariantHash &_userData);
+    /**
+     * @brief edit user permissions
+     * @param _id            user ID to edit
+     * @param _permission    permission to add or remove
+     * @param _add           indicates whether it should be added or removed
+     * @return true on successful user permission edition
+     */
+    bool editUserPermission(const long long _id,
+                            const QueuedEnums::Permission &_permission,
+                            const bool _add);
     /**
      * @brief init subclasses
      * @param _configuration path to configuration file
@@ -98,6 +126,12 @@ public:
     void init(const QString &_configuration);
 
 private slots:
+    /**
+     * @brief notify clients about settings update
+     * @param _key           updated key
+     * @param _value         new value
+     */
+    void updateSettings(const QString &_key, const QVariant &_value);
     /**
      * @brief update process time
      * @param _id            task id

@@ -31,9 +31,10 @@
 QueuedProcessManager::QueuedProcessManager(QObject *parent,
                                            const OnExitAction onExit)
     : QObject(parent)
-    , m_onExit(onExit)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
+
+    setOnExitAction(onExit);
 }
 
 
@@ -62,8 +63,8 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
     QueuedProcess::QueuedProcessDefinitions defs;
     // parameters
     defs.command = _properties[QString("command")].toString();
-    defs.arguments
-        = _properties[QString("arguments")].toString().split(QChar('\x01'));
+    defs.arguments = _properties[QString("commandArguments")].toString().split(
+        QChar('\x01'));
     defs.workingDirectory = _properties[QString("workDirectory")].toString();
     defs.nice = _properties[QString("nice")].toUInt();
     defs.limits
@@ -116,8 +117,13 @@ void QueuedProcessManager::loadProcesses(const QList<QVariantHash> &_processes)
 {
     qCDebug(LOG_LIB) << "Add tasks from" << _processes;
 
-    for (auto &processData : _processes)
+    for (auto &processData : _processes) {
+        if (static_cast<QueuedEnums::ProcessState>(
+                processData[QString("state")].toUInt())
+            == QueuedEnums::ProcessState::Exited)
+            continue;
         add(processData, processData[QString("_id")].toLongLong());
+    }
 }
 
 
@@ -170,6 +176,23 @@ void QueuedProcessManager::remove(const long long _index)
 
 
 /**
+ * @fn start
+ */
+ void QueuedProcessManager::start(const long long _index)
+{
+    qCDebug(LOG_LIB) << "Start task" << _index;
+
+    auto pr = process(_index);
+    if (!pr) {
+        qCWarning(LOG_LIB) << "No task" << _index << "found";
+        return;
+    }
+
+    pr->start();
+}
+
+
+/**
  * @fn stop
  */
 void QueuedProcessManager::stop(const long long _index)
@@ -200,6 +223,17 @@ void QueuedProcessManager::stop(const long long _index)
 QueuedProcessManager::OnExitAction QueuedProcessManager::onExit() const
 {
     return m_onExit;
+}
+
+
+/**
+ * @fn setOnExitAction
+ */
+void QueuedProcessManager::setOnExitAction(const OnExitAction _action)
+{
+    qCDebug(LOG_LIB) << "New action on exit" << static_cast<int>(_action);
+
+    m_onExit = _action;
 }
 
 

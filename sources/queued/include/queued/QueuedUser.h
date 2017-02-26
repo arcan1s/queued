@@ -39,15 +39,12 @@ class QueuedUser : public QObject
     Q_OBJECT
     Q_PROPERTY(long long index READ index)
     // generic properties
-    Q_PROPERTY(QString email READ email WRITE setEmail NOTIFY userUpdated)
-    Q_PROPERTY(QString name READ name WRITE setName NOTIFY userUpdated)
-    Q_PROPERTY(
-        QString password READ password WRITE setPassword NOTIFY userUpdated)
-    Q_PROPERTY(unsigned int permissions READ permissions WRITE setPermissions
-                   NOTIFY userUpdated)
+    Q_PROPERTY(QString email READ email WRITE setEmail)
+    Q_PROPERTY(QString name READ name WRITE setName)
+    Q_PROPERTY(QString password READ password WRITE setPassword)
+    Q_PROPERTY(unsigned int permissions READ permissions WRITE setPermissions)
     // limits
-    Q_PROPERTY(QueuedLimits::Limits limits READ limits WRITE setLimits NOTIFY
-                   userUpdated)
+    Q_PROPERTY(QueuedLimits::Limits limits READ limits WRITE setLimits)
 
 public:
     /**
@@ -57,7 +54,7 @@ public:
      * user name
      * @var email
      * user email
-     * @var passwordSHA512
+     * @var password
      * password hash, may be empty
      * @var permissions
      * user permissions
@@ -67,7 +64,7 @@ public:
     typedef struct {
         QString name;
         QString email;
-        QString passwordSHA512;
+        QString password;
         unsigned int permissions;
         QueuedLimits::Limits limits;
     } QueuedUserDefinitions;
@@ -188,12 +185,6 @@ public:
      * @return true if objects are equal
      */
     bool operator==(const QueuedUser &_other);
-
-signals:
-    /**
-     * @brief signal which emits on any property set action
-     */
-    void userUpdated();
 
 private:
     /**

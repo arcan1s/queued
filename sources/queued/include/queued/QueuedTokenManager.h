@@ -52,16 +52,16 @@ public:
      */
     bool isTokenValid(const QString &_token);
     /**
+    * @brief upload tokens from database
+    * @param _value         tokens from database
+    */
+    void loadTokens(const QList<QVariantHash> &_values);
+    /**
      * @brief register new token
      * @param _validUntil    token valid until
      * @return new generated token
      */
     QString registerToken(const QDateTime _validUntil);
-    /**
-     * @brief upload tokens from database
-     * @param _value         tokens from database
-     */
-    void set(const QList<QVariantHash> &_values);
 
 public slots:
     /**

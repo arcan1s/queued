@@ -83,6 +83,22 @@ enum class Permission {
 };
 Q_DECLARE_FLAGS(Permissions, Permission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+/**
+ * @ingroup QueuedEnums
+ * @enum ProcessState
+ * @brief process state description
+ * @var ProcessState::NotRunning
+ * process is not running yet
+ * @var ProcessState::Running
+ * process running at the moment
+ * @var ProcessState::Exited
+ * process exit
+ */
+enum class ProcessState {
+    NotRunning = 1 << 0,
+    Running = 1 << 1,
+    Exited = 1 << 2
+};
 };
 
 
