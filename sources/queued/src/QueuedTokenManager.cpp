@@ -67,18 +67,16 @@ void QueuedTokenManager::loadTokens(const QList<QVariantHash> &_values)
 {
     qCDebug(LOG_LIB) << "Set values from" << _values;
 
-    QDateTime now = QDateTime::currentDateTimeUtc();
     for (auto &token : _values) {
         QDateTime validUntil = QDateTime::fromString(
             token[QString("validUntil")].toString(), Qt::ISODate);
-        if (validUntil <= now)
-            continue;
         QString tokenId = token[QString("token")].toString();
         m_tokens[tokenId] = validUntil;
-        QTimer::singleShot(validUntil.toMSecsSinceEpoch()
-                               - now.toMSecsSinceEpoch(),
-                           Qt::VeryCoarseTimer,
-                           [this, tokenId]() { return expireToken(tokenId); });
+        QTimer::singleShot(
+            validUntil.toMSecsSinceEpoch()
+                - QDateTime::currentDateTimeUtc().toMSecsSinceEpoch(),
+            Qt::VeryCoarseTimer,
+            [this, tokenId]() { return expireToken(tokenId); });
     }
 }
 

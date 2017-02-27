@@ -82,7 +82,8 @@ struct Limits {
         , valid(false){};
     /**
      * @brief structure constructor from string representation
-     * @param _stringLimits  limits string representation
+     * @param _stringLimits
+     * limits string representation
      */
     Limits(const QString &_stringLimits)
     {
@@ -101,25 +102,32 @@ struct Limits {
 /**
  * @ingroup QueuedLimits
  * @brief convert QString memory value to integer
- * @param _value         value to convert
- * @param _status        conversion status
+ * @param _value
+ * value to convert
+ * @param _status
+ * conversion status
  * @return converted integer
  */
 long long convertMemory(QString _value, bool *_status);
 /**
  * @ingroup QueuedLimits
  * @brief compare two limits
- * @param _first         first limit
- * @param _second        second limit
+ * @param _first
+ * first limit
+ * @param _second
+ * second limit
  * @return true if first limit is less than second
  */
 bool limitCompare(const long long _first, const long long _second);
 /**
  * @ingroup QueuedLimits
  * @brief get minimal limits from given
- * @param _task          task defined limits
- * @param _user          user defined limit
- * @param _default       default limits if anu
+ * @param _task
+ * task defined limits
+ * @param _user
+ * user defined limit
+ * @param _default
+ * default limits if anu
  * @return minimal limits from given
  */
 Limits minimalLimits(const Limits &_task, const Limits &_user,

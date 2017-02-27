@@ -71,9 +71,12 @@ public:
 
     /**
      * @brief QueuedUser class constructor
-     * @param parent         pointer to parent item
-     * @param definitions    definitions of user
-     * @param index          index of process
+     * @param parent
+     * pointer to parent item
+     * @param definitions
+     * definitions of user
+     * @param index
+     * index of process
      */
     explicit QueuedUser(QObject *parent,
                         const QueuedUserDefinitions &definitions,
@@ -85,20 +88,23 @@ public:
     // methods
     /**
      * @brief add permissions to user
-     * @param _permissions   new user permissions
+     * @param _permissions
+     * new user permissions
      * @return current user permissions
      */
     QueuedEnums::Permissions
     addPermissions(const QueuedEnums::Permissions _permissions);
     /**
      * @brief generates SHA512 hash from given password
-     * @param _password      password as string
+     * @param _password
+     * password as string
      * @return SHA512 of password
      */
     static QString hashFromPassword(const QString &_password);
     /**
      * @brief test user permissions
-     * @param _permission    permission to test
+     * @param _permission
+     * permission to test
      * @return true if user has permission otherwise return false
      */
     bool hasPermission(const QueuedEnums::Permission _permission);
@@ -109,13 +115,15 @@ public:
     QPair<unsigned int, unsigned int> ids();
     /**
      * @brief check if password is valid
-     * @param _password     password as string
+     * @param _password
+     * password as string
      * @return true if password matches stored hash
      */
     bool isPasswordValid(const QString &_password) const;
     /**
      * @brief remove permissions from user
-     * @param _permissions   permissions to remove
+     * @param _permissions
+     * permissions to remove
      * @return current user permissions
      */
     QueuedEnums::Permissions
@@ -155,33 +163,39 @@ public:
     // main properties
     /**
      * @brief set user email
-     * @param _email         new user email
+     * @param _email
+     * new user email
      */
     void setEmail(const QString _email);
     /**
      * @brief set username
-     * @param _name          new user name
+     * @param _name
+     * new user name
      */
     void setName(const QString _name);
     /**
      * @brief set user password
-     * @param _password      new user password
+     * @param _password
+     * new user password
      */
     void setPassword(const QString _password);
     /**
      * @brief set user permissions
-     * @param _permissions   new user permissions
+     * @param _permissions
+     * new user permissions
      */
     void setPermissions(const unsigned int _permissions);
     // permissions
     /**
      * @brief set limits
-     * @param _limit         new user limits
+     * @param _limit
+     * new user limits
      */
     void setLimits(const QueuedLimits::Limits &_limits);
     /**
      * @brief equal operator implementation
-     * @param _other         other object
+     * @param _other
+     * other object
      * @return true if objects are equal
      */
     bool operator==(const QueuedUser &_other);

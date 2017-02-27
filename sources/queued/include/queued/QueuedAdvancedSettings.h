@@ -38,7 +38,8 @@ class QueuedAdvancedSettings : public QObject
 public:
     /**
      * @brief QueuedAdvancedSettings class constructor
-     * @param parent         pointer to parent item
+     * @param parent
+     * pointer to parent item
      */
     explicit QueuedAdvancedSettings(QObject *parent);
     /**
@@ -47,29 +48,41 @@ public:
     virtual ~QueuedAdvancedSettings();
     /**
      * @brief get value
-     * @param _key           key to search in
+     * @param _key
+     * key to search in
      * @return value by key if found
      */
     QVariant get(const QString &_key) const;
     /**
      * @brief get database value ID
-     * @param _key           key to search in
+     * @param _key
+     * key to search in
      * @return database id or -1 if not found
      */
     long long id(const QString &_key) const;
     /**
      * @brief set value
-     * @param _key           key to change
-     * @param _value         value to change
+     * @param _key
+     * key to change
+     * @param _value
+     * value to change
      */
     void set(const QString &_key, const QVariant &_value);
     /**
      * @brief upload configuration from database in to internal format
-     * @param _value         configuration values from database
+     * @param _value
+     * configuration values from database
      */
     void set(const QList<QVariantHash> &_values);
 
 signals:
+    /**
+     * @brief emits on each value update
+     * @param _key
+     * changed key
+     * @param _value
+     * changed value
+     */
     void valueUpdated(const QString &_key, const QVariant &_value);
 
 private:

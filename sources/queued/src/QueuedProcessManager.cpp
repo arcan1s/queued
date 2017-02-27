@@ -87,7 +87,7 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
  * @fn add
  */
 QueuedProcess *QueuedProcessManager::add(
-    const QueuedProcess::QueuedProcessDefinitions _definitions,
+    const QueuedProcess::QueuedProcessDefinitions &_definitions,
     const long long _index)
 {
     qCDebug(LOG_LIB) << "Add new process" << _definitions.command
@@ -117,13 +117,8 @@ void QueuedProcessManager::loadProcesses(const QList<QVariantHash> &_processes)
 {
     qCDebug(LOG_LIB) << "Add tasks from" << _processes;
 
-    for (auto &processData : _processes) {
-        if (static_cast<QueuedEnums::ProcessState>(
-                processData[QString("state")].toUInt())
-            == QueuedEnums::ProcessState::Exited)
-            continue;
+    for (auto &processData : _processes)
         add(processData, processData[QString("_id")].toLongLong());
-    }
 }
 
 
@@ -178,7 +173,7 @@ void QueuedProcessManager::remove(const long long _index)
 /**
  * @fn start
  */
- void QueuedProcessManager::start(const long long _index)
+void QueuedProcessManager::start(const long long _index)
 {
     qCDebug(LOG_LIB) << "Start task" << _index;
 

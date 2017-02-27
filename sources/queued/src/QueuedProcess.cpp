@@ -37,7 +37,7 @@ extern "C" {
  * @fn QueuedProcess
  */
 QueuedProcess::QueuedProcess(QObject *parent,
-                             const QueuedProcessDefinitions definitions,
+                             const QueuedProcessDefinitions &definitions,
                              const long long index)
     : QProcess(parent)
     , m_definitions(definitions)

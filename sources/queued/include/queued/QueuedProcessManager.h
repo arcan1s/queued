@@ -64,8 +64,10 @@ public:
 
     /**
      * @brief QueuedProcessManager class constructor
-     * @param parent         pointer to parent item
-     * @param onExit         default action on exit
+     * @param parent
+     * pointer to parent item
+     * @param onExit
+     * default action on exit
      */
     explicit QueuedProcessManager(QObject *parent, const OnExitAction onExit);
     /**
@@ -74,28 +76,34 @@ public:
     virtual ~QueuedProcessManager();
     /**
      * @brief add task
-     * @param _properties    task properties from database
-     * @param _index         task index
+     * @param _properties
+     * task properties from database
+     * @param _index
+     * task index
      * @return pointer to created task
      */
     QueuedProcess *add(const QVariantHash &_properties, const long long _index);
     /**
      * @brief add task
-     * @param _definitions   process definitions
-     * @param _index         task index
+     * @param _definitions
+     * process definitions
+     * @param _index
+     * task index
      * @return pointer to created task
      */
     QueuedProcess *
-    add(const QueuedProcess::QueuedProcessDefinitions _definitions,
+    add(const QueuedProcess::QueuedProcessDefinitions &_definitions,
         const long long _index);
     /**
      * @brief add tasks from database
-     * @param _processes     database stored tasks
+     * @param _processes
+     * database stored tasks
      */
     void loadProcesses(const QList<QVariantHash> &_processes);
     /**
      * @brief task
-     * @param _index         task index
+     * @param _index
+     * task index
      * @return task found by index or nullptr
      */
     QueuedProcess *process(const long long _index);
@@ -106,17 +114,20 @@ public:
     QueuedProcessMap processes();
     /**
      * @brief remove task from list
-     * @param _index         task index
+     * @param _index
+     * task index
      */
     void remove(const long long _index);
     /**
      * @brief force start task
-     * @param _index         task index
+     * @param _index
+     * task index
      */
-     void start(const long long _index);
+    void start(const long long _index);
     /**
      * @brief force stop task
-     * @param _index         task index
+     * @param _index
+     * task index
      */
     void stop(const long long _index);
     // properties
@@ -127,30 +138,38 @@ public:
     OnExitAction onExit() const;
     /**
      * @brief set on exit action
-     * @param _action        new on exit action
+     * @param _action
+     * new on exit action
      */
     void setOnExitAction(const OnExitAction _action);
 
 signals:
     /**
      * @brief signal which will be called on task start
-     * @param _index         task index
-     * @param _time          task start time
+     * @param _index
+     * task index
+     * @param _time
+     * task start time
      */
     void taskStartTimeReceived(const long long _index, const QDateTime &_time);
     /**
      * @brief signal which will be called on task end
-     * @param _index         task index
-     * @param _time          task stop time
+     * @param _index
+     * task index
+     * @param _time
+     * task stop time
      */
     void taskStopTimeReceived(const long long _index, const QDateTime &_time);
 
 private slots:
     /**
      * @brief slot for catching finished tasks
-     * @param _exitCode      exit code of finished task
-     * @param _exitStatus    exit status of finished task
-     * @param _index         index of finished task
+     * @param _exitCode
+     * exit code of finished task
+     * @param _exitStatus
+     * exit status of finished task
+     * @param _index
+     * index of finished task
      */
     void taskFinished(const int _exitCode,
                       const QProcess::ExitStatus _exitStatus,

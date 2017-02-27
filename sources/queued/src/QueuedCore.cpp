@@ -114,32 +114,6 @@ bool QueuedCore::addUser(const QString &_name, const QString &_email,
 
 
 /**
- * @fn deinit
- */
-void QueuedCore::deinit()
-{
-    // clear connections first
-    for (auto &connection : m_connections)
-        disconnect(connection);
-    m_connections.clear();
-
-    // delete objects now
-    if (m_reports)
-        delete m_reports;
-    if (m_processes)
-        delete m_processes;
-    if (m_users)
-        delete m_users;
-    if (m_database)
-        delete m_database;
-    if (m_settings)
-        delete m_settings;
-    if (m_advancedSettings)
-        delete m_advancedSettings;
-}
-
-
-/**
  * @fn editOption
  */
 bool QueuedCore::editOption(const QString &_key, const QVariant &_value)
@@ -270,6 +244,32 @@ bool QueuedCore::editUserPermission(const long long _id,
 
 
 /**
+ * @fn deinit
+ */
+void QueuedCore::deinit()
+{
+    // clear connections first
+    for (auto &connection : m_connections)
+        disconnect(connection);
+    m_connections.clear();
+
+    // delete objects now
+    if (m_reports)
+        delete m_reports;
+    if (m_processes)
+        delete m_processes;
+    if (m_users)
+        delete m_users;
+    if (m_database)
+        delete m_database;
+    if (m_settings)
+        delete m_settings;
+    if (m_advancedSettings)
+        delete m_advancedSettings;
+}
+
+
+/**
  * @fn init
  */
 void QueuedCore::init(const QString &_configuration)
@@ -279,49 +279,10 @@ void QueuedCore::init(const QString &_configuration)
     // deinit objects if any
     deinit();
 
-    // read configuration first
-    m_settings = new QueuedSettings(this, _configuration);
-    // init database now
-    auto dbSetup = m_settings->db();
-    m_database = new QueuedDatabase(this, dbSetup.path, dbSetup.driver);
-    m_database->open(dbSetup.hostname, dbSetup.port, dbSetup.username,
-                     dbSetup.password);
-    auto dbAdmin = m_settings->admin();
-    m_database->createAdministrator(dbAdmin.name, dbAdmin.password);
-
-    // and load advanced settings
-    m_advancedSettings = new QueuedAdvancedSettings(this);
-    m_advancedSettings->set(m_database->get(QueuedDB::SETTINGS_TABLE));
-
-    // report manager
-    m_reports = new QueuedReportManager(this, m_database);
-
-    // load users and tokens
-    m_users = new QueuedUserManager(this);
-    auto expiry
-        = m_advancedSettings->get(QString("TokenExpiration")).toLongLong();
-    m_users->setTokenExpiration(expiry);
-    m_users->loadTokens(m_database->get(QueuedDB::TOKENS_TABLE));
-    m_users->loadUsers(m_database->get(QueuedDB::USERS_TABLE));
-    m_connections += connect(
-        m_users, SIGNAL(userLoggedIn(const long long, const QDateTime &)), this,
-        SLOT(updateUserLoginTime(const long long, const QDateTime &)));
-
-    // and processes finally
-    auto onExitAction = static_cast<QueuedProcessManager::OnExitAction>(
-        m_advancedSettings->get(QString("OnExitAction")).toInt());
-    m_processes = new QueuedProcessManager(this, onExitAction);
-    m_processes->loadProcesses(m_database->get(QueuedDB::TASKS_TABLE));
-    m_connections
-        += connect(m_processes, &QueuedProcessManager::taskStartTimeReceived,
-                   [this](const long long _index, const QDateTime &_time) {
-                       return updateTaskTime(_index, _time, QDateTime());
-                   });
-    m_connections
-        += connect(m_processes, &QueuedProcessManager::taskStopTimeReceived,
-                   [this](const long long _index, const QDateTime &_time) {
-                       return updateTaskTime(_index, QDateTime(), _time);
-                   });
+    // init parts
+    initSettings(_configuration);
+    initUsers();
+    initProcesses();
 
     // settings update notifier
     m_connections += connect(
@@ -387,4 +348,86 @@ void QueuedCore::updateUserLoginTime(const long long _id,
     bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, record);
     if (!status)
         qCWarning(LOG_LIB) << "Could not modify user record" << _id;
+}
+
+
+/**
+ * @fn initProcesses
+ */
+void QueuedCore::initProcesses()
+{
+    // init processes
+    auto onExitAction = static_cast<QueuedProcessManager::OnExitAction>(
+        m_advancedSettings->get(QString("OnExitAction")).toInt());
+
+    m_processes = new QueuedProcessManager(this, onExitAction);
+    auto dbProcesses = m_database->get(
+        QueuedDB::TASKS_TABLE,
+        QString("WHERE state != %1")
+            .arg(static_cast<int>(QueuedEnums::ProcessState::Exited)));
+    m_processes->loadProcesses(dbProcesses);
+
+    m_connections
+        += connect(m_processes, &QueuedProcessManager::taskStartTimeReceived,
+                   [this](const long long _index, const QDateTime &_time) {
+                       return updateTaskTime(_index, _time, QDateTime());
+                   });
+    m_connections
+        += connect(m_processes, &QueuedProcessManager::taskStopTimeReceived,
+                   [this](const long long _index, const QDateTime &_time) {
+                       return updateTaskTime(_index, QDateTime(), _time);
+                   });
+}
+
+
+/**
+ * @fn initSettings
+ */
+void QueuedCore::initSettings(const QString &_configuration)
+{
+    // read configuration first
+    m_settings = new QueuedSettings(this, _configuration);
+    // init database now
+    auto dbSetup = m_settings->db();
+    m_database = new QueuedDatabase(this, dbSetup.path, dbSetup.driver);
+    bool status = m_database->open(dbSetup.hostname, dbSetup.port,
+                                   dbSetup.username, dbSetup.password);
+    if (!status)
+        throw QueuedDatabaseException("Could not open database");
+
+    // create administrator if required
+    auto dbAdmin = m_settings->admin();
+    m_database->createAdministrator(dbAdmin.name, dbAdmin.password);
+
+    // and load advanced settings
+    m_advancedSettings = new QueuedAdvancedSettings(this);
+    m_advancedSettings->set(m_database->get(QueuedDB::SETTINGS_TABLE));
+
+    // report manager
+    m_reports = new QueuedReportManager(this, m_database);
+}
+
+
+/**
+ * @fn initUsers
+ */
+void QueuedCore::initUsers()
+{
+    // load users and tokens
+    auto expiry
+        = m_advancedSettings->get(QString("TokenExpiration")).toLongLong();
+
+    m_users = new QueuedUserManager(this);
+    m_users->setTokenExpiration(expiry);
+    QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    auto dbTokens = m_database->get(
+        QueuedDB::TOKENS_TABLE,
+        QString("WHERE datetime(validUntil) > datetime(%2)").arg(now));
+    m_users->loadTokens(dbTokens);
+    auto dbUsers = m_database->get(QueuedDB::USERS_TABLE);
+    m_users->loadUsers(dbUsers);
+
+    m_connections += connect(
+        m_users, SIGNAL(userLoggedIn(const long long, const QDateTime &)), this,
+        SLOT(updateUserLoginTime(const long long, const QDateTime &)));
 }

@@ -96,12 +96,15 @@ public:
 
     /**
      * @brief QueuedProcess class constructor
-     * @param parent         pointer to parent item
-     * @param definitions    definitions of process
-     * @param index          index of process
+     * @param parent
+     * pointer to parent item
+     * @param definitions
+     * definitions of process
+     * @param index
+     * index of process
      */
     explicit QueuedProcess(QObject *parent,
-                           const QueuedProcessDefinitions definitions,
+                           const QueuedProcessDefinitions &definitions,
                            const long long index);
     /**
      * @brief QueuedProcess class destructor
@@ -180,57 +183,68 @@ public:
     void setCommand(const QString &_command);
     /**
      * @brief set command line arguments
-     * @param _commandArguments new command line arguments
+     * @param _commandArguments
+     * new command line arguments
      */
     void setCommandArguments(const QStringList &_commandArguments);
     /**
      * @brief set end time
-     * @param _time          process end time
+     * @param _time
+     * process end time
      */
     void setEndTime(const QDateTime &_time);
     /**
      * @brief set process GID
-     * @param _gid           new process GID
+     * @param _gid
+     * new process GID
      */
     void setGid(const unsigned int _gid);
     /**
      * @brief set process limits
-     * @param _limits        new process limits
+     * @param _limits
+     * new process limits
      */
     void setLimits(const QueuedLimits::Limits &_limits);
     /**
      * @brief set process nice
-     * @param _nice          new process nice
+     * @param _nice
+     * new process nice
      */
     void setNice(const unsigned int _nice);
     /**
      * @brief set process state
-     * @param _limits        new process state
+     * @param _limits
+     * new process state
      */
     void setPState(const QueuedEnums::ProcessState _state);
     /**
      * @brief set start time
-     * @param _time          process start time
+     * @param _time
+     * process start time
      */
     void setStartTime(const QDateTime &_time);
     /**
      * @brief set process UID
-     * @param _uid           new process UID
+     * @param _uid
+     * new process UID
      */
     void setUid(const unsigned int _uid);
     /**
      * @brief set user ID
-     * @param _user          new user ID
+     * @param _user
+     * new user ID
      */
     void setUser(const long long _user);
     /**
      * @brief set working directory
-     * @param _workDirectory new process working directory
+     * @param _workDirectory
+     * new process working directory
      */
     void setWorkDirectory(const QString &_workDirectory);
     /**
      * @brief equal operator implementation
-     * @param _other         other object
+     * @param _other
+     * other object
      * @return true if objects are equal
      */
     bool operator==(const QueuedProcess &_other);

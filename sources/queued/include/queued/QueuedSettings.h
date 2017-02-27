@@ -42,8 +42,10 @@ class QueuedSettings : public QObject
 public:
     /**
      * @brief QueuedSettings class constructor
-     * @param parent         pointer to parent item
-     * @param path           path to configuration file
+     * @param parent
+     * pointer to parent item
+     * @param path
+     * path to configuration file
      */
     explicit QueuedSettings(QObject *parent, const QString path);
     /**

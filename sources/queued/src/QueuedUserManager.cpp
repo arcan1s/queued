@@ -124,24 +124,25 @@ QString QueuedUserManager::authorize(const QString &_user,
 /**
  * @fn authorize
  */
-bool QueuedUserManager::authorize(const QString &_user, const QString &_token,
+bool QueuedUserManager::authorize(const UserAuthorization &_auth,
                                   const QueuedEnums::Permission _service)
 {
-    qCDebug(LOG_LIB) << "Authorize user" << _user << "for"
+    qCDebug(LOG_LIB) << "Authorize user" << _auth.user << "for"
                      << static_cast<int>(_service);
 
-    bool status = m_tokens->isTokenValid(_token);
+    bool status = m_tokens->isTokenValid(_auth.token);
     if (!status) {
-        qCInfo(LOG_LIB) << "Token invalid for user" << _user;
+        qCInfo(LOG_LIB) << "Token invalid for user" << _auth.user;
         return false;
     }
 
-    if (!m_users.contains(_user)) {
-        qCInfo(LOG_LIB) << "No user found" << _user;
+    auto userObj = user(_auth.user);
+    if (!userObj) {
+        qCInfo(LOG_LIB) << "No user found" << _auth.user;
         return false;
     }
 
-    return m_users[_user]->hasPermission(_service);
+    return userObj->hasPermission(_service);
 }
 
 

@@ -40,9 +40,12 @@ class QueuedDatabase : public QObject
 public:
     /**
      * @brief QueuedDatabase class constructor
-     * @param parent         pointer to parent item
-     * @param path           path to database
-     * @param driver         database driver
+     * @param parent
+     * pointer to parent item
+     * @param path
+     * path to database
+     * @param driver
+     * database driver
      */
     explicit QueuedDatabase(QObject *parent, const QString path,
                             const QString driver);
@@ -56,34 +59,44 @@ public:
     void checkDatabase();
     /**
      * @brief check and create queued administrator if missing
-     * @param _user          administrator username
-     * @param _password      administrator password SHA512
+     * @param _user
+     * administrator username
+     * @param _password
+     * administrator password SHA512
      */
     void createAdministrator(const QString &_user, const QString &_password);
     /**
      * @brief get all records from table
-     * @param _table         table name
-     * @param _condition     optional condition string
+     * @param _table
+     * table name
+     * @param _condition
+     * optional condition string
      * @return list of records from table
      */
     QList<QVariantHash> get(const QString &_table,
                             const QString &_condition = QString());
     /**
      * @brief get record from table with given id
-     * @param _table         table name
-     * @param _id            record id
+     * @param _table
+     * table name
+     * @param _id
+     * record id
      * @return variant map from table
      */
     QVariantHash get(const QString &_table, const long long _id);
     /**
      * @brief open database
-     * @param _hostname      hostname to connect, may be empty
-     * @param _port          port to connect, may be 0
-     * @param _username      username to connect, may be empty
-     * @param _password      password to connect, will be ignored if _username
-     * is empty
+     * @param _hostname
+     * hostname to connect, may be empty
+     * @param _port
+     * port to connect, may be 0
+     * @param _username
+     * username to connect, may be empty
+     * @param _password
+     * password to connect, will be ignored if _username is empty
+     * @return true on successful opening
      */
-    void open(const QString &_hostname, const int _port,
+    bool open(const QString &_hostname, const int _port,
               const QString &_username, const QString &_password);
     /**
      * @brief path to database
@@ -94,20 +107,50 @@ public:
 public slots:
     /**
      * @brief add record to database
-     * @param _table         table name
-     * @param _value         value to insert
+     * @param _table
+     * table name
+     * @param _value
+     * value to insert
      * @return index of inserted record or -1 if no insertion
      */
     long long add(const QString &_table, const QVariantHash &_value);
     /**
      * @brief modify record in table
-     * @param _table         table name
-     * @param _id            id for search
-     * @param _value         value to update
+     * @param _table
+     * table name
+     * @param _id
+     * id for search
+     * @param _value
+     * value to update
      * @return true on successfully modification
      */
     bool modify(const QString &_table, const long long _id,
                 const QVariantHash &_value);
+    /**
+     * @brief remove record in table by ID
+     * @param _table
+     * table name
+     * @param _id
+     * id to remove
+     * @return true on successfully removal
+     */
+    bool remove(const QString &_table, const long long _id);
+    /**
+     * @brief remove ended task
+     * @param _endTime
+     * last task end time
+     */
+    void removeTasks(const QDateTime &_endTime);
+    /**
+     * @brief remove unused tokens
+     */
+    void removeTokens();
+    /**
+     * @brief remove user which where not logged into system
+     * @param _lastLogin
+     * last user login
+     */
+    void removeUsers(const QDateTime &_lastLogin);
 
 private:
     /**
@@ -120,32 +163,39 @@ private:
     QString m_path;
     /**
      * @brief create or update actual schema in table
-     * @param _table         table name
+     * @param _table
+     * table name
      */
     void createSchema(const QString &_table);
     /**
      * @brief create given table
-     * @param _table         table name
+     * @param _table
+     * table name
      */
     void createTable(const QString &_table);
     /**
      * @brief additional function to get column numbers from table
-     * @param _columns       columns mapping
-     * @param _record        SQL record from query
+     * @param _columns
+     * columns mapping
+     * @param _record
+     * SQL record from query
      * @return map of column names to their numbers
      */
     QHash<QString, int> getColumnsInRecord(const QStringList &_columns,
                                            const QSqlRecord &_record) const;
     /**
      * @brief last insertion ID
-     * @param _table         table name
+     * @param _table
+     * table name
      * @return last insertion id from table
      */
     long long lastInsertionId(const QString &_table) const;
     /**
      * @brief additional function to get payload for query
-     * @param _table         table name for search
-     * @param _value         value to build payload
+     * @param _table
+     * table name for search
+     * @param _value
+     * value to build payload
      * @return list of keys and list of values
      */
     QPair<QStringList, QStringList>

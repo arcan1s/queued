@@ -38,7 +38,8 @@ class QueuedTokenManager : public QObject
 public:
     /**
      * @brief QueuedTokenManager class constructor
-     * @param parent         pointer to parent item
+     * @param parent
+     * pointer to parent item
      */
     explicit QueuedTokenManager(QObject *parent);
     /**
@@ -47,18 +48,21 @@ public:
     virtual ~QueuedTokenManager();
     /**
      * @brief check if token is valid
-     * @param _token         token ID
+     * @param _token
+     * token ID
      * @return true if token is valid otherwise return false
      */
     bool isTokenValid(const QString &_token);
     /**
     * @brief upload tokens from database
-    * @param _value         tokens from database
+    * @param _value
+     * tokens from database
     */
     void loadTokens(const QList<QVariantHash> &_values);
     /**
      * @brief register new token
-     * @param _validUntil    token valid until
+     * @param _validUntil
+     * token valid until
      * @return new generated token
      */
     QString registerToken(const QDateTime _validUntil);
@@ -66,20 +70,24 @@ public:
 public slots:
     /**
      * @brief method which will be called on token expiring
-     * @param _token         expired token ID
+     * @param _token
+     * expired token ID
      */
     void expireToken(const QString &_token);
 
 signals:
     /**
      * @brief signal which will be emitted on token expiration
-     * @param _token         token ID
+     * @param _token
+     * token ID
      */
     void tokenExpired(const QString &_token);
     /**
      * @brief signal which will be emitted on newly created token
-     * @param _token         token ID
-     * @param _validUntil    token valid until
+     * @param _token
+     * token ID
+     * @param _validUntil
+     * token valid until
      */
     void tokenRegistered(const QString &_token, const QDateTime &_validUntil);
 

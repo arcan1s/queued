@@ -161,7 +161,7 @@ QVariantHash QueuedDatabase::get(const QString &_table, const long long _id)
 /**
  * @fn open
  */
-void QueuedDatabase::open(const QString &_hostname, const int _port,
+bool QueuedDatabase::open(const QString &_hostname, const int _port,
                           const QString &_username, const QString &_password)
 {
     qCDebug(LOG_LIB) << "Open database at" << _hostname << _port << "as user"
@@ -176,7 +176,8 @@ void QueuedDatabase::open(const QString &_hostname, const int _port,
 
     qCDebug(LOG_LIB) << "Open database status" << status;
     if (status)
-        return checkDatabase();
+        checkDatabase();
+    return status;
 }
 
 
@@ -242,6 +243,83 @@ bool QueuedDatabase::modify(const QString &_table, const long long _id,
     }
 
     return true;
+}
+
+
+/**
+ * @fn remove
+ */
+bool QueuedDatabase::remove(const QString &_table, const long long _id)
+{
+    qCDebug(LOG_LIB) << "Remove row" << _id << "from" << _table;
+
+    QSqlQuery query = m_database.exec(
+        QString("DELETE FROM %1 WHERE _id=%2").arg(_table).arg(_id));
+    QSqlError error = query.lastError();
+    if (error.isValid()) {
+        qCCritical(LOG_LIB) << "Could not remove record" << _id << "in table"
+                            << _table << "message" << error.text();
+        return false;
+    }
+
+    return true;
+}
+
+
+/**
+ * @fn removeTasks
+ */
+void QueuedDatabase::removeTasks(const QDateTime &_endTime)
+{
+    qCDebug(LOG_LIB) << "Remove all tasks which are older than" << _endTime;
+
+    QSqlQuery query = m_database.exec(
+        QString("DELETE FROM %1 WHERE datetime(endTime) < datetime(%2)")
+            .arg(QueuedDB::TASKS_TABLE)
+            .arg(_endTime.toString(Qt::ISODate)));
+
+    QSqlError error = query.lastError();
+    if (error.isValid())
+        qCCritical(LOG_LIB) << "Could not remove tasks in table"
+                            << "message" << error.text();
+}
+
+
+/**
+ * @fn removeTokens
+ */
+void QueuedDatabase::removeTokens()
+{
+    QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    QSqlQuery query = m_database.exec(
+        QString("DELETE FROM %1 WHERE datetime(validUntil) > datetime(%2)")
+            .arg(QueuedDB::TOKENS_TABLE)
+            .arg(now));
+
+    QSqlError error = query.lastError();
+    if (error.isValid())
+        qCCritical(LOG_LIB) << "Could not remove tokens in table"
+                            << "message" << error.text();
+}
+
+
+/**
+ * @fn removeUsers
+ */
+void QueuedDatabase::removeUsers(const QDateTime &_lastLogin)
+{
+    qCDebug(LOG_LIB) << "Remove all users which logged older than"
+                     << _lastLogin;
+
+    QSqlQuery query = m_database.exec(
+        QString("DELETE FROM %1 WHERE datetime(lastLogin) < datetime(%2)")
+            .arg(QueuedDB::USERS_TABLE)
+            .arg(_lastLogin.toString(Qt::ISODate)));
+
+    QSqlError error = query.lastError();
+    if (error.isValid())
+        qCCritical(LOG_LIB) << "Could not remove users in table"
+                            << "message" << error.text();
 }
 
 
