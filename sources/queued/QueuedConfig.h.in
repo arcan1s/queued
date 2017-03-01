@@ -1,0 +1,93 @@
+/*
+ * Copyright (c) 2016 Evgeniy Alekseev
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ *
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ */
+/**
+ * @file QueuedConfig.h
+ * Source code of queued library
+ * @author Evgeniy Alekseev
+ * @copyright GPLv3
+ * @bug https://github.com/arcan1s/queued/issues
+ */
+
+
+#ifndef QUEUEDCONFIG_H
+#define QUEUEDCONFIG_H
+
+/**
+ * @defgroup QueuedConfig
+ * @brief Queued configuration constants
+ */
+namespace QueuedConfig
+{
+// dbus configuration
+/**
+ * @brief DBus service name for library and application
+ * @remark required by Qt macro
+ */
+#define DBUS_SERVICE_NAME "org.quadro.core"
+/**
+ * @ingroup QueuedConfig
+ * @brief DBus service name for library and application
+ */
+const char DBUS_SERVICE[] = DBUS_SERVICE_NAME;
+/**
+ * @ingroup QueuedConfig
+ * @brief DBus object path for library
+ */
+const char DBUS_OBJECT_PATH[] = "/queued";
+
+// path configuration
+// common paths
+/**
+ * @ingroup QueuedConfig
+ * @brief installation directory for executables
+ */
+const char BIN_INSTALL_DIR[] = "@BIN_INSTALL_DIR@";
+/**
+ * @ingroup QueuedConfig
+ * @brief installation directory for data
+ */
+const char DATA_INSTALL_DIR[] = "@DATA_INSTALL_DIR@";
+/**
+ * @ingroup QueuedConfig
+ * @brief installation directory for headers
+ */
+const char INCLUDE_INSTALL_DIR[] = "@INCLUDE_INSTALL_DIR@";
+/**
+ * @ingroup QueuedConfig
+ * @brief installation directory for libraries
+ */
+const char LIB_INSTALL_DIR[] = "@LIB_INSTALL_DIR@";
+/**
+ * @ingroup QueuedConfig
+ * @brief the same as CMAKE_INSTALL_PREFIX
+ */
+const char ROOT_INSTALL_DIR[] = "@CMAKE_INSTALL_PREFIX@";
+
+// plugin interfaces
+/**
+ * @brief plugin interface name
+ * @remark required by Qt macro
+ */
+#define PLUGIN_INTERFACE_NAME                                                  \
+    "queued.plugin/@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@"
+/**
+ * @ingroup QueuedConfig
+ * @brief plugin interface name
+ */
+const char PLUGIN_INTERFACE[] = PLUGIN_INTERFACE_NAME;
+}
+
+
+#endif /* QUEUEDCONFIG_H */

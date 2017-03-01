@@ -52,11 +52,12 @@ QueuedTokenManager::~QueuedTokenManager()
 /**
  * @fn isTokenValid
  */
-bool QueuedTokenManager::isTokenValid(const QString &_token)
+bool QueuedTokenManager::isTokenValid(const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Check token on validity" << _token;
 
-    return m_tokens.contains(_token);
+    return m_tokens.contains(_token)
+           && (tokenExpiration(_token) > QDateTime::currentDateTimeUtc());
 }
 
 
@@ -98,6 +99,15 @@ QString QueuedTokenManager::registerToken(const QDateTime _validUntil)
 
     // and return requester
     return token;
+}
+
+
+/**
+ * @fn tokenExpiration
+ */
+QDateTime QueuedTokenManager::tokenExpiration(const QString &_token) const
+{
+    return m_tokens[_token];
 }
 
 

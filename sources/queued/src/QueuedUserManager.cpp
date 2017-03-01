@@ -95,6 +95,22 @@ QueuedUserManager::add(const QueuedUser::QueuedUserDefinitions &_definitions,
 
 
 /**
+ * @fn auth
+ */
+QueuedUserManager::QueuedUserAuthorization
+QueuedUserManager::auth(const QString &_user, const QString &_token)
+{
+    qCDebug(LOG_LIB) << "Generate auth structure for user" << _user;
+
+    QueuedUserAuthorization authObj;
+    authObj.user = _user;
+    authObj.token = _token;
+
+    return authObj;
+}
+
+
+/**
  * @fn authorize
  */
 QString QueuedUserManager::authorize(const QString &_user,
@@ -124,7 +140,7 @@ QString QueuedUserManager::authorize(const QString &_user,
 /**
  * @fn authorize
  */
-bool QueuedUserManager::authorize(const UserAuthorization &_auth,
+bool QueuedUserManager::authorize(const QueuedUserAuthorization &_auth,
                                   const QueuedEnums::Permission _service)
 {
     qCDebug(LOG_LIB) << "Authorize user" << _auth.user << "for"
@@ -143,6 +159,19 @@ bool QueuedUserManager::authorize(const UserAuthorization &_auth,
     }
 
     return userObj->hasPermission(_service);
+}
+
+
+/**
+ * @fn checkToken
+ */
+QDateTime QueuedUserManager::checkToken(const QString &_token,
+                                        bool *_valid) const
+{
+    if (_valid)
+        *_valid = m_tokens->isTokenValid(_token);
+
+    return m_tokens->tokenExpiration(_token);
 }
 
 

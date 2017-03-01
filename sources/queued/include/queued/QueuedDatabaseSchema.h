@@ -64,11 +64,14 @@ const char USERS_TABLE[] = "users";
 * description to create column
 * @var type
 * Qt type of column for cast
+* @var adminField
+* is admin permissions required to edit or not
 */
 typedef struct {
     QString name;
     QString sqlDescription;
     QVariant::Type type;
+    bool adminField;
 } QueuedDBField;
 /**
  * @ingroup QueuedDB
@@ -83,39 +86,46 @@ typedef QHash<QString, QHash<QString, QueuedDBField>> QueuedDBSchema;
 const QueuedDBSchema DBSchema = {
     {SETTINGS_TABLE,
      {{"_id",
-       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
-      {"key", {"key", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String}},
-      {"value", {"value", "TEXT", QVariant::String}}}},
+       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong,
+        true}},
+      {"key",
+       {"key", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String, true}},
+      {"value", {"value", "TEXT", QVariant::String, true}}}},
     {TASKS_TABLE,
      {{"_id",
-       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
-      {"user", {"user", "INT NOT NULL DEFAULT 0", QVariant::LongLong}},
-      {"command", {"command", "TEXT", QVariant::String}},
-      {"commandArguments", {"commandArguments", "TEXT", QVariant::String}},
-      {"workDirectory", {"workDirectory", "TEXT", QVariant::String}},
-      {"nice", {"nice", "INT", QVariant::UInt}},
-      {"uid", {"uid", "INT", QVariant::UInt}},
-      {"gid", {"gid", "INT", QVariant::UInt}},
-      {"state", {"state", "INT", QVariant::UInt}},
-      {"limits", {"limits", "TEXT", QVariant::String}},
-      {"startTime", {"startTime", "INT", QVariant::LongLong}},
-      {"endTime", {"endTime", "INT", QVariant::LongLong}}}},
+       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong,
+        true}},
+      {"user", {"user", "INT NOT NULL DEFAULT 0", QVariant::LongLong, false}},
+      {"command", {"command", "TEXT", QVariant::String, false}},
+      {"commandArguments",
+       {"commandArguments", "TEXT", QVariant::String, false}},
+      {"workDirectory", {"workDirectory", "TEXT", QVariant::String, false}},
+      {"nice", {"nice", "INT", QVariant::UInt, false}},
+      {"uid", {"uid", "INT", QVariant::UInt, false}},
+      {"gid", {"gid", "INT", QVariant::UInt, false}},
+      {"state", {"state", "INT", QVariant::UInt, true}},
+      {"limits", {"limits", "TEXT", QVariant::String, false}},
+      {"startTime", {"startTime", "INT", QVariant::LongLong, true}},
+      {"endTime", {"endTime", "INT", QVariant::LongLong, true}}}},
     {TOKENS_TABLE,
      {{"_id",
-       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
+       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong,
+        true}},
       {"token",
-       {"token", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String}},
+       {"token", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String, true}},
       {"validUntil",
-       {"validUntil", "TEXT NOT NULL DEFAULT '0'", QVariant::String}}}},
+       {"validUntil", "TEXT NOT NULL DEFAULT '0'", QVariant::String, true}}}},
     {USERS_TABLE,
      {{"_id",
-       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong}},
-      {"name", {"name", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String}},
-      {"password", {"password", "TEXT", QVariant::String}},
-      {"email", {"email", "TEXT", QVariant::String}},
-      {"lastLogin", {"lastLogin", "TEXT", QVariant::String}},
-      {"limits", {"limits", "TEXT", QVariant::String}},
-      {"permissions", {"permissions", "INT", QVariant::UInt}}}}};
+       {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong,
+        true}},
+      {"name",
+       {"name", "TEXT NOT NULL UNIQUE DEFAULT '0'", QVariant::String, true}},
+      {"password", {"password", "TEXT", QVariant::String, false}},
+      {"email", {"email", "TEXT", QVariant::String, false}},
+      {"lastLogin", {"lastLogin", "TEXT", QVariant::String, true}},
+      {"limits", {"limits", "TEXT", QVariant::String, true}},
+      {"permissions", {"permissions", "INT", QVariant::UInt, true}}}}};
 };
 
 #endif /* QUEUEDDATABASESCHEMA_H */

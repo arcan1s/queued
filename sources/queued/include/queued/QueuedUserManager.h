@@ -55,7 +55,7 @@ public:
     typedef struct {
         QString token;
         QString user;
-    } UserAuthorization;
+    } QueuedUserAuthorization;
 
     /**
      * @brief QueuedUserManager class constructor
@@ -87,6 +87,16 @@ public:
     QueuedUser *add(const QueuedUser::QueuedUserDefinitions &_definitions,
                     const long long _id);
     /**
+     * @brief build user auth structure
+     * @param _user
+     * user name
+     * @param _token
+     * user token
+     * @return generated structure
+     */
+    static QueuedUserAuthorization auth(const QString &_user,
+                                        const QString &_token);
+    /**
      * @brief authorize user
      * @param _user
      * user name
@@ -103,8 +113,17 @@ public:
      * service to authorize
      * @return true if user allowed to do it otherwise return false
      */
-    bool authorize(const UserAuthorization &_auth,
+    bool authorize(const QueuedUserAuthorization &_auth,
                    const QueuedEnums::Permission _service);
+    /**
+     * @brief check token expiration
+     * @param _token
+     * token string
+     * @param _valid
+     * optional output parameter, will set to true if token is valid
+     * @return token expiration or default constructor
+     */
+    QDateTime checkToken(const QString &_token, bool *_valid = nullptr) const;
     /**
      * @brief get UID and GID from user ID
      * @param _id

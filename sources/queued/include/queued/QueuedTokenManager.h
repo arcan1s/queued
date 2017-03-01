@@ -52,7 +52,7 @@ public:
      * token ID
      * @return true if token is valid otherwise return false
      */
-    bool isTokenValid(const QString &_token);
+    bool isTokenValid(const QString &_token) const;
     /**
     * @brief upload tokens from database
     * @param _value
@@ -66,6 +66,14 @@ public:
      * @return new generated token
      */
     QString registerToken(const QDateTime _validUntil);
+    /**
+     * @brief token expiration
+     * @param _token
+     * token ID
+     * @return token expiration if token found, otherwise return default
+     * QDateTime constructor
+     */
+    QDateTime tokenExpiration(const QString &_token) const;
 
 public slots:
     /**

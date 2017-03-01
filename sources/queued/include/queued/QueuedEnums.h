@@ -63,8 +63,6 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(LimitTypes)
  * administrative permissions
  * @var Permissions::JobOwner
  * owner job related permissions
- * @var Permissions::JobGlobal
- * other users job control
  * @var Permissions::User
  * user related permissions
  * @var Permissions::Web
@@ -76,10 +74,9 @@ enum class Permission {
     SuperAdmin = 1 << 0,
     Admin = 1 << 1,
     JobOwner = 1 << 2,
-    JobGlobal = 1 << 3,
-    User = 1 << 4,
-    Web = 1 << 5,
-    Reports = 1 << 6
+    User = 1 << 3,
+    Web = 1 << 4,
+    Reports = 1 << 5
 };
 Q_DECLARE_FLAGS(Permissions, Permission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)

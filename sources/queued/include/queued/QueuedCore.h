@@ -28,6 +28,7 @@
 
 #include "QueuedEnums.h"
 #include "QueuedLimits.h"
+#include "QueuedUserManager.h"
 
 
 class QueuedAdvancedSettings;
@@ -36,7 +37,6 @@ class QueuedProcessManager;
 class QueuedReportManager;
 class QueuedSettings;
 class QueuedTokenManager;
-class QueuedUserManager;
 
 /**
  * @brief aggregator of queued classes
@@ -69,11 +69,14 @@ public:
      * task owner user ID
      * @param _limits
      * task defined limits
+     * @param _auth
+     * user auth structure
      * @return true on successfully addition
      */
     bool addTask(const QString &_command, const QStringList &_arguments,
                  const QString &_workingDirectory, const unsigned int _nice,
-                 const long long _userId, const QueuedLimits::Limits &_limits);
+                 const long long _userId, const QueuedLimits::Limits &_limits,
+                 const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
      * @brief add new user
      * @param _name
@@ -86,42 +89,65 @@ public:
      * user permissions
      * @param _limits
      * user limits
+     * @param _auth
+     * user auth structure
      * @return true on successfully addition
      */
     bool addUser(const QString &_name, const QString &_email,
                  const QString &_password, const unsigned int _permissions,
-                 const QueuedLimits::Limits &_limits);
+                 const QueuedLimits::Limits &_limits,
+                 const QueuedUserManager::QueuedUserAuthorization &_auth);
+    /**
+     * @brief authorize and create new token for user
+     * @param _name
+     * user name
+     * @param _password
+     * user password
+     * @return authorization structure. Token field will be empty in case if no
+     * authorization occurs
+     */
+    QueuedUserManager::QueuedUserAuthorization
+    authorization(const QString &_name, const QString &_password);
     /**
      * @brief edit advanced settings
      * @param _key
      * advanced settings key
      * @param _value
      * advanced settings value
+     * @param _auth
+     * user auth structure
      * @return true on successful option edition
      */
-    bool editOption(const QString &_key, const QVariant &_value);
+    bool editOption(const QString &_key, const QVariant &_value,
+                    const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
      * @brief edit task
      * @param _id
      * task ID to edit
      * @param _taskData
      * task data to edit
+     * @param _auth
+     * user auth structure
      * @remark _taskData should contain only fields defined in schema, any other
      * fields will be ignored. No need to pass all properties here
      * @return true on successful task edition
      */
-    bool editTask(const long long _id, const QVariantHash &_taskData);
+    bool editTask(const long long _id, const QVariantHash &_taskData,
+                  const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
      * @brief edit user
      * @param _id
      * user ID to edit
      * @param _userData
      * user data to edit
+     * @param _auth
+     * user auth structure
      * @remark _userData should contain only fields defined in schema, any other
      * fields will be ignored. No need to pass all properties here
      * @return true on successful user edition
      */
-    bool editUser(const long long _id, const QVariantHash &_userData);
+    bool editUser(const long long _id, const QVariantHash &_userData,
+                  const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
      * @brief edit user permissions
      * @param _id
@@ -130,11 +156,35 @@ public:
      * permission to add or remove
      * @param _add
      * indicates whether it should be added or removed
+     * @param _auth
+     * user auth structure
      * @return true on successful user permission edition
      */
-    bool editUserPermission(const long long _id,
-                            const QueuedEnums::Permission &_permission,
-                            const bool _add);
+    bool
+    editUserPermission(const long long _id,
+                       const QueuedEnums::Permission &_permission,
+                       const bool _add,
+                       const QueuedUserManager::QueuedUserAuthorization &_auth);
+    /**
+     * @brief force start task
+     * @param _id
+     * task ID
+     * @param _auth
+     * user auth structure
+     * @return true on successful task start
+     */
+    bool startTask(const long long _id,
+                   const QueuedUserManager::QueuedUserAuthorization &_auth);
+    /**
+     * @brief force stop task
+     * @param _id
+     * task ID
+     * @param _auth
+     * user auth structure
+     * @return true on successful task stop
+     */
+    bool stopTask(const long long _id,
+                  const QueuedUserManager::QueuedUserAuthorization &_auth);
     // control methods
     /**
      * @brief deinit subclasses
@@ -207,6 +257,16 @@ private:
      * @brief connection list
      */
     QList<QMetaObject::Connection> m_connections;
+    /**
+     * @brief drop non-admin fields from database payload
+     * @param _table
+     * table name
+     * @param _payload
+     * initial database payload
+     * @return payload with dropped keys
+     */
+    QVariantHash dropAdminFields(const QString &_table,
+                                 const QVariantHash &_payload);
     /**
      * @brief init processes
      */

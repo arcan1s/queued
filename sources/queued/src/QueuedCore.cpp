@@ -22,6 +22,8 @@
 
 
 #include "queued/Queued.h"
+#include <queued/Queued.h>
+#include <queued/QueuedDatabaseSchema.h>
 
 #include "queued/QueuedDatabaseSchema.h"
 
@@ -53,14 +55,38 @@ QueuedCore::~QueuedCore()
 /**
  * @addTask
  */
-bool QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
-                         const QString &_workingDirectory,
-                         const unsigned int _nice, const long long _userId,
-                         const QueuedLimits::Limits &_limits)
+bool QueuedCore::addTask(
+    const QString &_command, const QStringList &_arguments,
+    const QString &_workingDirectory, const unsigned int _nice,
+    const long long _userId, const QueuedLimits::Limits &_limits,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
                      << "from user" << _userId;
 
+    long long userAuthId = m_users->user(_auth.user)->index();
+    long long actualUserId = (_userId == -1) ? userAuthId : _userId;
+
+    // check permissions
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    bool isUser = m_users->authorize(_auth, QueuedEnums::Permission::JobOwner);
+    if (userAuthId == actualUserId) {
+        // it means that user places task as own one
+        if (!isUser) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to add task";
+            return false;
+        }
+    } else {
+        // user tries to place task as another one
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to add task";
+            return false;
+        }
+    }
+
+    // add to database
     auto ids = m_users->ids(_userId);
     auto taskLimits = QueuedLimits::minimalLimits(
         _limits, m_users->user(_userId)->limits(),
@@ -80,6 +106,7 @@ bool QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
         return false;
     }
 
+    // add to child object
     m_processes->add(properties, id);
     return true;
 }
@@ -88,14 +115,22 @@ bool QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
 /**
  * @fn addUser
  */
-bool QueuedCore::addUser(const QString &_name, const QString &_email,
-                         const QString &_password,
-                         const unsigned int _permissions,
-                         const QueuedLimits::Limits &_limits)
+bool QueuedCore::addUser(
+    const QString &_name, const QString &_email, const QString &_password,
+    const unsigned int _permissions, const QueuedLimits::Limits &_limits,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
                      << "and permissions" << _permissions;
 
+    // check permissions
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    if (!isAdmin) {
+        qCInfo(LOG_LIB) << "User" << _auth.user << "not allowed to add user";
+        return false;
+    }
+
+    // add to dababase
     QVariantHash properties
         = {{"name", _name},
            {"password", QueuedUser::hashFromPassword(_password)},
@@ -108,22 +143,52 @@ bool QueuedCore::addUser(const QString &_name, const QString &_email,
         return false;
     }
 
+    // add to child object
     m_users->add(properties, id);
     return true;
+}
+
+
+QueuedUserManager::QueuedUserAuthorization
+QueuedCore::authorization(const QString &_name, const QString &_password)
+{
+    qCDebug(LOG_LIB) << "Authorize user" << _name;
+
+    QString token = m_users->authorize(_name, _password);
+    QueuedUserManager::QueuedUserAuthorization auth;
+    auth.user = _name;
+
+    if (!token.isEmpty()) {
+        QVariantHash payload = {
+            {"token", token},
+            {"validUntil", m_users->checkToken(token).toString(Qt::ISODate)}};
+        m_database->add(QueuedDB::TOKENS_TABLE, payload);
+    }
+
+    return auth;
 }
 
 
 /**
  * @fn editOption
  */
-bool QueuedCore::editOption(const QString &_key, const QVariant &_value)
+bool QueuedCore::editOption(
+    const QString &_key, const QVariant &_value,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Set key" << _key << "to" << _value;
 
+    // check permissions
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    if (!isAdmin) {
+        qCInfo(LOG_LIB) << "User" << _auth.user
+                        << "not allowed to edit options";
+        return false;
+    }
+
+    // add to database
     long long id = m_advancedSettings->id(_key);
-    QVariantHash payload = {
-        {"key", _key}, {"value", _value},
-    };
+    QVariantHash payload = {{"key", _key}, {"value", _value}};
 
     bool status = false;
     if (id == -1) {
@@ -136,6 +201,7 @@ bool QueuedCore::editOption(const QString &_key, const QVariant &_value)
                         << "has been modified with status" << status;
     }
 
+    // add to child objectm
     if (status)
         m_advancedSettings->set(_key, _value);
     return status;
@@ -145,7 +211,9 @@ bool QueuedCore::editOption(const QString &_key, const QVariant &_value)
 /**
  * @fn editTask
  */
-bool QueuedCore::editTask(const long long _id, const QVariantHash &_taskData)
+bool QueuedCore::editTask(
+    const long long _id, const QVariantHash &_taskData,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Edit task with ID" << _id;
 
@@ -155,8 +223,41 @@ bool QueuedCore::editTask(const long long _id, const QVariantHash &_taskData)
         return false;
     }
 
+    // check permissions
+    long long userAuthId = m_users->user(_auth.user)->index();
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    bool isUser = m_users->authorize(_auth, QueuedEnums::Permission::JobOwner);
+    if (userAuthId == task->user()) {
+        // it means that user edits own task
+        if (!isUser) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to edit task";
+            return false;
+        }
+    } else {
+        // user tries to edit random task
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to edit task";
+            return false;
+        }
+    }
+    // only admin can edit run/stopped task
+    if (task->pstate() != QueuedEnums::ProcessState::NotRunning) {
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to edit run/exited task";
+            return false;
+        }
+    }
+
+    // drop admin fields
+    QVariantHash payload
+        = isAdmin ? _taskData
+                  : dropAdminFields(QueuedDB::TASKS_TABLE, _taskData);
+
     // modify record in database first
-    bool status = m_database->modify(QueuedDB::TASKS_TABLE, _id, _taskData);
+    bool status = m_database->modify(QueuedDB::TASKS_TABLE, _id, payload);
     if (!status) {
         qCWarning(LOG_LIB) << "Could not modify task record" << _id
                            << "in database, do not edit it in memory";
@@ -164,9 +265,9 @@ bool QueuedCore::editTask(const long long _id, const QVariantHash &_taskData)
     }
 
     // modify values stored in memory
-    for (auto &property : _taskData.keys())
+    for (auto &property : payload.keys())
         task->setProperty(property.toLocal8Bit().constData(),
-                          _taskData[property]);
+                          payload[property]);
 
     return true;
 }
@@ -175,7 +276,9 @@ bool QueuedCore::editTask(const long long _id, const QVariantHash &_taskData)
 /**
  * @fn editUser
  */
-bool QueuedCore::editUser(const long long _id, const QVariantHash &_userData)
+bool QueuedCore::editUser(
+    const long long _id, const QVariantHash &_userData,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Edit user with ID" << _id;
 
@@ -185,8 +288,24 @@ bool QueuedCore::editUser(const long long _id, const QVariantHash &_userData)
         return false;
     }
 
+    // check permissions
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    long long userAuthId = m_users->user(_auth.user)->index();
+    if (userAuthId != _id) {
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to edit user";
+            return false;
+        }
+    }
+
+    // drop admin fields
+    QVariantHash payload
+        = isAdmin ? _userData
+                  : dropAdminFields(QueuedDB::USERS_TABLE, _userData);
+
     // modify record in database first
-    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, _userData);
+    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, payload);
     if (!status) {
         qCWarning(LOG_LIB) << "Could not modify user record" << _id
                            << "in database, do not edit it in memory";
@@ -194,9 +313,9 @@ bool QueuedCore::editUser(const long long _id, const QVariantHash &_userData)
     }
 
     // modify values stored in memory
-    for (auto &property : _userData.keys())
+    for (auto &property : payload.keys())
         user->setProperty(property.toLocal8Bit().constData(),
-                          _userData[property]);
+                          payload[property]);
 
     return true;
 }
@@ -205,9 +324,9 @@ bool QueuedCore::editUser(const long long _id, const QVariantHash &_userData)
 /**
  * @fn editUserPermission
  */
-bool QueuedCore::editUserPermission(const long long _id,
-                                    const QueuedEnums::Permission &_permission,
-                                    const bool _add)
+bool QueuedCore::editUserPermission(
+    const long long _id, const QueuedEnums::Permission &_permission,
+    const bool _add, const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission)
                      << "for user" << _id << "add" << _add;
@@ -218,6 +337,18 @@ bool QueuedCore::editUserPermission(const long long _id,
         return false;
     }
 
+    // check permissions
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    long long userAuthId = m_users->user(_auth.user)->index();
+    if (userAuthId != _id) {
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to edit permissions";
+            return false;
+        }
+    }
+
+    // edit runtime permissions to get value
     if (_add)
         user->addPermissions(_permission);
     else
@@ -238,6 +369,73 @@ bool QueuedCore::editUserPermission(const long long _id,
             user->addPermissions(_permission);
         return false;
     }
+
+    return true;
+}
+
+
+/**
+ * @fn startTask
+ */
+bool QueuedCore::startTask(
+    const long long _id,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
+{
+    qCDebug(LOG_LIB) << "Force start task with ID" << _id;
+
+    // check permissions
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    long long userAuthId = m_users->user(_auth.user)->index();
+    if (userAuthId != _id) {
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to start tasks";
+            return false;
+        }
+    }
+
+    m_processes->start(_id);
+
+    return true;
+}
+
+
+/**
+ * @fn stopTask
+ */
+bool QueuedCore::stopTask(
+    const long long _id,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
+{
+    qCDebug(LOG_LIB) << "Force stop task with ID" << _id;
+
+    auto task = m_processes->process(_id);
+    if (!task) {
+        qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
+        return false;
+    }
+
+    // check permissions
+    long long userAuthId = m_users->user(_auth.user)->index();
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    bool isUser = m_users->authorize(_auth, QueuedEnums::Permission::JobOwner);
+    if (userAuthId == task->user()) {
+        // it means that user edits own task
+        if (!isUser) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to stop task";
+            return false;
+        }
+    } else {
+        // user tries to edit random task
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _auth.user
+                            << "not allowed to stop task";
+            return false;
+        }
+    }
+
+    m_processes->stop(_id);
 
     return true;
 }
@@ -348,6 +546,26 @@ void QueuedCore::updateUserLoginTime(const long long _id,
     bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, record);
     if (!status)
         qCWarning(LOG_LIB) << "Could not modify user record" << _id;
+}
+
+
+/**
+ * @fn dropAdminFields
+ */
+QVariantHash QueuedCore::dropAdminFields(const QString &_table,
+                                         const QVariantHash &_payload)
+{
+    qCDebug(LOG_LIB) << "Drop admin fields from" << _payload << "in table"
+                     << _table;
+
+    QVariantHash payload;
+    for (auto &key : _payload.keys()) {
+        if (QueuedDB::DBSchema[_table][key].adminField)
+            continue;
+        payload[key] = _payload[key];
+    }
+
+    return payload;
 }
 
 

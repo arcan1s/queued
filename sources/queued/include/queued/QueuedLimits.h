@@ -98,6 +98,28 @@ struct Limits {
         storage = limits.at(4).toLongLong();
         valid = true;
     };
+    /**
+     * @brief structure constructor from fields
+     * @param _cpuLimit
+     * limit by CPU cores
+     * @param _gpuLimit
+     * limit by GPU cores
+     * @param _memory
+     * limit by memory
+     * @param _gpumemory
+     * limit by GPU memory
+     * @param _storage
+     * limit by storage
+     */
+    Limits(const long long _cpuLimit, const long long _gpuLimit,
+           const long long _memoryLimit, const long long _gpumemoryLimit,
+           const long long _storage)
+        : cpu(_cpuLimit)
+        , gpu(_gpuLimit)
+        , memory(_memoryLimit)
+        , gpumemory(_gpumemoryLimit)
+        , storage(_storage)
+        , valid(true){};
 };
 /**
  * @ingroup QueuedLimits
@@ -108,7 +130,7 @@ struct Limits {
  * conversion status
  * @return converted integer
  */
-long long convertMemory(QString _value, bool *_status);
+long long convertMemory(QString _value, bool *_status = nullptr);
 /**
  * @ingroup QueuedLimits
  * @brief compare two limits
