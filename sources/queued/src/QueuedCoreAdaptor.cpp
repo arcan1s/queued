@@ -13,33 +13,34 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file Queued.h
- * Header of Queued library
+ * @file QueuedCoreAdaptor.cpp
+ * Source code of queued library
  * @author Evgeniy Alekseev
- * @copyright MIT
+ * @copyright GPLv3
  * @bug https://github.com/arcan1s/queued/issues
  */
 
 
-#ifndef QUEUED_H
-#define QUEUED_H
+#include "queued/Queued.h"
 
-#include "QueuedAdvancedSettings.h"
-#include "QueuedConfiguration.h"
-#include "QueuedCore.h"
-#include "QueuedCoreAdaptor.h"
-#include "QueuedCoreInterface.h"
-#include "QueuedDatabase.h"
-#include "QueuedDebug.h"
-#include "QueuedEnums.h"
-#include "QueuedExceptions.h"
-#include "QueuedLimits.h"
-#include "QueuedProcess.h"
-#include "QueuedProcessManager.h"
-#include "QueuedReportManager.h"
-#include "QueuedSettings.h"
-#include "QueuedTokenManager.h"
-#include "QueuedUser.h"
-#include "QueuedUserManager.h"
 
-#endif /* QUEUED_H */
+/**
+ * @class QueuedCoreAdaptor
+ */
+/**
+ * @fn QueuedCoreAdaptor
+ */
+QueuedCoreAdaptor::QueuedCoreAdaptor(QObject *parent)
+    : QObject(parent)
+{
+    qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
+}
+
+
+/**
+ * @fn ~QueuedCoreAdaptor
+ */
+QueuedCoreAdaptor::~QueuedCoreAdaptor()
+{
+    qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
+}

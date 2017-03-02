@@ -42,7 +42,7 @@ class QueuedUser : public QObject
     Q_PROPERTY(QString email READ email WRITE setEmail)
     Q_PROPERTY(QString name READ name WRITE setName)
     Q_PROPERTY(QString password READ password WRITE setPassword)
-    Q_PROPERTY(unsigned int permissions READ permissions WRITE setPermissions)
+    Q_PROPERTY(uint permissions READ permissions WRITE setPermissions)
     // limits
     Q_PROPERTY(QueuedLimits::Limits limits READ limits WRITE setLimits)
 
@@ -65,7 +65,7 @@ public:
         QString name;
         QString email;
         QString password;
-        unsigned int permissions;
+        uint permissions;
         QueuedLimits::Limits limits;
     } QueuedUserDefinitions;
 
@@ -112,7 +112,7 @@ public:
      * @brief get UID and GID from user ID
      * @return pair of {uid, gid}
      */
-    QPair<unsigned int, unsigned int> ids();
+    QPair<uint, uint> ids();
     /**
      * @brief check if password is valid
      * @param _password
@@ -153,7 +153,7 @@ public:
      * @brief user permissions
      * @return sum of user permissions from QueuedUser::Permissions
      */
-    unsigned int permissions() const;
+    uint permissions() const;
     // permissions
     /**
      * @brief user limits
@@ -184,7 +184,7 @@ public:
      * @param _permissions
      * new user permissions
      */
-    void setPermissions(const unsigned int _permissions);
+    void setPermissions(const uint _permissions);
     // permissions
     /**
      * @brief set limits

@@ -109,7 +109,7 @@ QDateTime QueuedProcess::endTime() const
 /**
  * @fn gid
  */
-unsigned int QueuedProcess::gid() const
+uint QueuedProcess::gid() const
 {
     return m_definitions.gid;
 }
@@ -127,7 +127,7 @@ QueuedLimits::Limits QueuedProcess::limits() const
 /**
  * @fn nice
  */
-unsigned int QueuedProcess::nice() const
+uint QueuedProcess::nice() const
 {
     return m_definitions.nice;
 }
@@ -154,7 +154,7 @@ QDateTime QueuedProcess::startTime() const
 /**
  * @fn uid
  */
-unsigned int QueuedProcess::uid() const
+uint QueuedProcess::uid() const
 {
     return m_definitions.uid;
 }
@@ -216,7 +216,7 @@ void QueuedProcess::setEndTime(const QDateTime &_time)
 /**
  * @fn setGid
  */
-void QueuedProcess::setGid(const unsigned int _gid)
+void QueuedProcess::setGid(const uint _gid)
 {
     qCDebug(LOG_LIB) << "Set process GID to" << _gid;
 
@@ -238,7 +238,7 @@ void QueuedProcess::setLimits(const QueuedLimits::Limits &_limits)
 /**
  * @fn setNice
  */
-void QueuedProcess::setNice(const unsigned int _nice)
+void QueuedProcess::setNice(const uint _nice)
 {
     qCDebug(LOG_LIB) << "Set nice level to" << _nice;
 
@@ -271,7 +271,7 @@ void QueuedProcess::setStartTime(const QDateTime &_time)
 /**
  * @fn setUid
  */
-void QueuedProcess::setUid(const unsigned int _uid)
+void QueuedProcess::setUid(const uint _uid)
 {
     qCDebug(LOG_LIB) << "Set process UID to" << _uid;
 

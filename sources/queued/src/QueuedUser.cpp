@@ -102,9 +102,9 @@ bool QueuedUser::hasPermission(const QueuedEnums::Permission _permission)
 /**
  * @fn ids
  */
-QPair<unsigned int, unsigned int> QueuedUser::ids()
+QPair<uint, uint> QueuedUser::ids()
 {
-    QPair<unsigned int, unsigned int> system = {1, 1};
+    QPair<uint, uint> system = {1, 1};
 
     auto pwd = getpwnam(name().toLocal8Bit().constData());
     if (!pwd) {
@@ -180,7 +180,7 @@ QString QueuedUser::password() const
 /**
  * @fn permissions
  */
-unsigned int QueuedUser::permissions() const
+uint QueuedUser::permissions() const
 {
     return m_definitions.permissions;
 }
@@ -231,7 +231,7 @@ void QueuedUser::setPassword(const QString _password)
 /**
  * @fn setPermissions
  */
-void QueuedUser::setPermissions(const unsigned int _permissions)
+void QueuedUser::setPermissions(const uint _permissions)
 {
     qCDebug(LOG_LIB) << "New user permissions" << _permissions;
 

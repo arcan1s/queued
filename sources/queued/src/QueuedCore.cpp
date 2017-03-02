@@ -22,8 +22,9 @@
 
 
 #include "queued/Queued.h"
-#include <queued/Queued.h>
-#include <queued/QueuedDatabaseSchema.h>
+
+#include <QDBusConnection>
+#include <QDBusMessage>
 
 #include "queued/QueuedDatabaseSchema.h"
 
@@ -57,8 +58,8 @@ QueuedCore::~QueuedCore()
  */
 bool QueuedCore::addTask(
     const QString &_command, const QStringList &_arguments,
-    const QString &_workingDirectory, const unsigned int _nice,
-    const long long _userId, const QueuedLimits::Limits &_limits,
+    const QString &_workingDirectory, const uint _nice, const long long _userId,
+    const QueuedLimits::Limits &_limits,
     const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
@@ -117,7 +118,7 @@ bool QueuedCore::addTask(
  */
 bool QueuedCore::addUser(
     const QString &_name, const QString &_email, const QString &_password,
-    const unsigned int _permissions, const QueuedLimits::Limits &_limits,
+    const uint _permissions, const QueuedLimits::Limits &_limits,
     const QueuedUserManager::QueuedUserAuthorization &_auth)
 {
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
@@ -353,7 +354,7 @@ bool QueuedCore::editUserPermission(
         user->addPermissions(_permission);
     else
         user->removePermissions(_permission);
-    unsigned int permissions = user->permissions();
+    uint permissions = user->permissions();
     qCInfo(LOG_LIB) << "New user permissions";
 
     // modify in database now
@@ -451,6 +452,11 @@ void QueuedCore::deinit()
         disconnect(connection);
     m_connections.clear();
 
+    // dbus cleanup
+    QDBusConnection::sessionBus().unregisterObject(
+        QueuedConfig::DBUS_OBJECT_PATH);
+    QDBusConnection::sessionBus().unregisterService(QueuedConfig::DBUS_SERVICE);
+
     // delete objects now
     if (m_reports)
         delete m_reports;
@@ -487,6 +493,9 @@ void QueuedCore::init(const QString &_configuration)
         m_advancedSettings,
         SIGNAL(valueUpdated(const QString &, const QVariant &)), this,
         SLOT(updateSettings(const QString &, const QVariant &)));
+
+    // dbus session
+    initDBus();
 }
 
 
@@ -570,6 +579,31 @@ QVariantHash QueuedCore::dropAdminFields(const QString &_table,
 
 
 /**
+ * @fn initDBus
+ */
+void QueuedCore::initDBus()
+{
+    QDBusConnection bus = QDBusConnection::sessionBus();
+
+    if (!bus.registerService(QueuedConfig::DBUS_SERVICE)) {
+        QString message = QString("Could not register service %1")
+                              .arg(bus.lastError().message());
+        qCCritical(LOG_DBUS) << message;
+        throw QueuedDBusException(message);
+    }
+
+    if (!bus.registerObject(QueuedConfig::DBUS_OBJECT_PATH,
+                            new QueuedCoreInterface(this),
+                            QDBusConnection::ExportAllContents)) {
+        QString message = QString("Could not register core object %1")
+                              .arg(bus.lastError().message());
+        qCCritical(LOG_DBUS) << message;
+        throw QueuedDBusException(message);
+    }
+}
+
+
+/**
  * @fn initProcesses
  */
 void QueuedCore::initProcesses()
@@ -610,8 +644,11 @@ void QueuedCore::initSettings(const QString &_configuration)
     m_database = new QueuedDatabase(this, dbSetup.path, dbSetup.driver);
     bool status = m_database->open(dbSetup.hostname, dbSetup.port,
                                    dbSetup.username, dbSetup.password);
-    if (!status)
-        throw QueuedDatabaseException("Could not open database");
+    if (!status) {
+        QString message = QString("Could not open database");
+        qCCritical(LOG_LIB) << message;
+        throw QueuedDatabaseException(message);
+    }
 
     // create administrator if required
     auto dbAdmin = m_settings->admin();

@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file Queued.h
+ * @file QueuedCoreAdaptor.h
  * Header of Queued library
  * @author Evgeniy Alekseev
  * @copyright MIT
@@ -21,25 +21,33 @@
  */
 
 
-#ifndef QUEUED_H
-#define QUEUED_H
+#ifndef QUEUEDCOREADAPTOR_H
+#define QUEUEDCOREADAPTOR_H
 
-#include "QueuedAdvancedSettings.h"
-#include "QueuedConfiguration.h"
-#include "QueuedCore.h"
-#include "QueuedCoreAdaptor.h"
-#include "QueuedCoreInterface.h"
-#include "QueuedDatabase.h"
-#include "QueuedDebug.h"
-#include "QueuedEnums.h"
-#include "QueuedExceptions.h"
-#include "QueuedLimits.h"
-#include "QueuedProcess.h"
-#include "QueuedProcessManager.h"
-#include "QueuedReportManager.h"
-#include "QueuedSettings.h"
-#include "QueuedTokenManager.h"
-#include "QueuedUser.h"
-#include "QueuedUserManager.h"
+#include <QObject>
 
-#endif /* QUEUED_H */
+
+/**
+ * @brief DBus adaptor for core interface
+ */
+class QueuedCoreAdaptor : public QObject
+{
+    Q_OBJECT
+
+public:
+    /**
+     * @brief QueuedCoreAdaptor class constructor
+     * @param parent
+     * pointer to parent item
+     */
+    explicit QueuedCoreAdaptor(QObject *parent);
+    /**
+     * @brief QueuedCoreAdaptor class destructor
+     */
+    virtual ~QueuedCoreAdaptor();
+
+private:
+};
+
+
+#endif /* QUEUEDCOREADAPTOR_H */

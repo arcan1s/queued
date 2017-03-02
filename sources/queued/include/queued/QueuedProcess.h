@@ -44,12 +44,12 @@ class QueuedProcess : public QProcess
     Q_PROPERTY(QStringList commandArguments READ commandArguments WRITE
                    setCommandArguments)
     Q_PROPERTY(QDateTime endTime READ endTime WRITE setEndTime)
-    Q_PROPERTY(unsigned int gid READ uid WRITE setGid)
+    Q_PROPERTY(uint gid READ uid WRITE setGid)
     Q_PROPERTY(QueuedLimits::Limits limits READ limits WRITE setLimits)
-    Q_PROPERTY(unsigned int nice READ nice WRITE setNice)
+    Q_PROPERTY(uint nice READ nice WRITE setNice)
     Q_PROPERTY(QueuedEnums::ProcessState pstate READ pstate WRITE setPState)
     Q_PROPERTY(QDateTime startTime READ startTime WRITE setStartTime)
-    Q_PROPERTY(unsigned int uid READ uid WRITE setUid)
+    Q_PROPERTY(uint uid READ uid WRITE setUid)
     Q_PROPERTY(long long user READ user WRITE setUser)
     Q_PROPERTY(QString workDirectory READ workDirectory WRITE setWorkDirectory)
 
@@ -84,9 +84,9 @@ public:
         QString command;
         QStringList arguments;
         QString workingDirectory;
-        unsigned int uid;
-        unsigned int gid;
-        unsigned int nice;
+        uint uid;
+        uint gid;
+        uint nice;
         QDateTime startTime;
         QDateTime endTime;
         long long user;
@@ -140,7 +140,7 @@ public:
      * @brief process GID
      * @return process GID
      */
-    unsigned int gid() const;
+    uint gid() const;
     /**
      * @brief process limits
      * @return process defined limits
@@ -150,7 +150,7 @@ public:
      * @brief process nice
      * @return process nice
      */
-    unsigned int nice() const;
+    uint nice() const;
     /**
      * @brief process state
      * @return process defined state
@@ -165,7 +165,7 @@ public:
      * @brief process UID
      * @return process UID
      */
-    unsigned int uid() const;
+    uint uid() const;
     /**
      * @brief user
      * @return process owner ID
@@ -198,7 +198,7 @@ public:
      * @param _gid
      * new process GID
      */
-    void setGid(const unsigned int _gid);
+    void setGid(const uint _gid);
     /**
      * @brief set process limits
      * @param _limits
@@ -210,7 +210,7 @@ public:
      * @param _nice
      * new process nice
      */
-    void setNice(const unsigned int _nice);
+    void setNice(const uint _nice);
     /**
      * @brief set process state
      * @param _limits
@@ -228,7 +228,7 @@ public:
      * @param _uid
      * new process UID
      */
-    void setUid(const unsigned int _uid);
+    void setUid(const uint _uid);
     /**
      * @brief set user ID
      * @param _user

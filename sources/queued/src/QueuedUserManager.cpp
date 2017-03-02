@@ -178,7 +178,7 @@ QDateTime QueuedUserManager::checkToken(const QString &_token,
 /**
  * @fn ids
  */
-QPair<unsigned int, unsigned int> QueuedUserManager::ids(const long long _id)
+QPair<uint, uint> QueuedUserManager::ids(const long long _id)
 {
     qCDebug(LOG_LIB) << "Get ids for user" << _id;
 

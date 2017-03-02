@@ -130,7 +130,7 @@ public:
      * user id
      * @return pair of {uid, gid}
      */
-    QPair<unsigned int, unsigned int> ids(const long long _id);
+    QPair<uint, uint> ids(const long long _id);
     /**
      * @brief load tokens
      * @param _tokens

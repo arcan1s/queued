@@ -74,7 +74,7 @@ public:
      * @return true on successfully addition
      */
     bool addTask(const QString &_command, const QStringList &_arguments,
-                 const QString &_workingDirectory, const unsigned int _nice,
+                 const QString &_workingDirectory, const uint _nice,
                  const long long _userId, const QueuedLimits::Limits &_limits,
                  const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
@@ -94,7 +94,7 @@ public:
      * @return true on successfully addition
      */
     bool addUser(const QString &_name, const QString &_email,
-                 const QString &_password, const unsigned int _permissions,
+                 const QString &_password, const uint _permissions,
                  const QueuedLimits::Limits &_limits,
                  const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
@@ -194,7 +194,8 @@ public:
      * @brief init subclasses
      * @param _configuration
      * path to configuration file
-     * @throws QueuedDatabaseException
+     * @throw QueuedDatabaseException
+     * @throw QueuedDBusException
      */
     void init(const QString &_configuration);
 
@@ -268,6 +269,11 @@ private:
     QVariantHash dropAdminFields(const QString &_table,
                                  const QVariantHash &_payload);
     /**
+     * @brief init DBus interface
+     * @throw QueuedDBusException
+     */
+    void initDBus();
+    /**
      * @brief init processes
      */
     void initProcesses();
@@ -275,6 +281,7 @@ private:
      * @brief init settings and database
      * @param _configuration
      * path to configuration file
+     * @throw QueuedDatabaseException
      */
     void initSettings(const QString &_configuration);
     /**

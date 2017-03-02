@@ -65,4 +65,42 @@ private:
 };
 
 
+/**
+ * @brief DBus operation exception
+ */
+class QueuedDBusException : public QException
+{
+public:
+    /**
+     * @brief QueuedDBusException class constructor
+     * @param message
+     * exception message
+     */
+    QueuedDBusException(const QString &message)
+        : m_message(message){};
+    /**
+     * @brief clone QueuedDBusException
+     */
+    QueuedDBusException *clone() const
+    {
+        return new QueuedDBusException(*this);
+    };
+    /**
+     * @brief message of this exception
+     * @return message for logging, etc
+     */
+    QString message() const { return m_message; };
+    /**
+     * @brief raise QueuedDBusException
+     */
+    void raise() const { throw * this; }
+
+private:
+    /**
+     * @brief exception message
+     */
+    QString m_message;
+};
+
+
 #endif /* QUEUEDEXCEPTIONS_H */
