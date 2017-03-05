@@ -80,15 +80,17 @@ void QueuedDatabase::createAdministrator(const QString &_user,
                                          const QString &_password)
 {
     qCDebug(LOG_LIB) << "Check for user" << _user;
-    QString table("users");
 
-    QSqlQuery query = m_database.exec(
-        QString("SELECT * FROM '%1' WHERE name='%2'").arg(table).arg(_user));
+    QSqlQuery query
+        = m_database.exec(QString("SELECT * FROM '%1' WHERE name='%2'")
+                              .arg(QueuedDB::USERS_TABLE)
+                              .arg(_user));
     QSqlError error = query.lastError();
     if (error.isValid())
-        qCWarning(LOG_LIB) << "Could not get record" << _user << "from" << table
-                           << "message" << error.text();
-    else if (query.size() > 0)
+        qCWarning(LOG_LIB) << "Could not get record" << _user << "from"
+                           << QueuedDB::USERS_TABLE << "message"
+                           << error.text();
+    else if (query.next())
         return;
 
     qCInfo(LOG_LIB) << "Create administrator user" << _user;
@@ -97,7 +99,7 @@ void QueuedDatabase::createAdministrator(const QString &_user,
         {"password", _password},
         {"permissions", static_cast<int>(QueuedEnums::Permission::SuperAdmin)}};
 
-    if (!add(table, payload))
+    if (!add(QueuedDB::USERS_TABLE, payload))
         qCCritical(LOG_LIB) << "Could not create administrator";
 }
 
@@ -113,7 +115,7 @@ QList<QVariantHash> QueuedDatabase::get(const QString &_table,
 
     QList<QVariantHash> output;
     QSqlQuery query
-        = m_database.exec(QString("SELECT * FROM '%1' ORDER BY _id DESC %1")
+        = m_database.exec(QString("SELECT * FROM '%1' %2 ORDER BY _id DESC")
                               .arg(_table)
                               .arg(_condition));
 
@@ -227,7 +229,7 @@ bool QueuedDatabase::modify(const QString &_table, const long long _id,
     auto payload = getQueryPayload(_table, _value);
     QStringList stringPayload;
     for (int i = 0; i < payload.first.count(); i++)
-        stringPayload.append(QString("%1='%2'")
+        stringPayload.append(QString("%1=%2")
                                  .arg(payload.first.at(i))
                                  .arg(payload.second.at(i)));
     // build query
@@ -274,7 +276,7 @@ void QueuedDatabase::removeTasks(const QDateTime &_endTime)
     qCDebug(LOG_LIB) << "Remove all tasks which are older than" << _endTime;
 
     QSqlQuery query = m_database.exec(
-        QString("DELETE FROM %1 WHERE datetime(endTime) < datetime(%2)")
+        QString("DELETE FROM %1 WHERE datetime(endTime) < datetime('%2')")
             .arg(QueuedDB::TASKS_TABLE)
             .arg(_endTime.toString(Qt::ISODate)));
 
@@ -292,7 +294,7 @@ void QueuedDatabase::removeTokens()
 {
     QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
     QSqlQuery query = m_database.exec(
-        QString("DELETE FROM %1 WHERE datetime(validUntil) > datetime(%2)")
+        QString("DELETE FROM %1 WHERE datetime(validUntil) > datetime('%2')")
             .arg(QueuedDB::TOKENS_TABLE)
             .arg(now));
 
@@ -312,7 +314,7 @@ void QueuedDatabase::removeUsers(const QDateTime &_lastLogin)
                      << _lastLogin;
 
     QSqlQuery query = m_database.exec(
-        QString("DELETE FROM %1 WHERE datetime(lastLogin) < datetime(%2)")
+        QString("DELETE FROM %1 WHERE datetime(lastLogin) < datetime('%2')")
             .arg(QueuedDB::USERS_TABLE)
             .arg(_lastLogin.toString(Qt::ISODate)));
 

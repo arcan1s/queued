@@ -65,7 +65,12 @@ bool QueuedCore::addTask(
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
                      << "from user" << _userId;
 
-    long long userAuthId = m_users->user(_auth.user)->index();
+    auto authUser = m_users->user(_auth.user);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _auth.user;
+        return false;
+    }
+    long long userAuthId = authUser->index();
     long long actualUserId = (_userId == -1) ? userAuthId : _userId;
 
     // check permissions
@@ -89,8 +94,13 @@ bool QueuedCore::addTask(
 
     // add to database
     auto ids = m_users->ids(_userId);
+    auto user = m_users->user(_userId);
+    if (!user) {
+        qCWarning(LOG_LIB) << "Could not find task user" << _userId;
+        return false;
+    }
     auto taskLimits = QueuedLimits::minimalLimits(
-        _limits, m_users->user(_userId)->limits(),
+        _limits, user->limits(),
         QueuedLimits::Limits(
             m_advancedSettings->get(QString("DefaultLimits")).toString()));
     QVariantHash properties = {{"user", _userId},
@@ -131,6 +141,13 @@ bool QueuedCore::addUser(
         return false;
     }
 
+    // check if already exists
+    auto user = m_users->user(_name);
+    if (user) {
+        qCWarning(LOG_LIB) << "User" << _name << "already exists";
+        return false;
+    }
+
     // add to dababase
     QVariantHash properties
         = {{"name", _name},
@@ -158,6 +175,7 @@ QueuedCore::authorization(const QString &_name, const QString &_password)
     QString token = m_users->authorize(_name, _password);
     QueuedUserManager::QueuedUserAuthorization auth;
     auth.user = _name;
+    auth.token = token;
 
     if (!token.isEmpty()) {
         QVariantHash payload = {
@@ -225,7 +243,12 @@ bool QueuedCore::editTask(
     }
 
     // check permissions
-    long long userAuthId = m_users->user(_auth.user)->index();
+    auto authUser = m_users->user(_auth.user);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _auth.user;
+        return false;
+    }
+    long long userAuthId = authUser->index();
     bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
     bool isUser = m_users->authorize(_auth, QueuedEnums::Permission::JobOwner);
     if (userAuthId == task->user()) {
@@ -290,8 +313,13 @@ bool QueuedCore::editUser(
     }
 
     // check permissions
+    auto authUser = m_users->user(_auth.user);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _auth.user;
+        return false;
+    }
+    long long userAuthId = authUser->index();
     bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
-    long long userAuthId = m_users->user(_auth.user)->index();
     if (userAuthId != _id) {
         if (!isAdmin) {
             qCInfo(LOG_LIB) << "User" << _auth.user
@@ -339,8 +367,13 @@ bool QueuedCore::editUserPermission(
     }
 
     // check permissions
+    auto authUser = m_users->user(_auth.user);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _auth.user;
+        return false;
+    }
+    long long userAuthId = authUser->index();
     bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
-    long long userAuthId = m_users->user(_auth.user)->index();
     if (userAuthId != _id) {
         if (!isAdmin) {
             qCInfo(LOG_LIB) << "User" << _auth.user
@@ -385,8 +418,13 @@ bool QueuedCore::startTask(
     qCDebug(LOG_LIB) << "Force start task with ID" << _id;
 
     // check permissions
+    auto authUser = m_users->user(_auth.user);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _auth.user;
+        return false;
+    }
+    long long userAuthId = authUser->index();
     bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
-    long long userAuthId = m_users->user(_auth.user)->index();
     if (userAuthId != _id) {
         if (!isAdmin) {
             qCInfo(LOG_LIB) << "User" << _auth.user
@@ -417,7 +455,12 @@ bool QueuedCore::stopTask(
     }
 
     // check permissions
-    long long userAuthId = m_users->user(_auth.user)->index();
+    auto authUser = m_users->user(_auth.user);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _auth.user;
+        return false;
+    }
+    long long userAuthId = authUser->index();
     bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
     bool isUser = m_users->authorize(_auth, QueuedEnums::Permission::JobOwner);
     if (userAuthId == task->user()) {
@@ -443,6 +486,28 @@ bool QueuedCore::stopTask(
 
 
 /**
+ * @fn task
+ */
+const QueuedProcess *QueuedCore::task(const long long _id)
+{
+    qCDebug(LOG_LIB) << "Get task by ID" << _id;
+
+    return m_processes->process(_id);
+}
+
+
+/**
+ * @fn user
+ */
+const QueuedUser *QueuedCore::user(const long long _id)
+{
+    qCDebug(LOG_LIB) << "Get user by ID" << _id;
+
+    return m_users->user(_id);
+}
+
+
+/**
  * @fn deinit
  */
 void QueuedCore::deinit()
@@ -455,6 +520,8 @@ void QueuedCore::deinit()
     // dbus cleanup
     QDBusConnection::sessionBus().unregisterObject(
         QueuedConfig::DBUS_OBJECT_PATH);
+    QDBusConnection::sessionBus().unregisterObject(
+        QueuedConfig::DBUS_PROPERTY_PATH);
     QDBusConnection::sessionBus().unregisterService(QueuedConfig::DBUS_SERVICE);
 
     // delete objects now
@@ -583,7 +650,7 @@ QVariantHash QueuedCore::dropAdminFields(const QString &_table,
  */
 void QueuedCore::initDBus()
 {
-    QDBusConnection bus = QDBusConnection::sessionBus();
+    QDBusConnection bus = QDBusConnection::systemBus();
 
     if (!bus.registerService(QueuedConfig::DBUS_SERVICE)) {
         QString message = QString("Could not register service %1")
@@ -596,6 +663,14 @@ void QueuedCore::initDBus()
                             new QueuedCoreInterface(this),
                             QDBusConnection::ExportAllContents)) {
         QString message = QString("Could not register core object %1")
+                              .arg(bus.lastError().message());
+        qCCritical(LOG_DBUS) << message;
+        throw QueuedDBusException(message);
+    }
+    if (!bus.registerObject(QueuedConfig::DBUS_PROPERTY_PATH,
+                            new QueuedCorePropertiesInterface(this),
+                            QDBusConnection::ExportAllContents)) {
+        QString message = QString("Could not register properties object %1")
                               .arg(bus.lastError().message());
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
@@ -677,7 +752,7 @@ void QueuedCore::initUsers()
     QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
     auto dbTokens = m_database->get(
         QueuedDB::TOKENS_TABLE,
-        QString("WHERE datetime(validUntil) > datetime(%2)").arg(now));
+        QString("WHERE datetime(validUntil) > datetime('%1')").arg(now));
     m_users->loadTokens(dbTokens);
     auto dbUsers = m_database->get(QueuedDB::USERS_TABLE);
     m_users->loadUsers(dbUsers);

@@ -28,6 +28,10 @@
 
 
 /**
+ * @brief daemon logging category
+ */
+Q_DECLARE_LOGGING_CATEGORY(LOG_APP)
+/**
  * @brief control application logging category
  */
 Q_DECLARE_LOGGING_CATEGORY(LOG_CTL)
@@ -63,7 +67,11 @@ const char LOG_FORMAT[] = "[%{time "
                           "{if-warning}WW%{endif}%{if-critical}CC%{endif}%{if-"
                           "fatal}FF%{endif}][%{category}][%{function}] "
                           "%{message}";
-
+/**
+ * @ingroup QueuedDebug
+ * @brief method to enable debug messages
+ */
+void enableDebug();
 /**
  * @ingroup QueuedDebug
  * @brief additional method to get build details declared in version.h

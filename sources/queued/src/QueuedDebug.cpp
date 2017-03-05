@@ -26,11 +26,21 @@
 #include "version.h"
 
 
+Q_LOGGING_CATEGORY(LOG_APP, "org.queued.application", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_CTL, "org.queued.control", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_DBUS, "org.queued.dbus", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_LIB, "org.queued.library", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_PL, "org.queued.plugin", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_SERV, "org.queued.server", QtMsgType::QtWarningMsg)
+
+
+/**
+ * @fn enableDebug
+ */
+void QueuedDebug::enableDebug()
+{
+    QLoggingCategory::setFilterRules(QString("org.queued.*=true"));
+}
 
 
 /**

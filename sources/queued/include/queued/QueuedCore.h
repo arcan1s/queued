@@ -33,6 +33,7 @@
 
 class QueuedAdvancedSettings;
 class QueuedDatabase;
+class QueuedProcess;
 class QueuedProcessManager;
 class QueuedReportManager;
 class QueuedSettings;
@@ -185,6 +186,20 @@ public:
      */
     bool stopTask(const long long _id,
                   const QueuedUserManager::QueuedUserAuthorization &_auth);
+    /**
+     * @brief get task by ID
+     * @param _id
+     * task ID
+     * @return task object or nullptr if no task found
+     */
+    const QueuedProcess *task(const long long _id);
+    /**
+     * @brief get user by ID
+     * @param _id
+     * user ID
+     * @return user object or nullptr if no user found
+     */
+    const QueuedUser *user(const long long _id);
     // control methods
     /**
      * @brief deinit subclasses

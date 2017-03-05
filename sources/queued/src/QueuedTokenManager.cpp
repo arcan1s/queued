@@ -73,11 +73,15 @@ void QueuedTokenManager::loadTokens(const QList<QVariantHash> &_values)
             token[QString("validUntil")].toString(), Qt::ISODate);
         QString tokenId = token[QString("token")].toString();
         m_tokens[tokenId] = validUntil;
-        QTimer::singleShot(
+        // create timer
+        std::chrono::milliseconds duration(
             validUntil.toMSecsSinceEpoch()
-                - QDateTime::currentDateTimeUtc().toMSecsSinceEpoch(),
-            Qt::VeryCoarseTimer,
-            [this, tokenId]() { return expireToken(tokenId); });
+            - QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
+        QTimer timer;
+        timer.setSingleShot(true);
+        timer.setInterval(duration);
+        connect(&timer, &QTimer::timeout,
+                [this, tokenId]() { return expireToken(tokenId); });
     }
 }
 

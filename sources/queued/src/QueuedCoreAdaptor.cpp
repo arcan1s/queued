@@ -23,24 +23,35 @@
 
 #include "queued/Queued.h"
 
+#include <QDBusConnection>
+#include <QDBusMessage>
+
 
 /**
- * @class QueuedCoreAdaptor
+ * @fn sendRequest
  */
-/**
- * @fn QueuedCoreAdaptor
- */
-QueuedCoreAdaptor::QueuedCoreAdaptor(QObject *parent)
-    : QObject(parent)
+QVariantList QueuedCoreAdaptor::sendRequest(const QString &_service,
+                                            const QString &_path,
+                                            const QString &_interface,
+                                            const QString &_cmd,
+                                            const QVariantList &_args)
 {
-    qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
-}
+    qCDebug(LOG_DBUS) << "Send request to service" << _service << "by interface"
+                      << _interface << "to" << _path << "command" << _cmd
+                      << "with args" << _args;
 
+    QDBusConnection bus = QDBusConnection::systemBus();
+    QDBusMessage request
+        = QDBusMessage::createMethodCall(_service, _path, _interface, _cmd);
+    if (!_args.isEmpty())
+        request.setArguments(_args);
 
-/**
- * @fn ~QueuedCoreAdaptor
- */
-QueuedCoreAdaptor::~QueuedCoreAdaptor()
-{
-    qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
+    QDBusMessage response = bus.call(request, QDBus::BlockWithGui);
+    QVariantList arguments = response.arguments();
+
+    QString error = response.errorMessage();
+    if (!error.isEmpty())
+        qCWarning(LOG_DBUS) << "Error message" << error;
+
+    return arguments;
 }

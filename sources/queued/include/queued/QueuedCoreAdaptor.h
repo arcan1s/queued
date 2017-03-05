@@ -24,30 +24,49 @@
 #ifndef QUEUEDCOREADAPTOR_H
 #define QUEUEDCOREADAPTOR_H
 
-#include <QObject>
+#include <QDBusArgument>
+#include <QVariant>
 
 
 /**
- * @brief DBus adaptor for core interface
+ * @defgroup QueuedCoreAdaptor
+ * @brief adaptor to DBus methods
  */
-class QueuedCoreAdaptor : public QObject
+namespace QueuedCoreAdaptor
 {
-    Q_OBJECT
-
-public:
-    /**
-     * @brief QueuedCoreAdaptor class constructor
-     * @param parent
-     * pointer to parent item
-     */
-    explicit QueuedCoreAdaptor(QObject *parent);
-    /**
-     * @brief QueuedCoreAdaptor class destructor
-     */
-    virtual ~QueuedCoreAdaptor();
-
-private:
+/**
+ * @ingroup QueuedCoreAdaptor
+ * @brief common DBus request
+ * @param _service
+ * DBus service name
+ * @param _path
+ * DBus object path
+ * @param _interface
+ * DBus interface name
+ * @param _cmd
+ * command which will be sent to DBus
+ * @param _args
+ * command arguments
+ * @return reply object from DBus request
+ */
+QVariantList sendRequest(const QString &_service, const QString &_path,
+                         const QString &_interface, const QString &_cmd,
+                         const QVariantList &_args);
+/**
+ * @ingroup QueuedCoreAdaptor
+ * @brief additional method to avoid conversion from DBus type to native ones
+ * @tparam T
+ * type to which DBus data should be converted
+ * @param _data
+ * source data
+ * @return converted value
+ */
+template <class T> T toNativeType(const QVariant &_data)
+{
+    return qdbus_cast<T>(
+        _data.value<QDBusVariant>().variant().value<QDBusArgument>());
 };
+}
 
 
 #endif /* QUEUEDCOREADAPTOR_H */

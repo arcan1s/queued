@@ -88,7 +88,7 @@ struct Limits {
     Limits(const QString &_stringLimits)
     {
         QStringList limits = _stringLimits.split(QChar('\x01'));
-        while (limits.count() < 4)
+        while (limits.count() < 5)
             limits.append(QString("0"));
 
         cpu = limits.at(0).toLongLong();

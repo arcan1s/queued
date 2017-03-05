@@ -79,7 +79,8 @@ QueuedUser::addPermissions(const QueuedEnums::Permissions _permissions)
 QString QueuedUser::hashFromPassword(const QString &_password)
 {
     return QCryptographicHash::hash(_password.toUtf8(),
-                                    QCryptographicHash::Sha512);
+                                    QCryptographicHash::Sha512)
+        .toHex();
 }
 
 
@@ -122,9 +123,7 @@ QPair<uint, uint> QueuedUser::ids()
  */
 bool QueuedUser::isPasswordValid(const QString &_password) const
 {
-    return (m_definitions.password.toUtf8()
-            == QCryptographicHash::hash(_password.toUtf8(),
-                                        QCryptographicHash::Sha512));
+    return (m_definitions.password.toUtf8() == hashFromPassword(_password));
 }
 
 

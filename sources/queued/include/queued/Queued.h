@@ -29,6 +29,7 @@
 #include "QueuedCore.h"
 #include "QueuedCoreAdaptor.h"
 #include "QueuedCoreInterface.h"
+#include "QueuedCorePropertiesInterface.h"
 #include "QueuedDatabase.h"
 #include "QueuedDebug.h"
 #include "QueuedEnums.h"

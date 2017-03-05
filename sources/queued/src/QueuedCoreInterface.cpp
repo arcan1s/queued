@@ -100,14 +100,54 @@ bool QueuedCoreInterface::TaskAdd(
 /**
  * @fn TaskEdit
  */
-bool QueuedCoreInterface::TaskEdit(const qlonglong id, const QDBusVariant &data,
-                                   const QString &whoAmI, const QString &token)
+bool QueuedCoreInterface::TaskEdit(
+    const qlonglong id, const QString &command, const QStringList &arguments,
+    const QString &directory, const uint nice, const uint uid, const uint gid,
+    const uint state, const long long cpu, const long long gpu,
+    const QString &memory, const QString &gpumemory, const QString &storage,
+    const QString &whoAmI, const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Edit task" << id << data.variant() << "auth by"
-                      << whoAmI;
+    qCDebug(LOG_DBUS) << "Edit task" << id << command << arguments << directory
+                      << nice << uid << gid << state << cpu << gpu << memory
+                      << gpumemory << storage << "auth by" << whoAmI;
 
-    return m_core->editTask(id, data.variant().toHash(),
-                            QueuedUserManager::auth(whoAmI, token));
+    auto task = m_core->task(id);
+    if (!task) {
+        qCWarning(LOG_DBUS) << "Could not find task" << id;
+        return false;
+    }
+
+    // build payload
+    QVariantHash data;
+    if (!command.isEmpty())
+        data[QString("command")] = command;
+    if (!arguments.isEmpty())
+        data[QString("arguments")] = arguments;
+    if (!directory.isEmpty())
+        data[QString("directory")] = directory;
+    if (nice > 0)
+        data[QString("nice")] = nice;
+    if (uid > 0)
+        data[QString("uid")] = uid;
+    if (gid > 0)
+        data[QString("gid")] = gid;
+    if (state > 0)
+        data[QString("state")] = state;
+    // append limits now
+    auto limits = task->limits();
+    if (cpu > -1)
+        limits.cpu = cpu;
+    if (gpu > -1)
+        limits.gpu = gpu;
+    if (memory > -1)
+        limits.memory = QueuedLimits::convertMemory(memory);
+    if (gpumemory > -1)
+        limits.gpumemory = QueuedLimits::convertMemory(gpumemory);
+    if (storage > -1)
+        limits.storage = QueuedLimits::convertMemory(storage);
+    data[QString("limits")] = limits.toString();
+
+    return m_core->editTask(id, data, QueuedUserManager::auth(whoAmI, token));
 }
 
 
@@ -161,14 +201,47 @@ bool QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
 /**
  * @fn UserEdit
  */
-bool QueuedCoreInterface::UserEdit(const qlonglong id, const QDBusVariant &data,
+bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
+                                   const QString &password,
+                                   const QString &email, const long long cpu,
+                                   const long long gpu, const QString &memory,
+                                   const QString &gpumemory,
+                                   const QString &storage,
                                    const QString &whoAmI, const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Edit user" << id << data.variant() << "auth by"
-                      << whoAmI;
+    qCDebug(LOG_DBUS) << "Edit user" << id << name << email << cpu << gpu
+                      << memory << gpumemory << storage << "auth by" << whoAmI;
 
-    return m_core->editUser(id, data.variant().toHash(),
-                            QueuedUserManager::auth(whoAmI, token));
+    // get user object first to match limits
+    auto user = m_core->user(id);
+    if (!user) {
+        qCWarning(LOG_DBUS) << "Could not find user" << id;
+        return false;
+    }
+
+    // build payload
+    QVariantHash data;
+    if (!name.isEmpty())
+        data[QString("name")] = name;
+    if (!password.isEmpty())
+        data[QString("password")] = password;
+    if (!email.isEmpty())
+        data[QString("email")] = email;
+    // append limits now
+    auto limits = user->limits();
+    if (cpu > -1)
+        limits.cpu = cpu;
+    if (gpu > -1)
+        limits.gpu = gpu;
+    if (memory > -1)
+        limits.memory = QueuedLimits::convertMemory(memory);
+    if (gpumemory > -1)
+        limits.gpumemory = QueuedLimits::convertMemory(gpumemory);
+    if (storage > -1)
+        limits.storage = QueuedLimits::convertMemory(storage);
+    data[QString("limits")] = limits.toString();
+
+    return m_core->editUser(id, data, QueuedUserManager::auth(whoAmI, token));
 }
 
 

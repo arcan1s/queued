@@ -33,30 +33,6 @@ namespace QueuedEnums
 {
 /**
  * @ingroup QueuedEnums
- * @enum LimitType
- * @brief available limit types
- * @var LimitType::CPUThreads
- * limit on CPU threads count
- * @var LimitType::GPUThreads
- * limit on GPU threads count
- * @var LimitType::Memory
- * limit on physical memory
- * @var LimitType::GPUMemory
- * limit on GPU memory
- * @var LimitType::Storage
- * limit on storage
- */
-enum LimitType {
-    CPUThreads = 1 << 0,
-    GPUThreads = 1 << 1,
-    Memory = 1 << 2,
-    GPUMemory = 1 << 3,
-    Storage = 1 << 4
-};
-Q_DECLARE_FLAGS(LimitTypes, LimitType)
-Q_DECLARE_OPERATORS_FOR_FLAGS(LimitTypes)
-/**
- * @ingroup QueuedEnums
  * @enum Permissions
  * @brief available user permissions
  * @var Permissions::Admin
@@ -71,10 +47,9 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(LimitTypes)
  * access to reports
  */
 enum class Permission {
-    SuperAdmin = 1 << 0,
-    Admin = 1 << 1,
-    JobOwner = 1 << 2,
-    User = 1 << 3,
+    SuperAdmin = 1 << 1,
+    Admin = 1 << 2,
+    JobOwner = 1 << 3,
     Web = 1 << 4,
     Reports = 1 << 5
 };
@@ -92,9 +67,9 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
  * process exit
  */
 enum class ProcessState {
-    NotRunning = 1 << 0,
-    Running = 1 << 1,
-    Exited = 1 << 2
+    NotRunning = 1 << 1,
+    Running = 1 << 2,
+    Exited = 1 << 3
 };
 };
 

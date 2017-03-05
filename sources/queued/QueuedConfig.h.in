@@ -35,7 +35,7 @@ namespace QueuedConfig
  * @brief DBus service name for library and application
  * @remark required by Qt macro
  */
-#define DBUS_SERVICE_NAME "org.quadro.core"
+#define DBUS_SERVICE_NAME "org.queued.core"
 /**
  * @ingroup QueuedConfig
  * @brief DBus service name for library and application
@@ -43,9 +43,19 @@ namespace QueuedConfig
 const char DBUS_SERVICE[] = DBUS_SERVICE_NAME;
 /**
  * @ingroup QueuedConfig
+ * @brief DBus object path for applicaiton
+ */
+const char DBUS_APPLICATION_PATH[] = "/application";
+/**
+ * @ingroup QueuedConfig
  * @brief DBus object path for library
  */
 const char DBUS_OBJECT_PATH[] = "/queued";
+/**
+ * @ingroup QueuedConfig
+ * @brief DBus properties path for library
+ */
+const char DBUS_PROPERTY_PATH[] = "/property";
 
 // path configuration
 // common paths

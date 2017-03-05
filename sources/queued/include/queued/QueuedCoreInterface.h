@@ -114,16 +114,45 @@ public slots:
      * @brief edit task
      * @param id
      * task ID
-     * @param data
-     * new task data
+     * @param command
+     * new command or empty
+     * @param arguments
+     * command line arguments or empty
+     * @param directory
+     * working directory or empty
+     * @param nice
+     * nice level or 0
+     * @param uid
+     * new uid or 0
+     * @param state
+     * new state or 0
+     * @param cpu
+     * new limit by CPU cores or -1
+     * @param gpu
+     * limit by GPU cores or -1
+     * @param memory
+     * new limit by memory or -1
+     * @param gpumemory
+     * new limit by GPU memory or -1
+     * @param storage
+     * new limit by storage or -1
+     * @param start
+     * new start time in ISO format or empty
+     * @param end
+     * new end time in ISO format or empty
      * @param whoAmI
      * auth user name
      * @param token
      * auth user token
      * @return true on successful task edition
      */
-    bool TaskEdit(const qlonglong id, const QDBusVariant &data,
-                  const QString &whoAmI, const QString &token);
+    bool TaskEdit(const qlonglong id, const QString &command,
+                  const QStringList &arguments, const QString &directory,
+                  const uint nice, const uint uid, const uint gid,
+                  const uint state, const long long cpu, const long long gpu,
+                  const QString &memory, const QString &gpumemory,
+                  const QString &storage, const QString &whoAmI,
+                  const QString &token);
     /**
      * @brief force start task
      * @param id
@@ -184,16 +213,34 @@ public slots:
      * @brief edit user
      * @param id
      * user ID
-     * @param data
-     * new user data
+     * @param name
+     * new user name or empty
+     * @param password
+     * new user password or empty
+     * @param email
+     * new user email or empty
+     * @param cpu
+     * new limit by CPU cores or -1
+     * @param gpu
+     * limit by GPU cores or -1
+     * @param memory
+     * new limit by memory or -1
+     * @param gpumemory
+     * new limit by GPU memory or -1
+     * @param storage
+     * new limit by storage or -1
      * @param whoAmI
      * auth user name
      * @param token
      * auth user token
      * @return true on successful user edition
      */
-    bool UserEdit(const qlonglong id, const QDBusVariant &data,
-                  const QString &whoAmI, const QString &token);
+    bool UserEdit(const qlonglong id, const QString &name,
+                  const QString &password, const QString &email,
+                  const long long cpu, const long long gpu,
+                  const QString &memory, const QString &gpumemory,
+                  const QString &storage, const QString &whoAmI,
+                  const QString &token);
     /**
      * @brief add permission to user
      * @param id
