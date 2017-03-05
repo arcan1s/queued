@@ -66,8 +66,7 @@ QueuedUser *QueuedUserManager::add(const QVariantHash &_properties,
     defs.email = _properties[QString("email")].toString();
     defs.password = _properties[QString("password")].toString();
     defs.permissions = _properties[QString("permissions")].toUInt();
-    defs.limits
-        = QueuedLimits::Limits(_properties[QString("limits")].toString());
+    defs.limits = _properties[QString("limits")].toString();
 
     return add(defs, _id);
 }

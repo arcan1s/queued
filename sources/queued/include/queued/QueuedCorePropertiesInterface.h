@@ -54,6 +54,13 @@ public:
 
 public slots:
     /**
+     * @brief get advanced option
+     * @param property
+     * property name
+     * @return property value or empty if property not found
+     */
+    QDBusVariant Option(const QString &property);
+    /**
      * @brief get task property
      * @param id
      * task ID

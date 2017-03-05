@@ -48,6 +48,17 @@ QueuedCorePropertiesInterface::~QueuedCorePropertiesInterface()
 
 
 /**
+ * @fn Option
+ */
+QDBusVariant QueuedCorePropertiesInterface::Option(const QString &property)
+{
+    qCDebug(LOG_DBUS) << "Get property" << property;
+
+    return QDBusVariant(m_core->option(property));
+}
+
+
+/**
  * @fn TaskProperty
  */
 QDBusVariant

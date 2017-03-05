@@ -67,8 +67,7 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
         QChar('\x01'));
     defs.workingDirectory = _properties[QString("workDirectory")].toString();
     defs.nice = _properties[QString("nice")].toUInt();
-    defs.limits
-        = QueuedLimits::Limits(_properties[QString("limits")].toString());
+    defs.limits = _properties[QString("limits")].toString();
     // user data
     defs.uid = _properties[QString("uid")].toUInt();
     defs.gid = _properties[QString("gid")].toUInt();

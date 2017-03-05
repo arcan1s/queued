@@ -27,6 +27,8 @@
 #include <QObject>
 #include <QVariant>
 
+#include "QueuedConfiguration.h"
+
 
 /**
  * @brief implementation over database stored settings
@@ -54,12 +56,26 @@ public:
      */
     QVariant get(const QString &_key) const;
     /**
+     * @brief get value
+     * @param _key
+     * key to search in
+     * @return value by key if found
+     */
+    QVariant get(const QueuedCfg::QueuedSettings _key) const;
+    /**
      * @brief get database value ID
      * @param _key
      * key to search in
      * @return database id or -1 if not found
      */
     long long id(const QString &_key) const;
+    /**
+     * @brief get internal ID by given string key
+     * @param _key
+     * string key
+     * @return ID in settings representation
+     */
+    static QString internalId(const QString &_key);
     /**
      * @brief set value
      * @param _key
@@ -83,7 +99,8 @@ signals:
      * @param _value
      * changed value
      */
-    void valueUpdated(const QString &_key, const QVariant &_value);
+    void valueUpdated(const QueuedCfg::QueuedSettings _key,
+                      const QVariant &_value);
 
 private:
     /**

@@ -100,9 +100,10 @@ bool QueuedCore::addTask(
         return false;
     }
     auto taskLimits = QueuedLimits::minimalLimits(
-        _limits, user->limits(),
+        _limits, user->nativeLimits(),
         QueuedLimits::Limits(
-            m_advancedSettings->get(QString("DefaultLimits")).toString()));
+            m_advancedSettings->get(QueuedCfg::QueuedSettings::DefaultLimits)
+                .toString()));
     QVariantHash properties = {{"user", _userId},
                                {"command", _command},
                                {"commandArguments", _arguments},
@@ -409,6 +410,17 @@ bool QueuedCore::editUserPermission(
 
 
 /**
+ * @fn option
+ */
+QVariant QueuedCore::option(const QString &_key)
+{
+    qCDebug(LOG_LIB) << "Look for option" << _key;
+
+    return m_advancedSettings->get(_key);
+}
+
+
+/**
  * @fn startTask
  */
 bool QueuedCore::startTask(
@@ -525,6 +537,8 @@ void QueuedCore::deinit()
     QDBusConnection::sessionBus().unregisterService(QueuedConfig::DBUS_SERVICE);
 
     // delete objects now
+    if (m_databaseManager)
+        delete m_databaseManager;
     if (m_reports)
         delete m_reports;
     if (m_processes)
@@ -558,8 +572,9 @@ void QueuedCore::init(const QString &_configuration)
     // settings update notifier
     m_connections += connect(
         m_advancedSettings,
-        SIGNAL(valueUpdated(const QString &, const QVariant &)), this,
-        SLOT(updateSettings(const QString &, const QVariant &)));
+        SIGNAL(valueUpdated(const QueuedCfg::QueuedSettings, const QVariant &)),
+        this, SLOT(updateSettings(const QueuedCfg::QueuedSettings,
+                                  const QVariant &)));
 
     // dbus session
     initDBus();
@@ -569,21 +584,35 @@ void QueuedCore::init(const QString &_configuration)
 /**
  * @fn updateSettings
  */
-void QueuedCore::updateSettings(const QString &_key, const QVariant &_value)
+void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _key,
+                                const QVariant &_value)
 {
-    qCDebug(LOG_LIB) << "Received update for" << _key << "with value" << _value;
+    qCDebug(LOG_LIB) << "Received update for" << static_cast<int>(_key)
+                     << "with value" << _value;
 
     // FIXME propbably there is a better way to change settings
-    QString key = _key.toLower();
-    if (key == QString("defaultlimits"))
-        ;
-    else if (key == QString("tokenexpiration"))
-        m_users->setTokenExpiration(_value.toLongLong());
-    else if (key == QString("onexitaction"))
+    switch (_key) {
+    case QueuedCfg::QueuedSettings::Invalid:
+        break;
+    case QueuedCfg::QueuedSettings::DatabaseInterval:
+        m_databaseManager->setInterval(_value.toLongLong());
+        break;
+    case QueuedCfg::QueuedSettings::DefaultLimits:
+        break;
+    case QueuedCfg::QueuedSettings::KeepTasks:
+        m_databaseManager->setKeepTasks(_value.toLongLong());
+        break;
+    case QueuedCfg::QueuedSettings::KeepUsers:
+        m_databaseManager->setKeepUsers(_value.toLongLong());
+        break;
+    case QueuedCfg::QueuedSettings::OnExitAction:
         m_processes->setOnExitAction(
             static_cast<QueuedProcessManager::OnExitAction>(_value.toInt()));
-    else
-        qCInfo(LOG_LIB) << "Unused key" << _key;
+        break;
+    case QueuedCfg::QueuedSettings::TokenExpiration:
+        m_users->setTokenExpiration(_value.toLongLong());
+        break;
+    }
 }
 
 
@@ -685,7 +714,8 @@ void QueuedCore::initProcesses()
 {
     // init processes
     auto onExitAction = static_cast<QueuedProcessManager::OnExitAction>(
-        m_advancedSettings->get(QString("OnExitAction")).toInt());
+        m_advancedSettings->get(QueuedCfg::QueuedSettings::OnExitAction)
+            .toInt());
 
     m_processes = new QueuedProcessManager(this, onExitAction);
     auto dbProcesses = m_database->get(
@@ -735,6 +765,8 @@ void QueuedCore::initSettings(const QString &_configuration)
 
     // report manager
     m_reports = new QueuedReportManager(this, m_database);
+    // database manager
+    m_databaseManager = new QueuedDatabaseManager(this, m_database);
 }
 
 
@@ -745,7 +777,8 @@ void QueuedCore::initUsers()
 {
     // load users and tokens
     auto expiry
-        = m_advancedSettings->get(QString("TokenExpiration")).toLongLong();
+        = m_advancedSettings->get(QueuedCfg::QueuedSettings::TokenExpiration)
+              .toLongLong();
 
     m_users = new QueuedUserManager(this);
     m_users->setTokenExpiration(expiry);

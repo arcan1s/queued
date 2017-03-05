@@ -60,7 +60,7 @@ public:
      * @var OnExitAction::Kill
      * send SIGKILL on exit
      */
-    enum class OnExitAction { Terminate, Kill };
+    enum class OnExitAction { Terminate = 1 << 1, Kill = 1 << 2 };
 
     /**
      * @brief QueuedProcessManager class constructor

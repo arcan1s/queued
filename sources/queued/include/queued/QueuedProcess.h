@@ -45,7 +45,8 @@ class QueuedProcess : public QProcess
                    setCommandArguments)
     Q_PROPERTY(QDateTime endTime READ endTime WRITE setEndTime)
     Q_PROPERTY(uint gid READ uid WRITE setGid)
-    Q_PROPERTY(QueuedLimits::Limits limits READ limits WRITE setLimits)
+    Q_PROPERTY(QString limits READ limits WRITE setLimits)
+    Q_PROPERTY(QueuedLimits::Limits nativeLimtis READ nativeLimits)
     Q_PROPERTY(uint nice READ nice WRITE setNice)
     Q_PROPERTY(QueuedEnums::ProcessState pstate READ pstate WRITE setPState)
     Q_PROPERTY(QDateTime startTime READ startTime WRITE setStartTime)
@@ -90,7 +91,7 @@ public:
         QDateTime startTime;
         QDateTime endTime;
         long long user;
-        QueuedLimits::Limits limits;
+        QString limits;
         QueuedEnums::ProcessState state;
     } QueuedProcessDefinitions;
 
@@ -145,7 +146,12 @@ public:
      * @brief process limits
      * @return process defined limits
      */
-    QueuedLimits::Limits limits() const;
+    QString limits() const;
+    /**
+     * @brief process limits
+     * @return process defined limits in native format
+     */
+    QueuedLimits::Limits nativeLimits() const;
     /**
      * @brief process nice
      * @return process nice
@@ -204,7 +210,7 @@ public:
      * @param _limits
      * new process limits
      */
-    void setLimits(const QueuedLimits::Limits &_limits);
+    void setLimits(const QString &_limits);
     /**
      * @brief set process nice
      * @param _nice

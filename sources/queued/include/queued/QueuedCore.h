@@ -26,6 +26,7 @@
 
 #include <QObject>
 
+#include "QueuedConfiguration.h"
 #include "QueuedEnums.h"
 #include "QueuedLimits.h"
 #include "QueuedUserManager.h"
@@ -33,6 +34,7 @@
 
 class QueuedAdvancedSettings;
 class QueuedDatabase;
+class QueuedDatabaseManager;
 class QueuedProcess;
 class QueuedProcessManager;
 class QueuedReportManager;
@@ -167,6 +169,13 @@ public:
                        const bool _add,
                        const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
+     * @brief get value from advanced settings
+     * @param _key
+     * key string
+     * @return option value or empty QVariant
+     */
+    QVariant option(const QString &_key);
+    /**
      * @brief force start task
      * @param _id
      * task ID
@@ -222,7 +231,8 @@ private slots:
      * @param _value
      * new value
      */
-    void updateSettings(const QString &_key, const QVariant &_value);
+    void updateSettings(const QueuedCfg::QueuedSettings _key,
+                        const QVariant &_value);
     /**
      * @brief update process time
      * @param _id
@@ -252,6 +262,10 @@ private:
      * @brief pointer to database object
      */
     QueuedDatabase *m_database = nullptr;
+    /**
+     * @brief pointer to database manager object
+     */
+    QueuedDatabaseManager *m_databaseManager = nullptr;
     /**
      * @brief pointer to process manager
      */

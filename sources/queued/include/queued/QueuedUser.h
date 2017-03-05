@@ -44,7 +44,8 @@ class QueuedUser : public QObject
     Q_PROPERTY(QString password READ password WRITE setPassword)
     Q_PROPERTY(uint permissions READ permissions WRITE setPermissions)
     // limits
-    Q_PROPERTY(QueuedLimits::Limits limits READ limits WRITE setLimits)
+    Q_PROPERTY(QString limits READ limits WRITE setLimits)
+    Q_PROPERTY(QueuedLimits::Limits nativeLimtis READ nativeLimits)
 
 public:
     /**
@@ -66,7 +67,7 @@ public:
         QString email;
         QString password;
         uint permissions;
-        QueuedLimits::Limits limits;
+        QString limits;
     } QueuedUserDefinitions;
 
     /**
@@ -145,6 +146,11 @@ public:
      */
     QString name() const;
     /**
+     * @brief user limits
+     * @return user limits in native format
+     */
+    QueuedLimits::Limits nativeLimits() const;
+    /**
      * @brief user password
      * @return SHA512 of user password
      */
@@ -159,7 +165,7 @@ public:
      * @brief user limits
      * @return user limits
      */
-    QueuedLimits::Limits limits() const;
+    QString limits() const;
     // main properties
     /**
      * @brief set user email
@@ -191,7 +197,7 @@ public:
      * @param _limit
      * new user limits
      */
-    void setLimits(const QueuedLimits::Limits &_limits);
+    void setLimits(const QString &_limits);
     /**
      * @brief equal operator implementation
      * @param _other

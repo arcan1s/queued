@@ -134,7 +134,7 @@ bool QueuedCoreInterface::TaskEdit(
     if (state > 0)
         data[QString("state")] = state;
     // append limits now
-    auto limits = task->limits();
+    auto limits = task->nativeLimits();
     if (cpu > -1)
         limits.cpu = cpu;
     if (gpu > -1)
@@ -228,7 +228,7 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
     if (!email.isEmpty())
         data[QString("email")] = email;
     // append limits now
-    auto limits = user->limits();
+    auto limits = user->nativeLimits();
     if (cpu > -1)
         limits.cpu = cpu;
     if (gpu > -1)

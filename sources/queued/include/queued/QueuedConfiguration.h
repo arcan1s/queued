@@ -24,7 +24,9 @@
 #ifndef QUEUEDCONFIGURATION_H
 #define QUEUEDCONFIGURATION_H
 
+#include <QHash>
 #include <QString>
+#include <QVariant>
 
 
 /**
@@ -47,7 +49,7 @@ typedef struct {
     QString password;
 } QueuedAdminSetup;
 /**
- * m@ingroup QueuedCfg
+ * @ingroup QueuedCfg
  * @struct QueuedDBSetup
  * @brief structure to define database setup
  * @var driver
@@ -71,7 +73,67 @@ typedef struct {
     int port;
     QString username;
 } QueuedDBSetup;
+/**
+ * @ingroup QueuedCfg
+ * @enum Settings
+ * @brief settings keys enum
+ * @var Settigns::Invalid
+ * unknown key
+ * @var Settings::DatabaseInterval
+ * database actions interval in msecs
+ * @var Settings::DefaultLimits
+ * default limits value
+ * @var Settings::KeepTasks
+ * keep ended tasks in msecs
+ * @var Settings::KeepUsers
+ * keep users last logged in msecs
+ * @var Settings::OnExitAction
+ * on queued exit action enum
+ * @var Settings::TokenExpiration
+ * token expiration value in days
+ */
+enum class QueuedSettings {
+    Invalid = 1 << 0,
+    DatabaseInterval = 1 << 1,
+    DefaultLimits = 1 << 2,
+    KeepTasks = 1 << 3,
+    KeepUsers = 1 << 4,
+    OnExitAction = 1 << 5,
+    TokenExpiration = 1 << 6,
 };
-
+/**
+ * @ingroup QueuedCfg
+ * @struct QueuedSettingsField
+ * @brief structure to define advanced settings field
+ * @var id
+ * interval field ID
+ * @var key
+ * settings key
+ * @var defaultValue
+ * settings default value
+ */
+typedef struct {
+    QueuedSettings id;
+    QVariant defaultValue;
+} QueuedSettingsField;
+/**
+ * @ingroup QueuedCfg
+ * @typedef QueuedProcessConnectionMap
+ * map of settings indices to related values
+ */
+typedef QHash<QString, QueuedSettingsField> QueuedSettingsDefaultMap;
+/**
+ * @ingroup QueuedCfg
+ * @brief default settings map
+ */
+const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
+    {"", {QueuedSettings::Invalid, QVariant()}},
+    {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000}},
+    {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\x010\x010\x010\x010"}},
+    {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
+    {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
+    {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
+    {"TokenExpiration", {QueuedSettings::TokenExpiration, 39}}};
+};
 
 #endif /* QUEUEDCONFIGURATION_H */

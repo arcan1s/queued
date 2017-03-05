@@ -22,6 +22,7 @@
 
 
 #include "queued/Queued.h"
+#include <queued/QueuedConfiguration.h>
 
 
 /**
@@ -53,7 +54,28 @@ QVariant QueuedAdvancedSettings::get(const QString &_key) const
 {
     qCDebug(LOG_LIB) << "Looking for key" << _key;
 
-    return m_values.value(_key.toLower(), QVariant());
+    QString key = _key.toLower();
+    if (m_values.contains(key))
+        return m_values.value(key);
+    else
+        return QueuedCfg::QueuedSettingsDefaults[internalId(_key)].defaultValue;
+}
+
+
+/**
+ * @fn get
+ */
+QVariant QueuedAdvancedSettings::get(const QueuedCfg::QueuedSettings _key) const
+{
+    qCDebug(LOG_LIB) << "Looking for key" << static_cast<int>(_key);
+
+    for (auto &key : QueuedCfg::QueuedSettingsDefaults.keys()) {
+        if (QueuedCfg::QueuedSettingsDefaults[key].id != _key)
+            continue;
+        return get(key);
+    }
+
+    return QVariant();
 }
 
 
@@ -69,6 +91,24 @@ long long QueuedAdvancedSettings::id(const QString &_key) const
 
 
 /**
+ * @fn internalId
+ */
+QString QueuedAdvancedSettings::internalId(const QString &_key)
+{
+    qCDebug(LOG_LIB) << "Looking for key" << _key;
+
+    QString key = _key.toLower();
+    for (auto &internal : QueuedCfg::QueuedSettingsDefaults.keys()) {
+        if (internal.toLower() != key)
+            continue;
+        return internal;
+    }
+
+    return QString();
+}
+
+
+/**
  * @fn set
  */
 void QueuedAdvancedSettings::set(const QString &_key, const QVariant &_value)
@@ -76,7 +116,8 @@ void QueuedAdvancedSettings::set(const QString &_key, const QVariant &_value)
     qCDebug(LOG_LIB) << "Set value" << _value << "for key" << _key;
 
     m_values[_key.toLower()] = _value;
-    emit(valueUpdated(_key, _value));
+    auto id = QueuedCfg::QueuedSettingsDefaults[internalId(_key)].id;
+    emit(valueUpdated(id, _value));
 }
 
 

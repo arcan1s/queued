@@ -31,6 +31,7 @@
 #include "QueuedCoreInterface.h"
 #include "QueuedCorePropertiesInterface.h"
 #include "QueuedDatabase.h"
+#include "QueuedDatabaseManager.h"
 #include "QueuedDebug.h"
 #include "QueuedEnums.h"
 #include "QueuedExceptions.h"

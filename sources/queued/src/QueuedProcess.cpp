@@ -118,9 +118,18 @@ uint QueuedProcess::gid() const
 /**
  * @fn limits
  */
-QueuedLimits::Limits QueuedProcess::limits() const
+QString QueuedProcess::limits() const
 {
     return m_definitions.limits;
+}
+
+
+/**
+ * @fn nativeLimits
+ */
+QueuedLimits::Limits QueuedProcess::nativeLimits() const
+{
+    return QueuedLimits::Limits(limits());
 }
 
 
@@ -227,9 +236,9 @@ void QueuedProcess::setGid(const uint _gid)
 /**
  * setLimits
  */
-void QueuedProcess::setLimits(const QueuedLimits::Limits &_limits)
+void QueuedProcess::setLimits(const QString &_limits)
 {
-    qCDebug(LOG_LIB) << "Set process limits" << _limits.toString();
+    qCDebug(LOG_LIB) << "Set process limits" << _limits;
 
     m_definitions.limits = _limits;
 }

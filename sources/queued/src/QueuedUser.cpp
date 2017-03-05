@@ -168,6 +168,15 @@ QString QueuedUser::name() const
 
 
 /**
+ * @fn nativeLimits
+ */
+QueuedLimits::Limits QueuedUser::nativeLimits() const
+{
+    return QueuedLimits::Limits(limits());
+}
+
+
+/**
  * @fn password
  */
 QString QueuedUser::password() const
@@ -188,7 +197,7 @@ uint QueuedUser::permissions() const
 /**
  * @fn limits
  */
-QueuedLimits::Limits QueuedUser::limits() const
+QString QueuedUser::limits() const
 {
     return m_definitions.limits;
 }
@@ -241,9 +250,9 @@ void QueuedUser::setPermissions(const uint _permissions)
 /**
  * @fn setLimits
  */
-void QueuedUser::setLimits(const QueuedLimits::Limits &_limits)
+void QueuedUser::setLimits(const QString &_limits)
 {
-    qCDebug(LOG_LIB) << "New user limits" << _limits.toString();
+    qCDebug(LOG_LIB) << "New user limits" << _limits;
 
     m_definitions.limits = _limits;
 }
