@@ -317,6 +317,88 @@ private:
      * @brief init users
      */
     void initUsers();
+    // private interfaces
+    /**
+     * @brief add new task
+     * @param _command
+     * command line
+     * @param _arguments
+     * command arguments
+     * @param _workingDirectory
+     * working directory
+     * @param _nice
+     * nice level
+     * @param _userId
+     * task owner user ID
+     * @param _limits
+     * task defined limits
+     * @return true on successfully addition
+     */
+    bool addTaskPrivate(const QString &_command, const QStringList &_arguments,
+                        const QString &_workingDirectory, const uint _nice,
+                        const long long _userId,
+                        const QueuedLimits::Limits &_limits);
+    /**
+     * @brief add new user
+     * @param _name
+     * user name
+     * @param _email
+     * user email
+     * @param _password
+     * user password
+     * @param _permissions
+     * user permissions
+     * @param _limits
+     * user limits
+     * @return true on successfully addition
+     */
+    bool addUserPrivate(const QString &_name, const QString &_email,
+                        const QString &_password, const uint _permissions,
+                        const QueuedLimits::Limits &_limits);
+    /**
+     * @brief edit advanced settings
+     * @param _key
+     * advanced settings key
+     * @param _value
+     * advanced settings value
+     * @return true on successful option edition
+     */
+    bool editOptionPrivate(const QString &_key, const QVariant &_value);
+    /**
+     * @brief edit task
+     * @param _id
+     * task ID to edit
+     * @param _taskData
+     * task data to edit
+     * @remark _taskData should contain only fields defined in schema, any other
+     * fields will be ignored. No need to pass all properties here
+     * @return true on successful task edition
+     */
+    bool editTaskPrivate(const long long _id, const QVariantHash &_taskData);
+    /**
+     * @brief edit user
+     * @param _id
+     * user ID to edit
+     * @param _userData
+     * user data to edit
+     * @remark _userData should contain only fields defined in schema, any other
+     * fields will be ignored. No need to pass all properties here
+     * @return true on successful user edition
+     */
+    bool editUserPrivate(const long long _id, const QVariantHash &_userData);
+    /**
+     * @brief edit user permissions
+     * @param _id
+     * user ID to edit
+     * @param _permission
+     * permission to add or remove
+     * @param _add
+     * indicates whether it should be added or removed
+     * @return true on successful user permission edition
+     */
+    bool editUserPermissionPrivate(const long long _id,
+                                   const QueuedEnums::Permission &_permission,
+                                   const bool _add);
 };
 
 

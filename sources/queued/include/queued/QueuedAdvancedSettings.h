@@ -49,6 +49,11 @@ public:
      */
     virtual ~QueuedAdvancedSettings();
     /**
+     * @brief check database version
+     * @return true if no version update required, otherwise return false
+     */
+    bool checkDatabaseVersion() const;
+    /**
      * @brief get value
      * @param _key
      * key to search in
@@ -76,6 +81,13 @@ public:
      * @return ID in settings representation
      */
     static QString internalId(const QString &_key);
+    /**
+     * @brief get internal ID by given string key
+     * @param _key
+     * string key
+     * @return ID in settings representation
+     */
+    static QString internalId(const QueuedCfg::QueuedSettings _key);
     /**
      * @brief set value
      * @param _key

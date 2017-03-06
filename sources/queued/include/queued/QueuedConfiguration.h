@@ -28,6 +28,8 @@
 #include <QString>
 #include <QVariant>
 
+#include "QueuedConfig.h"
+
 
 /**
  * @defgroup QueuedCfg
@@ -91,6 +93,8 @@ typedef struct {
  * on queued exit action enum
  * @var Settings::TokenExpiration
  * token expiration value in days
+ * @var Settings::DatabaseVersion
+ * internal field to control current database version
  */
 enum class QueuedSettings {
     Invalid = 1 << 0,
@@ -100,6 +104,7 @@ enum class QueuedSettings {
     KeepUsers = 1 << 4,
     OnExitAction = 1 << 5,
     TokenExpiration = 1 << 6,
+    DatabaseVersion = 1 << 7
 };
 /**
  * @ingroup QueuedCfg
@@ -133,7 +138,9 @@ const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
     {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
     {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
     {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
-    {"TokenExpiration", {QueuedSettings::TokenExpiration, 39}}};
+    {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
+    {"DatabaseVersion",
+     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}}};
 };
 
 #endif /* QUEUEDCONFIGURATION_H */

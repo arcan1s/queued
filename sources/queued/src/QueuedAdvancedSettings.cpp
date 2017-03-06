@@ -48,6 +48,20 @@ QueuedAdvancedSettings::~QueuedAdvancedSettings()
 
 
 /**
+ * @fn checkDatabase
+ */
+bool QueuedAdvancedSettings::checkDatabaseVersion() const
+{
+    QString key = internalId(QueuedCfg::QueuedSettings::DatabaseVersion);
+
+    if (m_values.contains(key.toLower()))
+        return get(key).toInt() == QueuedConfig::DATABASE_VERSION;
+    else
+        return false;
+}
+
+
+/**
  * @fn get
  */
 QVariant QueuedAdvancedSettings::get(const QString &_key) const
@@ -100,6 +114,23 @@ QString QueuedAdvancedSettings::internalId(const QString &_key)
     QString key = _key.toLower();
     for (auto &internal : QueuedCfg::QueuedSettingsDefaults.keys()) {
         if (internal.toLower() != key)
+            continue;
+        return internal;
+    }
+
+    return QString();
+}
+
+
+/**
+ * @fn internalId
+ */
+QString QueuedAdvancedSettings::internalId(const QueuedCfg::QueuedSettings _key)
+{
+    qCDebug(LOG_LIB) << "Looking for key" << static_cast<int>(_key);
+
+    for (auto &internal : QueuedCfg::QueuedSettingsDefaults.keys()) {
+        if (QueuedCfg::QueuedSettingsDefaults[internal].id != _key)
             continue;
         return internal;
     }

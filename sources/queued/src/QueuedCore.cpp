@@ -92,35 +92,8 @@ bool QueuedCore::addTask(
         }
     }
 
-    // add to database
-    auto ids = m_users->ids(_userId);
-    auto user = m_users->user(_userId);
-    if (!user) {
-        qCWarning(LOG_LIB) << "Could not find task user" << _userId;
-        return false;
-    }
-    auto taskLimits = QueuedLimits::minimalLimits(
-        _limits, user->nativeLimits(),
-        QueuedLimits::Limits(
-            m_advancedSettings->get(QueuedCfg::QueuedSettings::DefaultLimits)
-                .toString()));
-    QVariantHash properties = {{"user", _userId},
-                               {"command", _command},
-                               {"commandArguments", _arguments},
-                               {"workDirectory", _workingDirectory},
-                               {"nice", _nice},
-                               {"uid", ids.first},
-                               {"gid", ids.second},
-                               {"limits", taskLimits.toString()}};
-    auto id = m_database->add(QueuedDB::TASKS_TABLE, properties);
-    if (id == -1) {
-        qCWarning(LOG_LIB) << "Could not add task" << _command;
-        return false;
-    }
-
-    // add to child object
-    m_processes->add(properties, id);
-    return true;
+    return addTaskPrivate(_command, _arguments, _workingDirectory, _nice,
+                          _userId, _limits);
 }
 
 
@@ -149,25 +122,13 @@ bool QueuedCore::addUser(
         return false;
     }
 
-    // add to dababase
-    QVariantHash properties
-        = {{"name", _name},
-           {"password", QueuedUser::hashFromPassword(_password)},
-           {"email", _email},
-           {"permissions", _permissions},
-           {"limits", _limits.toString()}};
-    auto id = m_database->add(QueuedDB::USERS_TABLE, properties);
-    if (id == -1) {
-        qCWarning(LOG_LIB) << "Could not add user" << _name;
-        return false;
-    }
-
-    // add to child object
-    m_users->add(properties, id);
-    return true;
+    return addUserPrivate(_name, _email, _password, _permissions, _limits);
 }
 
 
+/**
+ * @fn authorization
+ */
 QueuedUserManager::QueuedUserAuthorization
 QueuedCore::authorization(const QString &_name, const QString &_password)
 {
@@ -206,25 +167,7 @@ bool QueuedCore::editOption(
         return false;
     }
 
-    // add to database
-    long long id = m_advancedSettings->id(_key);
-    QVariantHash payload = {{"key", _key}, {"value", _value}};
-
-    bool status = false;
-    if (id == -1) {
-        id = m_database->add(QueuedDB::SETTINGS_TABLE, payload);
-        qCInfo(LOG_LIB) << "Added new key with ID" << id;
-        status = (id != -1);
-    } else {
-        status = m_database->modify(QueuedDB::SETTINGS_TABLE, id, payload);
-        qCInfo(LOG_LIB) << "Value for" << _key
-                        << "has been modified with status" << status;
-    }
-
-    // add to child objectm
-    if (status)
-        m_advancedSettings->set(_key, _value);
-    return status;
+    return editOptionPrivate(_key, _value);
 }
 
 
@@ -281,20 +224,7 @@ bool QueuedCore::editTask(
         = isAdmin ? _taskData
                   : dropAdminFields(QueuedDB::TASKS_TABLE, _taskData);
 
-    // modify record in database first
-    bool status = m_database->modify(QueuedDB::TASKS_TABLE, _id, payload);
-    if (!status) {
-        qCWarning(LOG_LIB) << "Could not modify task record" << _id
-                           << "in database, do not edit it in memory";
-        return false;
-    }
-
-    // modify values stored in memory
-    for (auto &property : payload.keys())
-        task->setProperty(property.toLocal8Bit().constData(),
-                          payload[property]);
-
-    return true;
+    return editTaskPrivate(_id, payload);
 }
 
 
@@ -334,20 +264,7 @@ bool QueuedCore::editUser(
         = isAdmin ? _userData
                   : dropAdminFields(QueuedDB::USERS_TABLE, _userData);
 
-    // modify record in database first
-    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, payload);
-    if (!status) {
-        qCWarning(LOG_LIB) << "Could not modify user record" << _id
-                           << "in database, do not edit it in memory";
-        return false;
-    }
-
-    // modify values stored in memory
-    for (auto &property : payload.keys())
-        user->setProperty(property.toLocal8Bit().constData(),
-                          payload[property]);
-
-    return true;
+    return editUserPrivate(_id, payload);
 }
 
 
@@ -360,12 +277,6 @@ bool QueuedCore::editUserPermission(
 {
     qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission)
                      << "for user" << _id << "add" << _add;
-
-    auto user = m_users->user(_id);
-    if (!user) {
-        qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
-        return false;
-    }
 
     // check permissions
     auto authUser = m_users->user(_auth.user);
@@ -383,29 +294,7 @@ bool QueuedCore::editUserPermission(
         }
     }
 
-    // edit runtime permissions to get value
-    if (_add)
-        user->addPermissions(_permission);
-    else
-        user->removePermissions(_permission);
-    uint permissions = user->permissions();
-    qCInfo(LOG_LIB) << "New user permissions";
-
-    // modify in database now
-    QVariantHash payload = {{"permissions", permissions}};
-    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, payload);
-    if (!status) {
-        qCWarning(LOG_LIB) << "Could not modify user record" << _id
-                           << "in database, do not edit it in memory";
-        // rollback in-memory values
-        if (_add)
-            user->removePermissions(_permission);
-        else
-            user->addPermissions(_permission);
-        return false;
-    }
-
-    return true;
+    return editUserPermissionPrivate(_id, _permission, _add);
 }
 
 
@@ -597,6 +486,8 @@ void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _key,
     case QueuedCfg::QueuedSettings::DatabaseInterval:
         m_databaseManager->setInterval(_value.toLongLong());
         break;
+    case QueuedCfg::QueuedSettings::DatabaseVersion:
+        break;
     case QueuedCfg::QueuedSettings::DefaultLimits:
         break;
     case QueuedCfg::QueuedSettings::KeepTasks:
@@ -762,6 +653,13 @@ void QueuedCore::initSettings(const QString &_configuration)
     // and load advanced settings
     m_advancedSettings = new QueuedAdvancedSettings(this);
     m_advancedSettings->set(m_database->get(QueuedDB::SETTINGS_TABLE));
+    if (!m_advancedSettings->checkDatabaseVersion()) {
+        qCInfo(LOG_LIB) << "Bump database version to"
+                        << QueuedConfig::DATABASE_VERSION;
+        editOptionPrivate(m_advancedSettings->internalId(
+                              QueuedCfg::QueuedSettings::DatabaseVersion),
+                          QueuedConfig::DATABASE_VERSION);
+    }
 
     // report manager
     m_reports = new QueuedReportManager(this, m_database);
@@ -793,4 +691,210 @@ void QueuedCore::initUsers()
     m_connections += connect(
         m_users, SIGNAL(userLoggedIn(const long long, const QDateTime &)), this,
         SLOT(updateUserLoginTime(const long long, const QDateTime &)));
+}
+
+
+/**
+ * @addTaskPrivate
+ */
+bool QueuedCore::addTaskPrivate(const QString &_command,
+                                const QStringList &_arguments,
+                                const QString &_workingDirectory,
+                                const uint _nice, const long long _userId,
+                                const QueuedLimits::Limits &_limits)
+{
+    qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
+                     << "from user" << _userId;
+
+    // add to database
+    auto ids = m_users->ids(_userId);
+    auto user = m_users->user(_userId);
+    if (!user) {
+        qCWarning(LOG_LIB) << "Could not find task user" << _userId;
+        return false;
+    }
+    auto taskLimits = QueuedLimits::minimalLimits(
+        _limits, user->nativeLimits(),
+        QueuedLimits::Limits(
+            m_advancedSettings->get(QueuedCfg::QueuedSettings::DefaultLimits)
+                .toString()));
+    QVariantHash properties = {{"user", _userId},
+                               {"command", _command},
+                               {"commandArguments", _arguments},
+                               {"workDirectory", _workingDirectory},
+                               {"nice", _nice},
+                               {"uid", ids.first},
+                               {"gid", ids.second},
+                               {"limits", taskLimits.toString()}};
+    auto id = m_database->add(QueuedDB::TASKS_TABLE, properties);
+    if (id == -1) {
+        qCWarning(LOG_LIB) << "Could not add task" << _command;
+        return false;
+    }
+
+    // add to child object
+    m_processes->add(properties, id);
+    return true;
+}
+
+
+/**
+ * @fn addUserPrivate
+ */
+bool QueuedCore::addUserPrivate(const QString &_name, const QString &_email,
+                                const QString &_password,
+                                const uint _permissions,
+                                const QueuedLimits::Limits &_limits)
+{
+    qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
+                     << "and permissions" << _permissions;
+    // add to database
+    QVariantHash properties
+        = {{"name", _name},
+           {"password", QueuedUser::hashFromPassword(_password)},
+           {"email", _email},
+           {"permissions", _permissions},
+           {"limits", _limits.toString()}};
+    auto id = m_database->add(QueuedDB::USERS_TABLE, properties);
+    if (id == -1) {
+        qCWarning(LOG_LIB) << "Could not add user" << _name;
+        return false;
+    }
+
+    // add to child object
+    m_users->add(properties, id);
+    return true;
+}
+
+
+/**
+ * @fn editOptionPrivate
+ */
+bool QueuedCore::editOptionPrivate(const QString &_key, const QVariant &_value)
+{
+    qCDebug(LOG_LIB) << "Set key" << _key << "to" << _value;
+
+    // add to database
+    long long id = m_advancedSettings->id(_key);
+    QVariantHash payload = {{"key", _key}, {"value", _value}};
+
+    bool status = false;
+    if (id == -1) {
+        id = m_database->add(QueuedDB::SETTINGS_TABLE, payload);
+        qCInfo(LOG_LIB) << "Added new key with ID" << id;
+        status = (id != -1);
+    } else {
+        status = m_database->modify(QueuedDB::SETTINGS_TABLE, id, payload);
+        qCInfo(LOG_LIB) << "Value for" << _key
+                        << "has been modified with status" << status;
+    }
+
+    // add to child object
+    if (status)
+        m_advancedSettings->set(_key, _value);
+    return status;
+}
+
+
+/**
+ * @fn editTaskPrivate
+ */
+bool QueuedCore::editTaskPrivate(const long long _id,
+                                 const QVariantHash &_taskData)
+{
+    qCDebug(LOG_LIB) << "Edit task with ID" << _id;
+
+    auto task = m_processes->process(_id);
+    if (!task) {
+        qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
+        return false;
+    }
+
+    // modify record in database first
+    bool status = m_database->modify(QueuedDB::TASKS_TABLE, _id, _taskData);
+    if (!status) {
+        qCWarning(LOG_LIB) << "Could not modify task record" << _id
+                           << "in database, do not edit it in memory";
+        return false;
+    }
+
+    // modify values stored in memory
+    for (auto &property : _taskData.keys())
+        task->setProperty(property.toLocal8Bit().constData(),
+                          _taskData[property]);
+
+    return true;
+}
+
+
+/**
+ * @fn editUserPrivate
+ */
+bool QueuedCore::editUserPrivate(const long long _id,
+                                 const QVariantHash &_userData)
+{
+    qCDebug(LOG_LIB) << "Edit user with ID" << _id;
+
+    auto user = m_users->user(_id);
+    if (!user) {
+        qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
+        return false;
+    };
+
+    // modify record in database first
+    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, _userData);
+    if (!status) {
+        qCWarning(LOG_LIB) << "Could not modify user record" << _id
+                           << "in database, do not edit it in memory";
+        return false;
+    }
+
+    // modify values stored in memory
+    for (auto &property : _userData.keys())
+        user->setProperty(property.toLocal8Bit().constData(),
+                          _userData[property]);
+
+    return true;
+}
+
+
+/**
+ * @fn editUserPermissionPrivate
+ */
+bool QueuedCore::editUserPermissionPrivate(
+    const long long _id, const QueuedEnums::Permission &_permission,
+    const bool _add)
+{
+    qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission)
+                     << "for user" << _id << "add" << _add;
+
+    auto user = m_users->user(_id);
+    if (!user) {
+        qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
+        return false;
+    }
+
+    // edit runtime permissions to get value
+    if (_add)
+        user->addPermissions(_permission);
+    else
+        user->removePermissions(_permission);
+    uint permissions = user->permissions();
+    qCInfo(LOG_LIB) << "New user permissions";
+
+    // modify in database now
+    QVariantHash payload = {{"permissions", permissions}};
+    bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, payload);
+    if (!status) {
+        qCWarning(LOG_LIB) << "Could not modify user record" << _id
+                           << "in database, do not edit it in memory";
+        // rollback in-memory values
+        if (_add)
+            user->removePermissions(_permission);
+        else
+            user->addPermissions(_permission);
+        return false;
+    }
+
+    return true;
 }

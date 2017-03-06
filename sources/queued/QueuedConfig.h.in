@@ -85,6 +85,13 @@ const char LIB_INSTALL_DIR[] = "@LIB_INSTALL_DIR@";
  */
 const char ROOT_INSTALL_DIR[] = "@CMAKE_INSTALL_PREFIX@";
 
+// internal configuration
+/**
+ * @ingroup QueuedConfig
+ * @brief version of internal storage
+ */
+const int DATABASE_VERSION = 1;
+
 // plugin interfaces
 /**
  * @brief plugin interface name
