@@ -147,7 +147,8 @@ const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
     {"ProcessCommandLine",
      {QueuedSettings::ProcessCommandLine,
       "systemd-run\x01--scope\x01--unit={name}\x01--uid={uid}\x01--gid={gid}"
-      "\x01-p\x01CPUQuota={cpu}%\x01-p\x01MemoryHigh={memory}\x01{app}"}}};
+      "\x01-p\x01CPUQuota={cpu}%\x01-p\x01MemoryHigh={memory}\x01{"
+      "application}"}}};
 };
 
 #endif /* QUEUEDCONFIGURATION_H */

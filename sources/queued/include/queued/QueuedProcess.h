@@ -232,7 +232,11 @@ public:
      * @brief set process line
      * @param _processLine
      * original process line
-     * @remark the following values will be replaced
+     * @remark values in {} will be replaced
+     * 1. Property names, like {name}, {uid}, etc
+     * 2. {cpu} will be replaced to QueuedSystemInfo::cpuWeight(limit) in %
+     * 3. {memory} will be replaced to limit
+     * 4. {application} will be replaced to application line and arguments
      */
     void setProcessLine(const QString &_processLine);
     /**

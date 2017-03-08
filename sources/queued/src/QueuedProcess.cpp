@@ -92,7 +92,7 @@ void QueuedProcess::updateArguments()
 
     // command line
     QString commandLine = command() + "\x01" + commandArguments().join('\x01');
-    application.replace("{app}", commandLine);
+    application.replace("{application}", commandLine);
 
     QStringList arguments = application.split('\x01');
 
