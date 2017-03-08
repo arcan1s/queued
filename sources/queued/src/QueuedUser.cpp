@@ -27,7 +27,6 @@
 
 extern "C" {
 #include <pwd.h>
-#include <sys/types.h>
 }
 
 
@@ -107,7 +106,7 @@ QPair<uint, uint> QueuedUser::ids()
 {
     QPair<uint, uint> system = {1, 1};
 
-    auto pwd = getpwnam(name().toLocal8Bit().constData());
+    auto pwd = ::getpwnam(name().toLocal8Bit().constData());
     if (!pwd) {
         qCWarning(LOG_LIB) << "No user found by name" << name();
         return system;

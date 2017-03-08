@@ -29,12 +29,14 @@
  * @fn QueuedProcessManager
  */
 QueuedProcessManager::QueuedProcessManager(QObject *parent,
+                                           const QString &processLine,
                                            const OnExitAction onExit)
     : QObject(parent)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
     setOnExitAction(onExit);
+    setProcessLine(processLine);
 }
 
 
@@ -160,7 +162,6 @@ void QueuedProcessManager::remove(const long long _index)
         pr->kill();
         break;
     case OnExitAction::Terminate:
-    default:
         pr->terminate();
         break;
     }
@@ -204,7 +205,6 @@ void QueuedProcessManager::stop(const long long _index)
         pr->kill();
         break;
     case OnExitAction::Terminate:
-    default:
         pr->terminate();
         break;
     }
@@ -221,6 +221,15 @@ QueuedProcessManager::OnExitAction QueuedProcessManager::onExit() const
 
 
 /**
+ * @fn processLine
+ */
+QString QueuedProcessManager::processLine() const
+{
+    return m_processLine;
+}
+
+
+/**
  * @fn setOnExitAction
  */
 void QueuedProcessManager::setOnExitAction(const OnExitAction _action)
@@ -228,6 +237,19 @@ void QueuedProcessManager::setOnExitAction(const OnExitAction _action)
     qCDebug(LOG_LIB) << "New action on exit" << static_cast<int>(_action);
 
     m_onExit = _action;
+}
+
+
+/**
+ * @fn setProcessLine
+ */
+void QueuedProcessManager::setProcessLine(const QString _processLine)
+{
+    qCDebug(LOG_LIB) << "Set process line to" << _processLine;
+
+    m_processLine = _processLine;
+    for (auto process : m_processes.values())
+        process->setProcessLine(processLine());
 }
 
 

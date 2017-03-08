@@ -77,24 +77,26 @@ typedef struct {
 } QueuedDBSetup;
 /**
  * @ingroup QueuedCfg
- * @enum Settings
+ * @enum QueuedSettings
  * @brief settings keys enum
- * @var Settigns::Invalid
+ * @var QueuedSettings::Invalid
  * unknown key
- * @var Settings::DatabaseInterval
+ * @var QueuedSettings::DatabaseInterval
  * database actions interval in msecs
- * @var Settings::DefaultLimits
+ * @var QueuedSettings::DefaultLimits
  * default limits value
- * @var Settings::KeepTasks
+ * @var QueuedSettings::KeepTasks
  * keep ended tasks in msecs
- * @var Settings::KeepUsers
+ * @var QueuedSettings::KeepUsers
  * keep users last logged in msecs
- * @var Settings::OnExitAction
+ * @var QueuedSettings::OnExitAction
  * on queued exit action enum
- * @var Settings::TokenExpiration
+ * @var QueuedSettings::TokenExpiration
  * token expiration value in days
- * @var Settings::DatabaseVersion
+ * @var QueuedSettings::DatabaseVersion
  * internal field to control current database version
+ * @var QueuedSettings::ProcessCommandLine
+ * control process command line
  */
 enum class QueuedSettings {
     Invalid = 1 << 0,
@@ -104,7 +106,8 @@ enum class QueuedSettings {
     KeepUsers = 1 << 4,
     OnExitAction = 1 << 5,
     TokenExpiration = 1 << 6,
-    DatabaseVersion = 1 << 7
+    DatabaseVersion = 1 << 7,
+    ProcessCommandLine = 1 << 8,
 };
 /**
  * @ingroup QueuedCfg
@@ -140,7 +143,11 @@ const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
     {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
     {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
     {"DatabaseVersion",
-     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}}};
+     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
+    {"ProcessCommandLine",
+     {QueuedSettings::ProcessCommandLine,
+      "systemd-run\x01--scope\x01--unit={name}\x01--uid={uid}\x01--gid={gid}"
+      "\x01-p\x01CPUQuota={cpu}%\x01-p\x01MemoryHigh={memory}\x01{app}"}}};
 };
 
 #endif /* QUEUEDCONFIGURATION_H */

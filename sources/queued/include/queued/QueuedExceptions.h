@@ -28,32 +28,29 @@
 
 
 /**
- * @brief database operation exception
+ * @brief generic exception class
  */
-class QueuedDatabaseException : public QException
+class QueuedException : public QException
 {
 public:
     /**
-     * @brief QueuedDatabaseException class constructor
+     * @brief QueuedException class constructor
      * @param message
      * exception message
      */
-    QueuedDatabaseException(const QString &message)
+    QueuedException(const QString &message)
         : m_message(message){};
     /**
-     * @brief clone QueuedDatabaseException
+     * @brief clone QueuedException
      */
-    QueuedDatabaseException *clone() const
-    {
-        return new QueuedDatabaseException(*this);
-    };
+    QueuedException *clone() const { return new QueuedException(*this); };
     /**
      * @brief message of this exception
      * @return message for logging, etc
      */
     QString message() const { return m_message; };
     /**
-     * @brief raise QueuedDatabaseException
+     * @brief raise QueuedException
      */
     void raise() const { throw * this; }
 
@@ -66,9 +63,41 @@ private:
 
 
 /**
+ * @brief configuration related exception
+ */
+class QueuedConfigurationException : public QueuedException
+{
+public:
+    /**
+     * @brief QueuedConfigurationException class constructor
+     * @param message
+     * exception message
+     */
+    QueuedConfigurationException(const QString &message)
+        : QueuedException(message){};
+};
+
+
+/**
+ * @brief database operation exception
+ */
+class QueuedDatabaseException : public QueuedException
+{
+public:
+    /**
+     * @brief QueuedDatabaseException class constructor
+     * @param message
+     * exception message
+     */
+    QueuedDatabaseException(const QString &message)
+        : QueuedException(message){};
+};
+
+
+/**
  * @brief DBus operation exception
  */
-class QueuedDBusException : public QException
+class QueuedDBusException : public QueuedException
 {
 public:
     /**
@@ -77,29 +106,7 @@ public:
      * exception message
      */
     QueuedDBusException(const QString &message)
-        : m_message(message){};
-    /**
-     * @brief clone QueuedDBusException
-     */
-    QueuedDBusException *clone() const
-    {
-        return new QueuedDBusException(*this);
-    };
-    /**
-     * @brief message of this exception
-     * @return message for logging, etc
-     */
-    QString message() const { return m_message; };
-    /**
-     * @brief raise QueuedDBusException
-     */
-    void raise() const { throw * this; }
-
-private:
-    /**
-     * @brief exception message
-     */
-    QString m_message;
+        : QueuedException(message){};
 };
 
 

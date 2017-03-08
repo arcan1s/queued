@@ -48,6 +48,7 @@ class QueuedProcess : public QProcess
     Q_PROPERTY(QString limits READ limits WRITE setLimits)
     Q_PROPERTY(QueuedLimits::Limits nativeLimtis READ nativeLimits)
     Q_PROPERTY(uint nice READ nice WRITE setNice)
+    Q_PROPERTY(QString processLine READ processLine WRITE setProcessLine)
     Q_PROPERTY(QueuedEnums::ProcessState pstate READ pstate WRITE setPState)
     Q_PROPERTY(QDateTime startTime READ startTime WRITE setStartTime)
     Q_PROPERTY(uint uid READ uid WRITE setUid)
@@ -112,6 +113,11 @@ public:
      */
     virtual ~QueuedProcess();
     /**
+     * @brief update command arguments
+     */
+    void updateArguments();
+    // properties
+    /**
      * @brief index of process
      * @return assigned index of process
      */
@@ -157,6 +163,11 @@ public:
      * @return process nice
      */
     uint nice() const;
+    /**
+     * @brief process line
+     * @return process line as is in configuration
+     */
+    QString processLine() const;
     /**
      * @brief process state
      * @return process defined state
@@ -218,6 +229,13 @@ public:
      */
     void setNice(const uint _nice);
     /**
+     * @brief set process line
+     * @param _processLine
+     * original process line
+     * @remark the following values will be replaced
+     */
+    void setProcessLine(const QString &_processLine);
+    /**
      * @brief set process state
      * @param _limits
      * new process state
@@ -255,12 +273,6 @@ public:
      */
     bool operator==(const QueuedProcess &_other);
 
-protected:
-    /**
-     * @brief additional method with sets rules for QProcess
-     */
-    void setupChildProcess();
-
 private:
     /**
      * @brief process definitions
@@ -270,6 +282,10 @@ private:
      * @brief index of process
      */
     long long m_index = -1;
+    /**
+     * @brief process line to launch
+     */
+    QString m_processLine;
 };
 
 

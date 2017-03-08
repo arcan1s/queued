@@ -38,12 +38,13 @@ class QueuedProcessManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(OnExitAction onExit READ onExit WRITE setOnExitAction)
+    Q_PROPERTY(QString processLine READ processLine WRITE setProcessLine)
 
 public:
     /**
- * @typedef QueuedProcessMap
- * map of indices to QueuedProcess pointers
- */
+     * @typedef QueuedProcessMap
+     * map of indices to QueuedProcess pointers
+     */
     typedef QHash<long long, QueuedProcess *> QueuedProcessMap;
     /**
      * @typedef QueuedProcessConnectionMap
@@ -51,7 +52,6 @@ public:
      */
     typedef QHash<long long, QMetaObject::Connection>
         QueuedProcessConnectionMap;
-
     /**
      * @enum OnExitAction
      * @brief action with child process on destruction
@@ -66,10 +66,13 @@ public:
      * @brief QueuedProcessManager class constructor
      * @param parent
      * pointer to parent item
+     * @param processLine
+     * command line pattern
      * @param onExit
      * default action on exit
      */
-    explicit QueuedProcessManager(QObject *parent, const OnExitAction onExit);
+    explicit QueuedProcessManager(QObject *parent, const QString &processLine,
+                                  const OnExitAction onExit);
     /**
      * @brief QueuedProcessManager class destructor
      */
@@ -137,11 +140,22 @@ public:
      */
     OnExitAction onExit() const;
     /**
+     * @brief process command line
+     * @return current command line
+     */
+    QString processLine() const;
+    /**
      * @brief set on exit action
      * @param _action
      * new on exit action
      */
     void setOnExitAction(const OnExitAction _action);
+    /**
+     * @brief set command line
+     * @param _commandLine
+     * new command line
+     */
+    void setProcessLine(const QString _processLine);
 
 signals:
     /**
@@ -188,6 +202,10 @@ private:
      * @brief processes list
      */
     QueuedProcessMap m_processes;
+    /**
+     * @brief command line
+     */
+    QString m_processLine;
 };
 
 

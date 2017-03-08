@@ -17,11 +17,14 @@
 #include "QueuedApplicationInterface.h"
 
 #include <QCoreApplication>
-#include <unistd.h>
 
 #include "queued/Queued.h"
 
 #include "QueuedApplication.h"
+
+extern "C" {
+#include <unistd.h>
+}
 
 
 QueuedApplicationInterface::QueuedApplicationInterface(
@@ -54,8 +57,8 @@ void QueuedApplicationInterface::Close() const
 QStringList QueuedApplicationInterface::UIDs() const
 {
     QStringList uids;
-    uids.append(QString::number(getuid()));
-    uids.append(QString::number(geteuid()));
+    uids.append(QString::number(::getuid()));
+    uids.append(QString::number(::geteuid()));
 
     return uids;
 }

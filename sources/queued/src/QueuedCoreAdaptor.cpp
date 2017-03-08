@@ -55,3 +55,12 @@ QVariantList QueuedCoreAdaptor::sendRequest(const QString &_service,
 
     return arguments;
 }
+
+
+/**
+ * @fn toNativeType
+ */
+QVariant QueuedCoreAdaptor::toNativeType(const QVariant &_data)
+{
+    return _data.value<QDBusVariant>().variant();
+}

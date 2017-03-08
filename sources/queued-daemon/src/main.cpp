@@ -24,6 +24,10 @@
 #include "QueuedApplication.h"
 #include "version.h"
 
+extern "C" {
+#include <unistd.h>
+}
+
 
 bool existingSessionOperation(const QString &operation)
 {
@@ -38,7 +42,13 @@ bool existingSessionOperation(const QString &operation)
 
 int main(int argc, char *argv[])
 {
-    // daemon(0, 0);
+    // HACK preparse arguments to find out if --daemon is set
+    for (int i = 0; i < argc; i++) {
+        if (std::string(argv[i]) != "--daemon")
+            continue;
+        ::daemon(0, 0);
+    }
+
 
     QCoreApplication app(argc, argv);
     app.setApplicationName(NAME);
@@ -50,21 +60,39 @@ int main(int argc, char *argv[])
         "Daemon for starting jobs to queue of calculations");
     parser.addHelpOption();
     parser.addVersionOption();
+    // info
+    QCommandLineOption infoOption(QStringList() << "i"
+                                                << "info",
+                                  "Show additional info.");
+    parser.addOption(infoOption);
 
     // configuration option
     QCommandLineOption configOption(QStringList() << "c"
                                                   << "config",
-                                    "Read initial configuration from file",
+                                    "Read initial configuration from file.",
                                     "config", QueuedSettings::defaultPath());
     parser.addOption(configOption);
 
     // debug mode
     QCommandLineOption debugOption(QStringList() << "d"
                                                  << "debug",
-                                   "Print debug information");
+                                   "Print debug information.");
     parser.addOption(debugOption);
 
+    // daemon mode
+    QCommandLineOption daemonOption(QStringList() << "daemon",
+                                    "Start detached.");
+    parser.addOption(daemonOption);
+
     parser.process(app);
+
+    // show info and exit
+    if (parser.isSet(infoOption)) {
+        QueuedDebug::enableDebug();
+        auto metadata = QueuedDebug::getBuildData();
+        for (auto &string : metadata)
+            qCInfo(LOG_APP) << string;
+    }
 
     // check if exists
     if (existingSessionOperation(QString("Active"))) {

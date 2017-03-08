@@ -40,6 +40,7 @@
 #include "QueuedProcessManager.h"
 #include "QueuedReportManager.h"
 #include "QueuedSettings.h"
+#include "QueuedSystemInfo.h"
 #include "QueuedTokenManager.h"
 #include "QueuedUser.h"
 #include "QueuedUserManager.h"

@@ -500,6 +500,9 @@ void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _key,
         m_processes->setOnExitAction(
             static_cast<QueuedProcessManager::OnExitAction>(_value.toInt()));
         break;
+    case QueuedCfg::QueuedSettings::ProcessCommandLine:
+        m_processes->setProcessLine(_value.toString());
+        break;
     case QueuedCfg::QueuedSettings::TokenExpiration:
         m_users->setTokenExpiration(_value.toLongLong());
         break;
@@ -607,8 +610,11 @@ void QueuedCore::initProcesses()
     auto onExitAction = static_cast<QueuedProcessManager::OnExitAction>(
         m_advancedSettings->get(QueuedCfg::QueuedSettings::OnExitAction)
             .toInt());
+    auto processLine
+        = m_advancedSettings->get(QueuedCfg::QueuedSettings::ProcessCommandLine)
+              .toString();
 
-    m_processes = new QueuedProcessManager(this, onExitAction);
+    m_processes = new QueuedProcessManager(this, processLine, onExitAction);
     auto dbProcesses = m_database->get(
         QueuedDB::TASKS_TABLE,
         QString("WHERE state != %1")
