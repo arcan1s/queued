@@ -84,6 +84,17 @@ const char LIB_INSTALL_DIR[] = "@LIB_INSTALL_DIR@";
  * @brief the same as CMAKE_INSTALL_PREFIX
  */
 const char ROOT_INSTALL_DIR[] = "@CMAKE_INSTALL_PREFIX@";
+// application specific
+/**
+ * @def HOME_PATH
+ * path to queued home directory
+ */
+const char HOME_PATH[] = "queued";
+/**
+ * @def PLUGIN_PATH
+ * path to plugins inside @ref HOME_PATH
+ */
+const char PLUGIN_PATH[] = "plugins";
 
 // internal configuration
 /**
