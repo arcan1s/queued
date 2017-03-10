@@ -122,6 +122,10 @@ public:
      */
     void remove(const long long _index);
     /**
+     * @brief select and start task automatically
+     */
+    void start();
+    /**
      * @brief force start task
      * @param _index
      * task index
@@ -156,6 +160,11 @@ public:
      * new command line
      */
     void setProcessLine(const QString _processLine);
+    /**
+     * @brief get used limits
+     * @return used system limits
+     */
+    QueuedLimits::Limits usedLimits();
 
 signals:
     /**

@@ -530,6 +530,9 @@ void QueuedCore::init(const QString &_configuration)
 
     // dbus session
     initDBus();
+
+    // run!
+    m_processes->start();
 }
 
 

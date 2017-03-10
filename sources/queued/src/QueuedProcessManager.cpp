@@ -173,6 +173,45 @@ void QueuedProcessManager::remove(const long long _index)
 /**
  * @fn start
  */
+void QueuedProcessManager::start()
+{
+    qCDebug(LOG_LIB) << "Start random task";
+
+    long long index = -1;
+    // gather used resources
+    QueuedLimits::Limits limits = usedLimits();
+    double weightedCpu
+        = limits.cpu == 0 ? 0.0 : QueuedSystemInfo::cpuWeight(limits.cpu);
+    double weightedMemory = limits.memory == 0
+                                ? 0.0
+                                : QueuedSystemInfo::memoryWeight(limits.memory);
+
+    auto tasks = processes().values();
+    for (auto pr : tasks) {
+        // check limits first
+        if (((1.0 - weightedCpu)
+             < QueuedSystemInfo::cpuWeight(pr->nativeLimits().cpu))
+            && ((1.0 - weightedMemory)
+                < QueuedSystemInfo::memoryWeight(pr->nativeLimits().memory)))
+            continue;
+        // now check nice level
+        if ((index > -1) && (pr->nice() < process(index)->nice()))
+            continue;
+        // now check index value
+        if ((index > -1) && (pr->index() > index))
+            continue;
+        // hmmm, looks like we found a candidate
+        index = pr->index();
+    }
+
+    if (index > -1)
+        return start(index);
+}
+
+
+/**
+ * @fn start
+ */
 void QueuedProcessManager::start(const long long _index)
 {
     qCDebug(LOG_LIB) << "Start task" << _index;
@@ -184,6 +223,7 @@ void QueuedProcessManager::start(const long long _index)
     }
 
     pr->start();
+    emit(taskStartTimeReceived(_index, QDateTime::currentDateTimeUtc()));
 }
 
 
@@ -254,6 +294,52 @@ void QueuedProcessManager::setProcessLine(const QString _processLine)
 
 
 /**
+ * @fn usedLimits
+ */
+QueuedLimits::Limits QueuedProcessManager::usedLimits()
+{
+    auto tasks = processes().values();
+    long long cpu = std::accumulate(
+        tasks.cbegin(), tasks.cend(), 0,
+        [](long long value, QueuedProcess *process) {
+            return process->pstate() == QueuedEnums::ProcessState::Running
+                       ? value + process->nativeLimits().cpu
+                       : value;
+        });
+    long long gpu = std::accumulate(
+        tasks.cbegin(), tasks.cend(), 0,
+        [](long long value, QueuedProcess *process) {
+            return process->pstate() == QueuedEnums::ProcessState::Running
+                       ? value + process->nativeLimits().gpu
+                       : value;
+        });
+    long long memory = std::accumulate(
+        tasks.cbegin(), tasks.cend(), 0,
+        [](long long value, QueuedProcess *process) {
+            return process->pstate() == QueuedEnums::ProcessState::Running
+                       ? value + process->nativeLimits().memory
+                       : value;
+        });
+    long long gpumemory = std::accumulate(
+        tasks.cbegin(), tasks.cend(), 0,
+        [](long long value, QueuedProcess *process) {
+            return process->pstate() == QueuedEnums::ProcessState::Running
+                       ? value + process->nativeLimits().gpumemory
+                       : value;
+        });
+    long long storage = std::accumulate(
+        tasks.cbegin(), tasks.cend(), 0,
+        [](long long value, QueuedProcess *process) {
+            return process->pstate() == QueuedEnums::ProcessState::Running
+                       ? value + process->nativeLimits().storage
+                       : value;
+        });
+
+    return QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage);
+}
+
+
+/**
  * @fn taskFinished
  */
 void QueuedProcessManager::taskFinished(const int _exitCode,
@@ -269,7 +355,6 @@ void QueuedProcessManager::taskFinished(const int _exitCode,
         pr->setEndTime(endTime);
         emit(taskStopTimeReceived(_index, endTime));
     }
-    // TODO implementation
-    // TODO emit signal for new task here
-    // emit(taskStartTimeReceived(_index, QDateTime::currentDateTimeUtc()));
+
+    start();
 }
