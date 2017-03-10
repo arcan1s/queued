@@ -106,12 +106,14 @@ public:
 signals:
     /**
      * @brief emits on each value update
+     * @param _id
+     * internal key id
      * @param _key
      * changed key
      * @param _value
      * changed value
      */
-    void valueUpdated(const QueuedCfg::QueuedSettings _key,
+    void valueUpdated(const QueuedCfg::QueuedSettings _id, const QString &_key,
                       const QVariant &_value);
 
 private:

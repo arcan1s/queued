@@ -35,6 +35,7 @@
 class QueuedAdvancedSettings;
 class QueuedDatabase;
 class QueuedDatabaseManager;
+class QueuedPluginManager;
 class QueuedProcess;
 class QueuedProcessManager;
 class QueuedReportManager;
@@ -58,6 +59,16 @@ public:
      * @brief QueuedCore class destructor
      */
     virtual ~QueuedCore();
+    /**
+     * @brief add plugin to autoload and load it now
+     * @param _plugin
+     * plugin name
+     * @param _auth
+     * user auth structure
+     * @return true on successfully addition
+     */
+    bool addPlugin(const QString &_plugin,
+                   const QueuedUserManager::QueuedUserAuthorization &_auth);
     /**
      * @brief add new task
      * @param _command
@@ -176,6 +187,23 @@ public:
      */
     QVariant option(const QString &_key);
     /**
+     * @brief get plugin settings
+     * @param _plugin
+     * plugin name
+     * @return hash of plugin settings
+     */
+    QVariantHash pluginSettings(const QString &_plugin);
+    /**
+     * @brief remove plugin from autoload and unload it now
+     * @param _plugin
+     * plugin name
+     * @param _auth
+     * user auth structure
+     * @return true on successful plugin removal
+     */
+    bool removePlugin(const QString &_plugin,
+                      const QueuedUserManager::QueuedUserAuthorization &_auth);
+    /**
      * @brief force start task
      * @param _id
      * task ID
@@ -226,13 +254,15 @@ public:
 private slots:
     /**
      * @brief notify clients about settings update
+     * @param _id
+     * updated key id
      * @param _key
      * updated key
      * @param _value
      * new value
      */
-    void updateSettings(const QueuedCfg::QueuedSettings _key,
-                        const QVariant &_value);
+    void updateSettings(const QueuedCfg::QueuedSettings _id,
+                        const QString &_key, const QVariant &_value);
     /**
      * @brief update process time
      * @param _id
@@ -266,6 +296,10 @@ private:
      * @brief pointer to database manager object
      */
     QueuedDatabaseManager *m_databaseManager = nullptr;
+    /**
+     * @brief pointer to plugin manager
+     */
+    QueuedPluginManager *m_plugins = nullptr;
     /**
      * @brief pointer to process manager
      */
@@ -302,6 +336,10 @@ private:
      * @throw QueuedDBusException
      */
     void initDBus();
+    /**
+     * @brief init plugins
+     */
+    void initPlugins();
     /**
      * @brief init processes
      */
@@ -364,6 +402,15 @@ private:
      * @return true on successful option edition
      */
     bool editOptionPrivate(const QString &_key, const QVariant &_value);
+    /**
+     * @brief edit plugin list
+     * @param _plugin
+     * plugin name
+     * @param add
+     * true if it requires add plugin
+     * @return true on successful action
+     */
+    bool editPluginPrivate(const QString &_plugin, const bool _add);
     /**
      * @brief edit task
      * @param _id

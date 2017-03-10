@@ -77,6 +77,30 @@ public slots:
     bool OptionEdit(const QString &key, const QDBusVariant &value,
                     const QString &whoAmI, const QString &token);
     /**
+     * @brief add plugin
+     * @param plugin
+     * plugin name
+     * @param whoAmI
+     * auth user name
+     * @param token
+     * auth user token
+     * @return  true on successful plugin addition
+     */
+    bool PluginAdd(const QString &plugin, const QString &whoAmI,
+                   const QString &token);
+    /**
+     * @brief remove plugin
+     * @param plugin
+     * plugin name
+     * @param whoAmI
+     * auth user name
+     * @param token
+     * auth user token
+     * @return  true on successful plugin removal
+     */
+    bool PluginRemove(const QString &plugin, const QString &whoAmI,
+                      const QString &token);
+    /**
      * @brief add new task
      * @param command
      * command line

@@ -54,6 +54,25 @@ QueuedCore::~QueuedCore()
 
 
 /**
+ * @fn addPlugin
+ */
+bool QueuedCore::addPlugin(
+    const QString &_plugin,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
+{
+    qCDebug(LOG_LIB) << "Add plugin" << _plugin;
+
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    if (!isAdmin) {
+        qCInfo(LOG_LIB) << "User" << _auth.user << "not allowed to add plugin";
+        return false;
+    }
+
+    return editPluginPrivate(_plugin, true);
+}
+
+
+/**
  * @addTask
  */
 bool QueuedCore::addTask(
@@ -310,6 +329,46 @@ QVariant QueuedCore::option(const QString &_key)
 
 
 /**
+ * @fn pluginSettings
+ */
+QVariantHash QueuedCore::pluginSettings(const QString &_plugin)
+{
+    qCDebug(LOG_LIB) << "Get plugin settings for" << _plugin;
+
+    auto dbSettings
+        = m_database->get(QueuedDB::SETTINGS_TABLE,
+                          QString("WHERE key LIKE 'Plugin.%1.%'").arg(_plugin));
+    QVariantHash settings;
+    std::for_each(dbSettings.cbegin(), dbSettings.cend(),
+                  [&settings](const QVariantHash &value) {
+                      settings[value["key"].toString()] = value["value"];
+                  });
+
+    return settings;
+}
+
+
+/**
+ * @fn removePlugin
+ */
+bool QueuedCore::removePlugin(
+    const QString &_plugin,
+    const QueuedUserManager::QueuedUserAuthorization &_auth)
+{
+    qCDebug(LOG_LIB) << "Remove plugin" << _plugin;
+
+    bool isAdmin = m_users->authorize(_auth, QueuedEnums::Permission::Admin);
+    if (!isAdmin) {
+        qCInfo(LOG_LIB) << "User" << _auth.user
+                        << "not allowed to remove plugin";
+        return false;
+    }
+
+    return editPluginPrivate(_plugin, false);
+}
+
+
+/**
  * @fn startTask
  */
 bool QueuedCore::startTask(
@@ -430,6 +489,8 @@ void QueuedCore::deinit()
         delete m_databaseManager;
     if (m_reports)
         delete m_reports;
+    if (m_plugins)
+        delete m_plugins;
     if (m_processes)
         delete m_processes;
     if (m_users)
@@ -455,15 +516,17 @@ void QueuedCore::init(const QString &_configuration)
 
     // init parts
     initSettings(_configuration);
+    initPlugins();
     initUsers();
     initProcesses();
 
     // settings update notifier
     m_connections += connect(
         m_advancedSettings,
-        SIGNAL(valueUpdated(const QueuedCfg::QueuedSettings, const QVariant &)),
+        SIGNAL(valueUpdated(const QueuedCfg::QueuedSettings, const QString &,
+                            const QVariant &)),
         this, SLOT(updateSettings(const QueuedCfg::QueuedSettings,
-                                  const QVariant &)));
+                                  const QString &, const QVariant &)));
 
     // dbus session
     initDBus();
@@ -473,15 +536,19 @@ void QueuedCore::init(const QString &_configuration)
 /**
  * @fn updateSettings
  */
-void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _key,
-                                const QVariant &_value)
+void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _id,
+                                const QString &_key, const QVariant &_value)
 {
-    qCDebug(LOG_LIB) << "Received update for" << static_cast<int>(_key)
+    qCDebug(LOG_LIB) << "Received update for" << static_cast<int>(_id) << _key
                      << "with value" << _value;
 
     // FIXME propbably there is a better way to change settings
-    switch (_key) {
+    switch (_id) {
     case QueuedCfg::QueuedSettings::Invalid:
+        // check if it is plugin settings
+        if (_key.startsWith("Plugin."))
+            m_plugins->optionChanged(_key, _value);
+        // do nothing otherwise
         break;
     case QueuedCfg::QueuedSettings::DatabaseInterval:
         m_databaseManager->setInterval(_value.toLongLong());
@@ -499,6 +566,9 @@ void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _key,
     case QueuedCfg::QueuedSettings::OnExitAction:
         m_processes->setOnExitAction(
             static_cast<QueuedProcessManager::OnExitAction>(_value.toInt()));
+        break;
+    case QueuedCfg::QueuedSettings::Plugins:
+        // do nothing here
         break;
     case QueuedCfg::QueuedSettings::ProcessCommandLine:
         m_processes->setProcessLine(_value.toString());
@@ -598,6 +668,22 @@ void QueuedCore::initDBus()
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
     }
+}
+
+
+/**
+ * @fn initPlugins
+ */
+void QueuedCore::initPlugins()
+{
+    QStringList pluginList
+        = m_advancedSettings->get(QueuedCfg::QueuedSettings::Plugins)
+              .toString()
+              .split('\x01');
+
+    m_plugins = new QueuedPluginManager(this);
+    for (auto &plugin : pluginList)
+        m_plugins->loadPlugin(plugin, pluginSettings(plugin));
 }
 
 
@@ -796,8 +882,35 @@ bool QueuedCore::editOptionPrivate(const QString &_key, const QVariant &_value)
     }
 
     // add to child object
-    if (status)
+    if (status) {
         m_advancedSettings->set(_key, _value);
+        // notify plugin if required
+    }
+    return status;
+}
+
+
+/**
+ * @fn editPluginPrivate
+ */
+bool QueuedCore::editPluginPrivate(const QString &_plugin, const bool _add)
+{
+    qCDebug(LOG_LIB) << "Edit plugin" << _plugin << "add" << _add;
+
+    QStringList pluginList
+        = m_advancedSettings->get(QueuedCfg::QueuedSettings::Plugins)
+              .toString()
+              .split('\x01');
+
+    bool status = false;
+    if (_add && !pluginList.contains(_plugin))
+        status = m_plugins->loadPlugin(_plugin, pluginSettings(_plugin));
+    else if (!_add && pluginList.contains(_plugin))
+        status = m_plugins->unloadPlugin(_plugin);
+    else
+        qCDebug(LOG_LIB) << "Plugin" << _plugin
+                         << "not loaded or already loaded";
+
     return status;
 }
 

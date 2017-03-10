@@ -39,7 +39,7 @@ QueuedPluginManager::QueuedPluginManager(QObject *parent)
 {
     qCDebug(LOG_PL) << __PRETTY_FUNCTION__;
 
-    m_interface = new QueuedPluginManagerInterface(this);
+    m_interface = new QueuedPluginManagerInterface();
 }
 
 
@@ -55,6 +55,25 @@ QueuedPluginManager::~QueuedPluginManager()
         unloadPlugin(plugin);
 
     delete m_interface;
+}
+
+
+/**
+ * @fn convertOptionName
+ */
+QPair<QString, QString>
+QueuedPluginManager::convertOptionName(const QString &_key)
+{
+    qCDebug(LOG_PL) << "Convert option name" << _key;
+
+    QStringList fields = _key.split('.');
+    // Plugin.
+    fields.takeFirst();
+    // plugin name
+    QString plugin = fields.takeFirst();
+    QString option = fields.join('.');
+
+    return {plugin, option};
 }
 
 
@@ -76,6 +95,10 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
     qCDebug(LOG_PL) << "Load plugin" << _name << "with settings" << _settings;
 
     QString libraryName = QString("lib%2.so").arg(_name);
+    // init plugin settings with valid keys
+    QVariantHash pluginSettings;
+    for (auto &key : _settings.keys())
+        pluginSettings[convertOptionName(key).first] = _settings[key];
 
     for (auto &dir : pluginLocations()) {
         if (!QDir(dir).entryList(QDir::Files).contains(libraryName))
@@ -93,7 +116,7 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
                                << "error" << loader.errorString();
         if (item) {
             m_plugins[_name] = item;
-            item->init(_settings);
+            item->init(pluginSettings);
             item->connect(interface());
         } else {
             qCCritical(LOG_PL) << "Could not cast plugin" << _name;
@@ -139,4 +162,23 @@ bool QueuedPluginManager::unloadPlugin(const QString &_name)
     delete plugin;
 
     return true;
+}
+
+
+/**
+ * @fn optionChanged
+ */
+void QueuedPluginManager::optionChanged(const QString &_key,
+                                        const QVariant &_value)
+{
+    qCDebug(LOG_PL) << "Option" << _key << "changed to" << _value;
+
+    auto option = convertOptionName(_key);
+    if (!m_plugins.contains(option.first)) {
+        qCWarning(LOG_PL) << "Plugin" << option.first << "not found for"
+                          << _key;
+        return;
+    }
+
+    return m_plugins[option.first]->updateSettings(option.second, _value);
 }

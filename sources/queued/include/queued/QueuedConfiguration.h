@@ -97,6 +97,8 @@ typedef struct {
  * internal field to control current database version
  * @var QueuedSettings::ProcessCommandLine
  * control process command line
+ * @var QueuedSettings::Plugins
+ * plugin list
  */
 enum class QueuedSettings {
     Invalid = 1 << 0,
@@ -108,6 +110,7 @@ enum class QueuedSettings {
     TokenExpiration = 1 << 6,
     DatabaseVersion = 1 << 7,
     ProcessCommandLine = 1 << 8,
+    Plugins = 1 << 9,
 };
 /**
  * @ingroup QueuedCfg
@@ -148,7 +151,8 @@ const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
      {QueuedSettings::ProcessCommandLine,
       "systemd-run\x01--scope\x01--unit={name}\x01--uid={uid}\x01--gid={gid}"
       "\x01-p\x01CPUQuota={cpu}%\x01-p\x01MemoryHigh={memory}\x01{"
-      "application}"}}};
+      "application}"}},
+    {"Plugins", {QueuedSettings::Plugins, ""}}};
 };
 
 #endif /* QUEUEDCONFIGURATION_H */

@@ -26,6 +26,7 @@
 
 #include <QHash>
 #include <QObject>
+#include <QPair>
 
 
 class QueuedPluginInterface;
@@ -56,6 +57,13 @@ public:
      */
     virtual ~QueuedPluginManager();
     /**
+     * @brief get option name from database format
+     * @param _key
+     * option key
+     * @return plugin name and option key in plugin format
+     */
+    static QPair<QString, QString> convertOptionName(const QString &_key);
+    /**
      * @brief plugin manager interface
      * @return pointer to plugin manager interface
      */
@@ -81,6 +89,16 @@ public:
      * @return true on success unload otherwise return false
      */
     bool unloadPlugin(const QString &_name);
+
+public slots:
+    /**
+     * @brief notifies plugin about option changes
+     * @param _key
+     * database option key
+     * @param _value
+     * option value
+     */
+    void optionChanged(const QString &_key, const QVariant &_value);
 
 private:
     /**

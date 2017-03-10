@@ -54,6 +54,14 @@ public:
      * @remark plugin settings will be stored as "plugin.name.Key"
      */
     virtual void init(const QVariantHash &_settings) = 0;
+    /**
+     * @brief method which will be called on option update
+     * @param _key
+     * option key
+     * @param _value
+     * option value
+     */
+    virtual void updateSettings(const QString &_key, const QVariant &_value);
 };
 
 Q_DECLARE_INTERFACE(QueuedPluginInterface, PLUGIN_INTERFACE_NAME)

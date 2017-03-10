@@ -37,11 +37,9 @@ class QueuedPluginManagerInterface : public QObject
 public:
     /**
      * @brief QueuedPluginManagerInterface class constructor
-     * @param parent
-     * pointer to parent object
      */
-    explicit QueuedPluginManagerInterface(QObject *parent)
-        : QObject(parent){};
+    explicit QueuedPluginManagerInterface()
+        : QObject(nullptr){};
     /**
      * @brief QueuedPluginManagerInterface class destructor
      */

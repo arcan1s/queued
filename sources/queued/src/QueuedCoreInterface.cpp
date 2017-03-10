@@ -75,6 +75,31 @@ bool QueuedCoreInterface::OptionEdit(const QString &key,
 
 
 /**
+ * @fn PluginAdd
+ */
+bool QueuedCoreInterface::PluginAdd(const QString &plugin,
+                                    const QString &whoAmI, const QString &token)
+{
+    qCDebug(LOG_DBUS) << "Add plugin" << plugin << "auth by" << whoAmI;
+
+    return m_core->addPlugin(plugin, QueuedUserManager::auth(whoAmI, token));
+}
+
+
+/**
+ * @fn PluginRemove
+ */
+bool QueuedCoreInterface::PluginRemove(const QString &plugin,
+                                       const QString &whoAmI,
+                                       const QString &token)
+{
+    qCDebug(LOG_DBUS) << "Remove plugin" << plugin << "auth by" << whoAmI;
+
+    return m_core->removePlugin(plugin, QueuedUserManager::auth(whoAmI, token));
+}
+
+
+/**
  * @fn TaskAdd
  */
 bool QueuedCoreInterface::TaskAdd(

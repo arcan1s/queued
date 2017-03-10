@@ -148,7 +148,7 @@ void QueuedAdvancedSettings::set(const QString &_key, const QVariant &_value)
 
     m_values[_key.toLower()] = _value;
     auto id = QueuedCfg::QueuedSettingsDefaults[internalId(_key)].id;
-    emit(valueUpdated(id, _value));
+    emit(valueUpdated(id, _key, _value));
 }
 
 
