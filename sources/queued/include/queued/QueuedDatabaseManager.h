@@ -64,7 +64,7 @@ public:
     void startWorker();
     // properties
     /**
-     * @breef database actions interval
+     * @brief database actions interval
      * @return interval in milliseconds
      */
     long long interval() const;

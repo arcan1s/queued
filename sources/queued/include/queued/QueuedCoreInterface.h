@@ -87,8 +87,6 @@ public slots:
      * @brief remove plugin
      * @param plugin
      * plugin name
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return  true on successful plugin removal
@@ -116,8 +114,6 @@ public slots:
      * limit by GPU memory
      * @param storage
      * limit by storage
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful task addition
@@ -141,6 +137,8 @@ public slots:
      * nice level or 0
      * @param uid
      * new uid or 0
+     * @param gid
+     * new gid or 0
      * @param state
      * new state or 0
      * @param cpu
@@ -153,12 +151,6 @@ public slots:
      * new limit by GPU memory or -1
      * @param storage
      * new limit by storage or -1
-     * @param start
-     * new start time in ISO format or empty
-     * @param end
-     * new end time in ISO format or empty
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful task edition
@@ -173,8 +165,6 @@ public slots:
      * @brief force start task
      * @param id
      * task ID
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful task start
@@ -184,8 +174,6 @@ public slots:
      * @brief force stop task
      * @param id
      * task ID
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful task stop
@@ -211,8 +199,6 @@ public slots:
      * limit by GPU memory
      * @param storage
      * limit by storage
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful task addition
@@ -242,8 +228,6 @@ public slots:
      * new limit by GPU memory or -1
      * @param storage
      * new limit by storage or -1
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful user edition
@@ -259,8 +243,6 @@ public slots:
      * user ID
      * @param permission
      * permission to add
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful permission addition
@@ -273,8 +255,6 @@ public slots:
      * user ID
      * @param permission
      * permission to remove
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful permission removal

@@ -30,15 +30,15 @@
  */
 QueuedProcessManager::QueuedProcessManager(QObject *parent,
                                            const QString &processLine,
-                                           const OnExitAction onExit)
+                                           const QueuedEnums::ExitAction onExit)
     : QObject(parent)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
-    qRegisterMetaType<QueuedProcessManager::OnExitAction>(
-        "QueuedProcessManager::OnExitAction");
+    qRegisterMetaType<QueuedEnums::ExitAction>(
+        "QueuedEnums::ExitAction");
 
-    setOnExitAction(onExit);
+    setExitAction(onExit);
     setProcessLine(processLine);
 }
 
@@ -164,10 +164,10 @@ void QueuedProcessManager::remove(const long long _index)
     disconnect(connection);
 
     switch (onExit()) {
-    case OnExitAction::Kill:
+    case QueuedEnums::ExitAction::Kill:
         pr->kill();
         break;
-    case OnExitAction::Terminate:
+    case QueuedEnums::ExitAction::Terminate:
         pr->terminate();
         break;
     }
@@ -252,10 +252,10 @@ void QueuedProcessManager::stop(const long long _index)
     }
 
     switch (onExit()) {
-    case OnExitAction::Kill:
+    case QueuedEnums::ExitAction::Kill:
         pr->kill();
         break;
-    case OnExitAction::Terminate:
+    case QueuedEnums::ExitAction::Terminate:
         pr->terminate();
         break;
     }
@@ -265,7 +265,7 @@ void QueuedProcessManager::stop(const long long _index)
 /**
  * @fn onExit
  */
-QueuedProcessManager::OnExitAction QueuedProcessManager::onExit() const
+QueuedEnums::ExitAction QueuedProcessManager::onExit() const
 {
     return m_onExit;
 }
@@ -281,9 +281,9 @@ QString QueuedProcessManager::processLine() const
 
 
 /**
- * @fn setOnExitAction
+ * @fn setExitAction
  */
-void QueuedProcessManager::setOnExitAction(const OnExitAction _action)
+void QueuedProcessManager::setExitAction(const QueuedEnums::ExitAction _action)
 {
     qCDebug(LOG_LIB) << "New action on exit" << static_cast<int>(_action);
 

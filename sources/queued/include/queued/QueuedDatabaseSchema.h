@@ -29,42 +29,37 @@
 
 
 /**
- * @defgroup QueuedDB
+ * @addtogroup QueuedDB
  * @brief Queued database related constants
  */
 namespace QueuedDB
 {
 /**
- * @ingroup QueuedDB
  * @brief settings table name
  */
 const char SETTINGS_TABLE[] = "settings";
 /**
-* @ingroup QueuedDB
 * @brief tasks table name
 */
 const char TASKS_TABLE[] = "tasks";
 /**
-* @ingroup QueuedDB
 * @brief tokens table name
 */
 const char TOKENS_TABLE[] = "tokens";
 /**
-* @ingroup QueuedDB
 * @brief users table name
 */
 const char USERS_TABLE[] = "users";
 /**
- *@ingroup QueuedDB
 * @struct QueuedDBField
 * @brief describes database column
-* @var name
+* @var QueuedDBField::name
 * column name
-* @var sqlDescription
+* @var QueuedDBField::sqlDescription
 * description to create column
-* @var type
+* @var QueuedDBField::type
 * Qt type of column for cast
-* @var adminField
+* @var QueuedDBField::adminField
 * is admin permissions required to edit or not
 */
 typedef struct {
@@ -74,13 +69,11 @@ typedef struct {
     bool adminField;
 } QueuedDBField;
 /**
- * @ingroup QueuedDB
  * @typedef QueuedDBSchema
  * custom map for database schemas descriptions
  */
 typedef QHash<QString, QHash<QString, QueuedDBField>> QueuedDBSchema;
 /**
- * @ingroup QueuedDB
  * @brief database schema
  */
 const QueuedDBSchema DBSchema = {

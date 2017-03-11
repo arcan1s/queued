@@ -26,24 +26,23 @@
 
 
 /**
- * @defgroup QueuedEnums
+ * @addtogroup QueuedEnums
  * @brief Queued enumerations
  */
 namespace QueuedEnums
 {
 /**
- * @ingroup QueuedEnums
- * @enum Permissions
+ * @enum Permission
  * @brief available user permissions
- * @var Permissions::Admin
+ * @var Permission::SuperAdmin
+ * "allow all" permissions
+ * @var Permission::Admin
  * administrative permissions
- * @var Permissions::JobOwner
+ * @var Permission::JobOwner
  * owner job related permissions
- * @var Permissions::User
- * user related permissions
- * @var Permissions::Web
+ * @var Permission::Web
  * web server access
- * @var Permissions::Reports
+ * @var Permission::Reports
  * access to reports
  */
 enum class Permission {
@@ -55,6 +54,15 @@ enum class Permission {
 };
 Q_DECLARE_FLAGS(Permissions, Permission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+/**
+ * @enum ExitAction
+ * @brief action with child process on destruction
+ * @var ExitAction::Terminate
+ * send SIGTERM on exit
+ * @var ExitAction::Kill
+ * send SIGKILL on exit
+ */
+enum class ExitAction { Terminate = 1 << 1, Kill = 1 << 2 };
 };
 
 

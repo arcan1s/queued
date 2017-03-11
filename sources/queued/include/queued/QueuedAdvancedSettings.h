@@ -98,7 +98,7 @@ public:
     void set(const QString &_key, const QVariant &_value);
     /**
      * @brief upload configuration from database in to internal format
-     * @param _value
+     * @param _values
      * configuration values from database
      */
     void set(const QList<QVariantHash> &_values);

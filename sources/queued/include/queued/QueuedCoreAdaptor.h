@@ -29,13 +29,12 @@
 
 
 /**
- * @defgroup QueuedCoreAdaptor
+ * @addtogroup QueuedCoreAdaptor
  * @brief adaptor to DBus methods
  */
 namespace QueuedCoreAdaptor
 {
 /**
- * @ingroup QueuedCoreAdaptor
  * @brief common DBus request
  * @param _service
  * DBus service name
@@ -53,7 +52,6 @@ QVariantList sendRequest(const QString &_service, const QString &_path,
                          const QString &_interface, const QString &_cmd,
                          const QVariantList &_args);
 /**
- * @ingroup QueuedCoreAdaptor
  * @brief additional method to avoid conversion from DBus type to native ones
  * @param _data
  * source data

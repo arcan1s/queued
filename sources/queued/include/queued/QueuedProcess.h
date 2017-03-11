@@ -57,25 +57,25 @@ public:
     /**
      * @struct QueuedProcessDefinition
      * @brief structure to define process
-     * @var command
+     * @var QueuedProcessDefinitions::command
      * command line
-     * @var arguments
+     * @var QueuedProcessDefinitions::arguments
      * command line arguments
-     * @var workingDirectory
+     * @var QueuedProcessDefinitions::workingDirectory
      * path to working directory
-     * @var uid
+     * @var QueuedProcessDefinitions::uid
      * UID of process
-     * @var gid
+     * @var QueuedProcessDefinitions::gid
      * GID of process
-     * @var nice
+     * @var QueuedProcessDefinitions::nice
      * nice level of process
-     * @var startTime
+     * @var QueuedProcessDefinitions::startTime
      * process start time
-     * @var endTime
+     * @var QueuedProcessDefinitions::endTime
      * process end time
-     * @var user
+     * @var QueuedProcessDefinitions::user
      * task owner ID
-     * @var limits
+     * @var QueuedProcessDefinitions::limits
      * task limits
      */
     typedef struct {

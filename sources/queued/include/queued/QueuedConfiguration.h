@@ -32,18 +32,17 @@
 
 
 /**
- * @defgroup QueuedCfg
+ * @addtogroup QueuedCfg
  * @brief Queued configuration related types
  */
 namespace QueuedCfg
 {
 /**
- * @ingroup QueuedCfg
  * @struct QueuedAdminSetup
  * @brief structure to define administrator user
- * @var name
+ * @var QueuedAdminSetup::name
  * administrator user name
- * @var password
+ * @var QueuedAdminSetup::password
  * administrator user password
  */
 typedef struct {
@@ -51,20 +50,19 @@ typedef struct {
     QString password;
 } QueuedAdminSetup;
 /**
- * @ingroup QueuedCfg
  * @struct QueuedDBSetup
  * @brief structure to define database setup
- * @var driver
+ * @var QueuedDBSetup::driver
  * driver name
- * @var hostname
+ * @var QueuedDBSetup::hostname
  * hostname to connect
- * @var password
+ * @var QueuedDBSetup::password
  * password to connect if any
- * @var path
+ * @var QueuedDBSetup::path
  * path to database
- * @var port
+ * @var QueuedDBSetup::port
  * port to connect
- * @var username
+ * @var QueuedDBSetup::username
  * username to connect if any
  */
 typedef struct {
@@ -76,7 +74,6 @@ typedef struct {
     QString username;
 } QueuedDBSetup;
 /**
- * @ingroup QueuedCfg
  * @enum QueuedSettings
  * @brief settings keys enum
  * @var QueuedSettings::Invalid
@@ -113,14 +110,11 @@ enum class QueuedSettings {
     Plugins = 1 << 9,
 };
 /**
- * @ingroup QueuedCfg
  * @struct QueuedSettingsField
  * @brief structure to define advanced settings field
- * @var id
+ * @var QueuedSettingsField::id
  * interval field ID
- * @var key
- * settings key
- * @var defaultValue
+ * @var QueuedSettingsField::defaultValue
  * settings default value
  */
 typedef struct {
@@ -128,13 +122,11 @@ typedef struct {
     QVariant defaultValue;
 } QueuedSettingsField;
 /**
- * @ingroup QueuedCfg
- * @typedef QueuedProcessConnectionMap
+ * @typedef QueuedSettingsDefaultMap
  * map of settings indices to related values
  */
 typedef QHash<QString, QueuedSettingsField> QueuedSettingsDefaultMap;
 /**
- * @ingroup QueuedCfg
  * @brief default settings map
  */
 const QueuedSettingsDefaultMap QueuedSettingsDefaults

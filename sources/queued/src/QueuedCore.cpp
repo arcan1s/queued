@@ -543,8 +543,8 @@ void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _id,
         m_databaseManager->setKeepUsers(_value.toLongLong());
         break;
     case QueuedCfg::QueuedSettings::OnExitAction:
-        m_processes->setOnExitAction(
-            static_cast<QueuedProcessManager::OnExitAction>(_value.toInt()));
+        m_processes->setExitAction(
+            static_cast<QueuedEnums::ExitAction>(_value.toInt()));
         break;
     case QueuedCfg::QueuedSettings::Plugins:
         // do nothing here
@@ -672,7 +672,7 @@ void QueuedCore::initPlugins()
 void QueuedCore::initProcesses()
 {
     // init processes
-    auto onExitAction = static_cast<QueuedProcessManager::OnExitAction>(
+    auto onExitAction = static_cast<QueuedEnums::ExitAction>(
         m_advancedSettings->get(QueuedCfg::QueuedSettings::OnExitAction)
             .toInt());
     auto processLine
@@ -787,15 +787,14 @@ bool QueuedCore::addTaskPrivate(const QString &_command,
         QueuedLimits::Limits(
             m_advancedSettings->get(QueuedCfg::QueuedSettings::DefaultLimits)
                 .toString()));
-    QVariantHash properties
-        = {{"user", _userId},
-           {"command", _command},
-           {"commandArguments", _arguments},
-           {"workDirectory", _workingDirectory},
-           {"nice", _nice},
-           {"uid", ids.first},
-           {"gid", ids.second},
-           {"limits", taskLimits.toString()}};
+    QVariantHash properties = {{"user", _userId},
+                               {"command", _command},
+                               {"commandArguments", _arguments},
+                               {"workDirectory", _workingDirectory},
+                               {"nice", _nice},
+                               {"uid", ids.first},
+                               {"gid", ids.second},
+                               {"limits", taskLimits.toString()}};
     auto id = m_database->add(QueuedDB::TASKS_TABLE, properties);
     if (id == -1) {
         qCWarning(LOG_LIB) << "Could not add task" << _command;

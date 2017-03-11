@@ -194,7 +194,7 @@ public:
     // permissions
     /**
      * @brief set limits
-     * @param _limit
+     * @param _limits
      * new user limits
      */
     void setLimits(const QString &_limits);

@@ -28,6 +28,7 @@
 #include <QHash>
 #include <QObject>
 
+#include "QueuedEnums.h"
 #include "QueuedProcess.h"
 
 
@@ -37,7 +38,7 @@
 class QueuedProcessManager : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(OnExitAction onExit READ onExit WRITE setOnExitAction)
+    Q_PROPERTY(QueuedEnums::ExitAction onExit READ onExit WRITE setExitAction)
     Q_PROPERTY(QString processLine READ processLine WRITE setProcessLine)
 
 public:
@@ -52,15 +53,6 @@ public:
      */
     typedef QHash<long long, QMetaObject::Connection>
         QueuedProcessConnectionMap;
-    /**
-     * @enum OnExitAction
-     * @brief action with child process on destruction
-     * @var OnExitAction::Terminate
-     * send SIGTERM on exit
-     * @var OnExitAction::Kill
-     * send SIGKILL on exit
-     */
-    enum class OnExitAction { Terminate = 1 << 1, Kill = 1 << 2 };
 
     /**
      * @brief QueuedProcessManager class constructor
@@ -72,7 +64,7 @@ public:
      * default action on exit
      */
     explicit QueuedProcessManager(QObject *parent, const QString &processLine,
-                                  const OnExitAction onExit);
+                                  const QueuedEnums::ExitAction onExit);
     /**
      * @brief QueuedProcessManager class destructor
      */
@@ -142,7 +134,7 @@ public:
      * @brief default action on exit
      * @return default action from possible ones
      */
-    OnExitAction onExit() const;
+    QueuedEnums::ExitAction onExit() const;
     /**
      * @brief process command line
      * @return current command line
@@ -153,10 +145,10 @@ public:
      * @param _action
      * new on exit action
      */
-    void setOnExitAction(const OnExitAction _action);
+    void setExitAction(const QueuedEnums::ExitAction _action);
     /**
      * @brief set command line
-     * @param _commandLine
+     * @param _processLine
      * new command line
      */
     void setProcessLine(const QString _processLine);
@@ -206,7 +198,7 @@ private:
     /**
      * @brief action on exit
      */
-    OnExitAction m_onExit = OnExitAction::Terminate;
+    QueuedEnums::ExitAction m_onExit = QueuedEnums::ExitAction::Terminate;
     /**
      * @brief processes list
      */

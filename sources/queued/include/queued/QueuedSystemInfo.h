@@ -26,19 +26,17 @@
 
 
 /**
- * @defgroup QueuedSystemInfo
+ * @addtogroup QueuedSystemInfo
  * @brief system information methods
  */
 namespace QueuedSystemInfo
 {
 /**
- * @ingroup QueuedSystemInfo
  * @brief system CPU count
  * @return system CPU count
  */
 long long cpuCount();
 /**
- * @ingroup QueuedSystemInfo
  * @brief weight of specified CPU count
  * @param _cpu
  * CPU count to get weight
@@ -46,13 +44,11 @@ long long cpuCount();
  */
 double cpuWeight(const long long _cpu);
 /**
- * @ingroup QueuedSystemInfo
  * @brief system memory count
  * @return system memory count in bytes
  */
 long long memoryCount();
 /**
- * @ingroup QueuedSystemInfo
  * @brief weight of specified memory count
  * @param _memory
  * memory in bytes to get weight

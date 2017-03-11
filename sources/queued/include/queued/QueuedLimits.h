@@ -28,25 +28,24 @@
 
 
 /**
- * @defgroup QueuedLimits
+ * @addtogroup QueuedLimits
  * @brief Queued limits
  */
 namespace QueuedLimits
 {
 /**
- * @ingroup QueuedLimits
  * @struct Limits
- * @var cpu
+ * @var Limits::cpu
  * limit by CPU
- * @var gpu
+ * @var Limits::gpu
  * limit by GPU
- * @var memory
+ * @var Limits::memory
  * limit by memory
- * @var gpumemory
+ * @var Limits::gpumemory
  * limit by GPU memory
- * @var storage
+ * @var Limits::storage
  * limit by storage
- * @var valid
+ * @var Limits::valid
  * is this permissions default generated or not
  */
 struct Limits {
@@ -100,9 +99,9 @@ struct Limits {
     };
     /**
      * @brief structure constructor from fields
-     * @param _cpuLimit
+     * @param _cpu
      * limit by CPU cores
-     * @param _gpuLimit
+     * @param _gpu
      * limit by GPU cores
      * @param _memory
      * limit by memory
@@ -111,18 +110,16 @@ struct Limits {
      * @param _storage
      * limit by storage
      */
-    Limits(const long long _cpuLimit, const long long _gpuLimit,
-           const long long _memoryLimit, const long long _gpumemoryLimit,
-           const long long _storage)
-        : cpu(_cpuLimit)
-        , gpu(_gpuLimit)
-        , memory(_memoryLimit)
-        , gpumemory(_gpumemoryLimit)
+    Limits(const long long _cpu, const long long _gpu, const long long _memory,
+           const long long _gpumemory, const long long _storage)
+        : cpu(_cpu)
+        , gpu(_gpu)
+        , memory(_memory)
+        , gpumemory(_gpumemory)
         , storage(_storage)
         , valid(true){};
 };
 /**
- * @ingroup QueuedLimits
  * @brief convert QString memory value to integer
  * @param _value
  * value to convert
@@ -132,7 +129,6 @@ struct Limits {
  */
 long long convertMemory(QString _value, bool *_status = nullptr);
 /**
- * @ingroup QueuedLimits
  * @brief compare two limits
  * @param _first
  * first limit
@@ -142,7 +138,6 @@ long long convertMemory(QString _value, bool *_status = nullptr);
  */
 bool limitCompare(const long long _first, const long long _second);
 /**
- * @ingroup QueuedLimits
  * @brief get minimal limits from given
  * @param _task
  * task defined limits

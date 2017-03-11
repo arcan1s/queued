@@ -53,13 +53,12 @@ Q_DECLARE_LOGGING_CATEGORY(LOG_PL)
 Q_DECLARE_LOGGING_CATEGORY(LOG_SERV)
 
 /**
- * @defgroup QueuedDebug
+ * @addtogroup QueuedDebug
  * @brief Queued debug functions
  */
 namespace QueuedDebug
 {
 /**
- * @ingroup QueuedDebug
  * @brief default log format
  */
 const char LOG_FORMAT[] = "[%{time "
@@ -68,12 +67,10 @@ const char LOG_FORMAT[] = "[%{time "
                           "fatal}FF%{endif}][%{category}][%{function}] "
                           "%{message}";
 /**
- * @ingroup QueuedDebug
  * @brief method to enable debug messages
  */
 void enableDebug();
 /**
- * @ingroup QueuedDebug
  * @brief additional method to get build details declared in version.h
  */
 QStringList getBuildData();

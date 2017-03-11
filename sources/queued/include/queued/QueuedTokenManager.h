@@ -39,11 +39,11 @@ public:
     /**
      * @struct QueuedTokenDefinitions
      * @brief structure to define token
-     * @var token
+     * @var QueuedTokenDefinitions::token
      * token ID
-     * @var user
+     * @var QueuedTokenDefinitions::user
      * token owner user
-     * @var validUntil
+     * @var QueuedTokenDefinitions::validUntil
      * valid until
      */
     typedef struct {
@@ -78,7 +78,7 @@ public:
     loadToken(const QueuedTokenManager::QueuedTokenDefinitions &_definitions);
     /**
      * @brief upload tokens from database
-     * @param _value
+     * @param _values
      * tokens from database
      */
     void loadTokens(const QList<QVariantHash> &_values);
