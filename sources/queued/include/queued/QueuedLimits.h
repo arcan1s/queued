@@ -63,7 +63,7 @@ struct Limits {
      */
     QString toString() const
     {
-        return QString("%1\x01%2\x01%3\x01%4\x01%5")
+        return QString("%1\n%2\n%3\n%4\n%5")
             .arg(cpu)
             .arg(gpu)
             .arg(memory)
@@ -87,7 +87,7 @@ struct Limits {
      */
     Limits(const QString &_stringLimits)
     {
-        QStringList limits = _stringLimits.split(QChar('\x01'));
+        QStringList limits = _stringLimits.split(QChar('\n'));
         while (limits.count() < 5)
             limits.append(QString("0"));
 

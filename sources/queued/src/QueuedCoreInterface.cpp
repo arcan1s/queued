@@ -54,7 +54,7 @@ QString QueuedCoreInterface::Auth(const QString &name, const QString &password)
 {
     qCDebug(LOG_DBUS) << "Authorize user" << name;
 
-    return m_core->authorization(name, password).token;
+    return m_core->authorization(name, password);
 }
 
 
@@ -63,26 +63,22 @@ QString QueuedCoreInterface::Auth(const QString &name, const QString &password)
  */
 bool QueuedCoreInterface::OptionEdit(const QString &key,
                                      const QDBusVariant &value,
-                                     const QString &whoAmI,
                                      const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Edit option" << key << value.variant() << "auth by"
-                      << whoAmI;
+    qCDebug(LOG_DBUS) << "Edit option" << key << value.variant();
 
-    return m_core->editOption(key, value.variant(),
-                              QueuedUserManager::auth(whoAmI, token));
+    return m_core->editOption(key, value.variant(), token);
 }
 
 
 /**
  * @fn PluginAdd
  */
-bool QueuedCoreInterface::PluginAdd(const QString &plugin,
-                                    const QString &whoAmI, const QString &token)
+bool QueuedCoreInterface::PluginAdd(const QString &plugin, const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Add plugin" << plugin << "auth by" << whoAmI;
+    qCDebug(LOG_DBUS) << "Add plugin" << plugin;
 
-    return m_core->addPlugin(plugin, QueuedUserManager::auth(whoAmI, token));
+    return m_core->addPlugin(plugin, token);
 }
 
 
@@ -90,12 +86,11 @@ bool QueuedCoreInterface::PluginAdd(const QString &plugin,
  * @fn PluginRemove
  */
 bool QueuedCoreInterface::PluginRemove(const QString &plugin,
-                                       const QString &whoAmI,
                                        const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Remove plugin" << plugin << "auth by" << whoAmI;
+    qCDebug(LOG_DBUS) << "Remove plugin" << plugin;
 
-    return m_core->removePlugin(plugin, QueuedUserManager::auth(whoAmI, token));
+    return m_core->removePlugin(plugin, token);
 }
 
 
@@ -106,35 +101,35 @@ bool QueuedCoreInterface::TaskAdd(
     const QString &command, const QStringList &arguments,
     const QString &workingDirectory, const uint nice, const long long user,
     const long long cpu, const long long gpu, const QString &memory,
-    const QString &gpumemory, const QString &storage, const QString &whoAmI,
-    const QString &token)
+    const QString &gpumemory, const QString &storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new task with parameters" << command << arguments
-                      << workingDirectory << nice << "from user" << user
-                      << "auth by" << whoAmI;
+                      << workingDirectory << nice << "from user" << user;
 
     return m_core->addTask(
         command, arguments, workingDirectory, nice, user,
         QueuedLimits::Limits(cpu, gpu, QueuedLimits::convertMemory(memory),
                              QueuedLimits::convertMemory(gpumemory),
                              QueuedLimits::convertMemory(storage)),
-        QueuedUserManager::auth(whoAmI, token));
+        token);
 }
 
 
 /**
  * @fn TaskEdit
  */
-bool QueuedCoreInterface::TaskEdit(
-    const qlonglong id, const QString &command, const QStringList &arguments,
-    const QString &directory, const uint nice, const uint uid, const uint gid,
-    const uint state, const long long cpu, const long long gpu,
-    const QString &memory, const QString &gpumemory, const QString &storage,
-    const QString &whoAmI, const QString &token)
+bool QueuedCoreInterface::TaskEdit(const qlonglong id, const QString &command,
+                                   const QStringList &arguments,
+                                   const QString &directory, const uint nice,
+                                   const uint uid, const uint gid,
+                                   const uint state, const long long cpu,
+                                   const long long gpu, const QString &memory,
+                                   const QString &gpumemory,
+                                   const QString &storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Edit task" << id << command << arguments << directory
                       << nice << uid << gid << state << cpu << gpu << memory
-                      << gpumemory << storage << "auth by" << whoAmI;
+                      << gpumemory << storage;
 
     auto task = m_core->task(id);
     if (!task) {
@@ -172,31 +167,29 @@ bool QueuedCoreInterface::TaskEdit(
         limits.storage = QueuedLimits::convertMemory(storage);
     data[QString("limits")] = limits.toString();
 
-    return m_core->editTask(id, data, QueuedUserManager::auth(whoAmI, token));
+    return m_core->editTask(id, data, token);
 }
 
 
 /**
  * @fn TaskStart
  */
-bool QueuedCoreInterface::TaskStart(const qlonglong id, const QString &whoAmI,
-                                    const QString &token)
+bool QueuedCoreInterface::TaskStart(const qlonglong id, const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Force start task" << id << "auth by" << whoAmI;
+    qCDebug(LOG_DBUS) << "Force start task" << id;
 
-    return m_core->startTask(id, QueuedUserManager::auth(whoAmI, token));
+    return m_core->startTask(id, token);
 }
 
 
 /**
  * @fn TaskStop
  */
-bool QueuedCoreInterface::TaskStop(const qlonglong id, const QString &whoAmI,
-                                   const QString &token)
+bool QueuedCoreInterface::TaskStop(const qlonglong id, const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Force stop task" << id << "auth by" << whoAmI;
+    qCDebug(LOG_DBUS) << "Force stop task" << id;
 
-    return m_core->stopTask(id, QueuedUserManager::auth(whoAmI, token));
+    return m_core->stopTask(id, token);
 }
 
 
@@ -208,18 +201,17 @@ bool QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
                                   const uint permissions, const long long cpu,
                                   const long long gpu, const QString &memory,
                                   const QString &gpumemory,
-                                  const QString &storage, const QString &whoAmI,
-                                  const QString &token)
+                                  const QString &storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new user with paramaters" << name << email
-                      << permissions << "auth by" << whoAmI;
+                      << permissions;
 
     return m_core->addUser(
         name, email, password, permissions,
         QueuedLimits::Limits(cpu, gpu, QueuedLimits::convertMemory(memory),
                              QueuedLimits::convertMemory(gpumemory),
                              QueuedLimits::convertMemory(storage)),
-        QueuedUserManager::auth(whoAmI, token));
+        token);
 }
 
 
@@ -231,11 +223,10 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
                                    const QString &email, const long long cpu,
                                    const long long gpu, const QString &memory,
                                    const QString &gpumemory,
-                                   const QString &storage,
-                                   const QString &whoAmI, const QString &token)
+                                   const QString &storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Edit user" << id << name << email << cpu << gpu
-                      << memory << gpumemory << storage << "auth by" << whoAmI;
+                      << memory << gpumemory << storage;
 
     // get user object first to match limits
     auto user = m_core->user(id);
@@ -266,7 +257,7 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
         limits.storage = QueuedLimits::convertMemory(storage);
     data[QString("limits")] = limits.toString();
 
-    return m_core->editUser(id, data, QueuedUserManager::auth(whoAmI, token));
+    return m_core->editUser(id, data, token);
 }
 
 
@@ -275,15 +266,12 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
  */
 bool QueuedCoreInterface::UserPermissionAdd(const qlonglong id,
                                             const uint permission,
-                                            const QString &whoAmI,
                                             const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Add permission" << permission << "to user" << id
-                      << "auth by" << whoAmI;
+    qCDebug(LOG_DBUS) << "Add permission" << permission << "to user" << id;
 
     return m_core->editUserPermission(
-        id, static_cast<QueuedEnums::Permission>(permission), true,
-        QueuedUserManager::auth(whoAmI, token));
+        id, static_cast<QueuedEnums::Permission>(permission), true, token);
 }
 
 
@@ -292,13 +280,10 @@ bool QueuedCoreInterface::UserPermissionAdd(const qlonglong id,
  */
 bool QueuedCoreInterface::UserPermissionRemove(const qlonglong id,
                                                const uint permission,
-                                               const QString &whoAmI,
                                                const QString &token)
 {
-    qCDebug(LOG_DBUS) << "Remove permission" << permission << "from user" << id
-                      << "auth by" << whoAmI;
+    qCDebug(LOG_DBUS) << "Remove permission" << permission << "from user" << id;
 
     return m_core->editUserPermission(
-        id, static_cast<QueuedEnums::Permission>(permission), false,
-        QueuedUserManager::auth(whoAmI, token));
+        id, static_cast<QueuedEnums::Permission>(permission), false, token);
 }

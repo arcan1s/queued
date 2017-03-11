@@ -29,7 +29,6 @@
 #include "QueuedConfiguration.h"
 #include "QueuedEnums.h"
 #include "QueuedLimits.h"
-#include "QueuedUserManager.h"
 
 
 class QueuedAdvancedSettings;
@@ -41,6 +40,8 @@ class QueuedProcessManager;
 class QueuedReportManager;
 class QueuedSettings;
 class QueuedTokenManager;
+class QueuedUser;
+class QueuedUserManager;
 
 /**
  * @brief aggregator of queued classes
@@ -63,12 +64,11 @@ public:
      * @brief add plugin to autoload and load it now
      * @param _plugin
      * plugin name
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successfully addition
      */
-    bool addPlugin(const QString &_plugin,
-                   const QueuedUserManager::QueuedUserAuthorization &_auth);
+    bool addPlugin(const QString &_plugin, const QString &_token);
     /**
      * @brief add new task
      * @param _command
@@ -83,14 +83,14 @@ public:
      * task owner user ID
      * @param _limits
      * task defined limits
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successfully addition
      */
     bool addTask(const QString &_command, const QStringList &_arguments,
                  const QString &_workingDirectory, const uint _nice,
                  const long long _userId, const QueuedLimits::Limits &_limits,
-                 const QueuedUserManager::QueuedUserAuthorization &_auth);
+                 const QString &_token);
     /**
      * @brief add new user
      * @param _name
@@ -103,65 +103,62 @@ public:
      * user permissions
      * @param _limits
      * user limits
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successfully addition
      */
     bool addUser(const QString &_name, const QString &_email,
                  const QString &_password, const uint _permissions,
-                 const QueuedLimits::Limits &_limits,
-                 const QueuedUserManager::QueuedUserAuthorization &_auth);
+                 const QueuedLimits::Limits &_limits, const QString &_token);
     /**
      * @brief authorize and create new token for user
      * @param _name
      * user name
      * @param _password
      * user password
-     * @return authorization structure. Token field will be empty in case if no
-     * authorization occurs
+     * @return token. It will be empty if authorization error occurs
      */
-    QueuedUserManager::QueuedUserAuthorization
-    authorization(const QString &_name, const QString &_password);
+    QString authorization(const QString &_name, const QString &_password);
     /**
      * @brief edit advanced settings
      * @param _key
      * advanced settings key
      * @param _value
      * advanced settings value
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successful option edition
      */
     bool editOption(const QString &_key, const QVariant &_value,
-                    const QueuedUserManager::QueuedUserAuthorization &_auth);
+                    const QString &_token);
     /**
      * @brief edit task
      * @param _id
      * task ID to edit
      * @param _taskData
      * task data to edit
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @remark _taskData should contain only fields defined in schema, any other
      * fields will be ignored. No need to pass all properties here
      * @return true on successful task edition
      */
     bool editTask(const long long _id, const QVariantHash &_taskData,
-                  const QueuedUserManager::QueuedUserAuthorization &_auth);
+                  const QString &_token);
     /**
      * @brief edit user
      * @param _id
      * user ID to edit
      * @param _userData
      * user data to edit
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @remark _userData should contain only fields defined in schema, any other
      * fields will be ignored. No need to pass all properties here
      * @return true on successful user edition
      */
     bool editUser(const long long _id, const QVariantHash &_userData,
-                  const QueuedUserManager::QueuedUserAuthorization &_auth);
+                  const QString &_token);
     /**
      * @brief edit user permissions
      * @param _id
@@ -170,15 +167,13 @@ public:
      * permission to add or remove
      * @param _add
      * indicates whether it should be added or removed
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successful user permission edition
      */
-    bool
-    editUserPermission(const long long _id,
-                       const QueuedEnums::Permission &_permission,
-                       const bool _add,
-                       const QueuedUserManager::QueuedUserAuthorization &_auth);
+    bool editUserPermission(const long long _id,
+                            const QueuedEnums::Permission &_permission,
+                            const bool _add, const QString &_token);
     /**
      * @brief get value from advanced settings
      * @param _key
@@ -197,32 +192,29 @@ public:
      * @brief remove plugin from autoload and unload it now
      * @param _plugin
      * plugin name
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successful plugin removal
      */
-    bool removePlugin(const QString &_plugin,
-                      const QueuedUserManager::QueuedUserAuthorization &_auth);
+    bool removePlugin(const QString &_plugin, const QString &_token);
     /**
      * @brief force start task
      * @param _id
      * task ID
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successful task start
      */
-    bool startTask(const long long _id,
-                   const QueuedUserManager::QueuedUserAuthorization &_auth);
+    bool startTask(const long long _id, const QString &_token);
     /**
      * @brief force stop task
      * @param _id
      * task ID
-     * @param _auth
-     * user auth structure
+     * @param _token
+     * user auth token
      * @return true on successful task stop
      */
-    bool stopTask(const long long _id,
-                  const QueuedUserManager::QueuedUserAuthorization &_auth);
+    bool stopTask(const long long _id, const QString &_token);
     /**
      * @brief get task by ID
      * @param _id

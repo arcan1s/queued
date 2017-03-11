@@ -137,22 +137,21 @@ typedef QHash<QString, QueuedSettingsField> QueuedSettingsDefaultMap;
  * @ingroup QueuedCfg
  * @brief default settings map
  */
-const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
-    {"", {QueuedSettings::Invalid, QVariant()}},
-    {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000}},
-    {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\x010\x010\x010\x010"}},
-    {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
-    {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
-    {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
-    {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
-    {"DatabaseVersion",
-     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
-    {"ProcessCommandLine",
-     {QueuedSettings::ProcessCommandLine,
-      "systemd-run\x01--scope\x01--unit={name}\x01--uid={uid}\x01--gid={gid}"
-      "\x01-p\x01CPUQuota={cpu}%\x01-p\x01MemoryHigh={memory}\x01{"
-      "application}"}},
-    {"Plugins", {QueuedSettings::Plugins, ""}}};
+const QueuedSettingsDefaultMap QueuedSettingsDefaults
+    = {{"", {QueuedSettings::Invalid, QVariant()}},
+       {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000}},
+       {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\n0\n0\n0\n0"}},
+       {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
+       {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
+       {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
+       {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
+       {"DatabaseVersion",
+        {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
+       {"ProcessCommandLine",
+        {QueuedSettings::ProcessCommandLine,
+         "systemd-run\n--scope\n--unit={name}\n--uid={uid}\n--gid={gid}"
+         "\n-p\nCPUQuota={cpu}%\n-p\nMemoryHigh={memory}\n{application}"}},
+       {"Plugins", {QueuedSettings::Plugins, ""}}};
 };
 
 #endif /* QUEUEDCONFIGURATION_H */

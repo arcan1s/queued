@@ -44,20 +44,6 @@ class QueuedUserManager : public QObject
 
 public:
     /**
-     * @struct UserAuthorization
-     * user authorization structure
-     * @remark only
-     * @var token
-     * authorization token
-     * @var user
-     * username, token owner
-     */
-    typedef struct {
-        QString token;
-        QString user;
-    } QueuedUserAuthorization;
-
-    /**
      * @brief QueuedUserManager class constructor
      * @param parent
      * pointer to parent item
@@ -87,16 +73,6 @@ public:
     QueuedUser *add(const QueuedUser::QueuedUserDefinitions &_definitions,
                     const long long _id);
     /**
-     * @brief build user auth structure
-     * @param _user
-     * user name
-     * @param _token
-     * user token
-     * @return generated structure
-     */
-    static QueuedUserAuthorization auth(const QString &_user,
-                                        const QString &_token);
-    /**
      * @brief authorize user
      * @param _user
      * user name
@@ -107,13 +83,13 @@ public:
     QString authorize(const QString &_user, const QString &_password);
     /**
      * @brief authorize user for service
-     * @param _auth
-     * user authorization structure
+     * @param _token
+     * user token
      * @param _service
      * service to authorize
      * @return true if user allowed to do it otherwise return false
      */
-    bool authorize(const QueuedUserAuthorization &_auth,
+    bool authorize(const QString &_token,
                    const QueuedEnums::Permission _service);
     /**
      * @brief check token expiration
@@ -154,9 +130,11 @@ public:
      * @brief user by name
      * @param _name
      * user name for search
+     * @param _isToken
+     * is passed name token or not
      * @return user by name or nullptr if no user found
      */
-    QueuedUser *user(const QString &_name);
+    QueuedUser *user(const QString &_name, const bool _isToken);
     // properties
     /**
      * @brief token expiration

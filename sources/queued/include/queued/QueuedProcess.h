@@ -27,7 +27,6 @@
 #include <QDateTime>
 #include <QProcess>
 
-#include "QueuedEnums.h"
 #include "QueuedLimits.h"
 
 
@@ -49,7 +48,6 @@ class QueuedProcess : public QProcess
     Q_PROPERTY(QueuedLimits::Limits nativeLimtis READ nativeLimits)
     Q_PROPERTY(uint nice READ nice WRITE setNice)
     Q_PROPERTY(QString processLine READ processLine WRITE setProcessLine)
-    Q_PROPERTY(QueuedEnums::ProcessState pstate READ pstate WRITE setPState)
     Q_PROPERTY(QDateTime startTime READ startTime WRITE setStartTime)
     Q_PROPERTY(uint uid READ uid WRITE setUid)
     Q_PROPERTY(long long user READ user WRITE setUser)
@@ -79,8 +77,6 @@ public:
      * task owner ID
      * @var limits
      * task limits
-     * @var state
-     * current task state
      */
     typedef struct {
         QString command;
@@ -93,7 +89,6 @@ public:
         QDateTime endTime;
         long long user;
         QString limits;
-        QueuedEnums::ProcessState state;
     } QueuedProcessDefinitions;
 
     /**
@@ -169,11 +164,6 @@ public:
      */
     QString processLine() const;
     /**
-     * @brief process state
-     * @return process defined state
-     */
-    QueuedEnums::ProcessState pstate() const;
-    /**
      * @brief process start time
      * @return process start time
      */
@@ -239,12 +229,6 @@ public:
      * 4. {application} will be replaced to application line and arguments
      */
     void setProcessLine(const QString &_processLine);
-    /**
-     * @brief set process state
-     * @param _limits
-     * new process state
-     */
-    void setPState(const QueuedEnums::ProcessState _state);
     /**
      * @brief set start time
      * @param _time

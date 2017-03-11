@@ -44,6 +44,8 @@ QueuedUser::QueuedUser(QObject *parent,
     , m_index(index)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
+
+    qRegisterMetaType<QueuedLimits::Limits>("QueuedLimits::Limits");
 }
 
 

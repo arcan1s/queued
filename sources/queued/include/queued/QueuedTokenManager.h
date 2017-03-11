@@ -37,6 +37,22 @@ class QueuedTokenManager : public QObject
 
 public:
     /**
+     * @struct QueuedTokenDefinitions
+     * @brief structure to define token
+     * @var token
+     * token ID
+     * @var user
+     * token owner user
+     * @var validUntil
+     * valid until
+     */
+    typedef struct {
+        QString token;
+        QString user;
+        QDateTime validUntil;
+    } QueuedTokenDefinitions;
+
+    /**
      * @brief QueuedTokenManager class constructor
      * @param parent
      * pointer to parent item
@@ -50,22 +66,31 @@ public:
      * @brief check if token is valid
      * @param _token
      * token ID
-     * @return true if token is valid otherwise return false
+     * @return token user if token is valid otherwise return false
      */
-    bool isTokenValid(const QString &_token) const;
+    QString isTokenValid(const QString &_token) const;
     /**
-    * @brief upload tokens from database
-    * @param _value
+     * @brief load token
+     * @param _definitions
+     * token definitions
+     */
+    void
+    loadToken(const QueuedTokenManager::QueuedTokenDefinitions &_definitions);
+    /**
+     * @brief upload tokens from database
+     * @param _value
      * tokens from database
-    */
+     */
     void loadTokens(const QList<QVariantHash> &_values);
     /**
      * @brief register new token
+     * @param _user
+     * token user
      * @param _validUntil
      * token valid until
      * @return new generated token
      */
-    QString registerToken(const QDateTime _validUntil);
+    QString registerToken(const QString &_user, const QDateTime &_validUntil);
     /**
      * @brief token expiration
      * @param _token
@@ -90,20 +115,12 @@ signals:
      * token ID
      */
     void tokenExpired(const QString &_token);
-    /**
-     * @brief signal which will be emitted on newly created token
-     * @param _token
-     * token ID
-     * @param _validUntil
-     * token valid until
-     */
-    void tokenRegistered(const QString &_token, const QDateTime &_validUntil);
 
 private:
     /**
      * @brief token storage
      */
-    QHash<QString, QDateTime> m_tokens;
+    QHash<QString, QueuedTokenDefinitions> m_tokens;
 };
 
 

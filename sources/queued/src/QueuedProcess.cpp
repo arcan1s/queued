@@ -41,14 +41,12 @@ QueuedProcess::QueuedProcess(QObject *parent,
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
+    qRegisterMetaType<QueuedLimits::Limits>("QueuedLimits::Limits");
+
     // update QProcess related values as well
-    // TODO configuration
     setCommand(m_definitions.command);
     setCommandArguments(m_definitions.arguments);
     setWorkDirectory(m_definitions.workingDirectory);
-
-    setStandardErrorFile(QString("%1-err.log").arg(name()), QIODevice::Append);
-    setStandardOutputFile(QString("%1-out.log").arg(name()), QIODevice::Append);
 }
 
 
@@ -91,14 +89,14 @@ void QueuedProcess::updateArguments()
                           0, 'f', 0));
 
     // command line
-    QString commandLine = command() + "\x01" + commandArguments().join('\x01');
+    QString commandLine = command() + "\n" + commandArguments().join('\n');
     application.replace("{application}", commandLine);
 
-    QStringList arguments = application.split('\x01');
+    QStringList arguments = application.split('\n');
 
     // set QProcess properties
     setProgram(arguments.takeFirst());
-    setCommandArguments(arguments);
+    setArguments(arguments);
 }
 
 
@@ -189,15 +187,6 @@ uint QueuedProcess::nice() const
 QString QueuedProcess::processLine() const
 {
     return m_processLine;
-}
-
-
-/**
- * @fn pstate
- */
-QueuedEnums::ProcessState QueuedProcess::pstate() const
-{
-    return m_definitions.state;
 }
 
 
@@ -320,17 +309,6 @@ void QueuedProcess::setProcessLine(const QString &_processLine)
 
 
 /**
- * @fn setPState
- */
-void QueuedProcess::setPState(const QueuedEnums::ProcessState _state)
-{
-    qCDebug(LOG_LIB) << "Set process state to" << static_cast<int>(_state);
-
-    m_definitions.state = _state;
-}
-
-
-/**
  * @fn setStartTime
  */
 void QueuedProcess::setStartTime(const QDateTime &_time)
@@ -372,6 +350,12 @@ void QueuedProcess::setWorkDirectory(const QString &_workDirectory)
     qCDebug(LOG_LIB) << "Set working directory to" << _workDirectory;
 
     m_definitions.workingDirectory = _workDirectory;
+    setStandardErrorFile(
+        QString("%1/%2-err.log").arg(_workDirectory).arg(name()),
+        QIODevice::Append);
+    setStandardOutputFile(
+        QString("%1/%2-out.log").arg(_workDirectory).arg(name()),
+        QIODevice::Append);
     setWorkingDirectory(_workDirectory);
 }
 

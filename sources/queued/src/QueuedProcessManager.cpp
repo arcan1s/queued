@@ -35,6 +35,9 @@ QueuedProcessManager::QueuedProcessManager(QObject *parent,
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
+    qRegisterMetaType<QueuedProcessManager::OnExitAction>(
+        "QueuedProcessManager::OnExitAction");
+
     setOnExitAction(onExit);
     setProcessLine(processLine);
 }
@@ -47,7 +50,7 @@ QueuedProcessManager::~QueuedProcessManager()
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
-    QList<long long> indices = m_processes.keys();
+    QList<long long> indices = processes().keys();
     for (auto index : indices)
         remove(index);
 }
@@ -66,7 +69,7 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
     // parameters
     defs.command = _properties[QString("command")].toString();
     defs.arguments = _properties[QString("commandArguments")].toString().split(
-        QChar('\x01'));
+        QChar('\n'));
     defs.workingDirectory = _properties[QString("workDirectory")].toString();
     defs.nice = _properties[QString("nice")].toUInt();
     defs.limits = _properties[QString("limits")].toString();
@@ -94,10 +97,11 @@ QueuedProcess *QueuedProcessManager::add(
     qCDebug(LOG_LIB) << "Add new process" << _definitions.command
                      << "with index" << _index;
 
-    if (m_processes.contains(_index))
-        return m_processes[_index];
+    if (processes().contains(_index))
+        return process(_index);
 
     QueuedProcess *process = new QueuedProcess(this, _definitions, _index);
+    process->setProcessLine(processLine());
     m_processes[_index] = process;
     // connect to signal
     m_connections[_index] = connect(
@@ -107,6 +111,8 @@ QueuedProcess *QueuedProcessManager::add(
             return taskFinished(exitCode, exitStatus, _index);
         });
 
+    // check if we can start new task
+    start();
     return process;
 }
 
@@ -150,7 +156,7 @@ void QueuedProcessManager::remove(const long long _index)
 {
     qCDebug(LOG_LIB) << "Remove process by index" << _index;
 
-    if (!m_processes.contains(_index))
+    if (!processes().contains(_index))
         return;
 
     QueuedProcess *pr = m_processes.take(_index);
@@ -188,6 +194,9 @@ void QueuedProcessManager::start()
 
     auto tasks = processes().values();
     for (auto pr : tasks) {
+        // check task state
+        if (pr->state() != QProcess::ProcessState::NotRunning)
+            continue;
         // check limits first
         if (((1.0 - weightedCpu)
              < QueuedSystemInfo::cpuWeight(pr->nativeLimits().cpu))
@@ -222,8 +231,10 @@ void QueuedProcessManager::start(const long long _index)
         return;
     }
 
+    QDateTime start = QDateTime::currentDateTimeUtc();
     pr->start();
-    emit(taskStartTimeReceived(_index, QDateTime::currentDateTimeUtc()));
+    pr->setStartTime(start);
+    emit(taskStartTimeReceived(_index, start));
 }
 
 
@@ -288,7 +299,7 @@ void QueuedProcessManager::setProcessLine(const QString _processLine)
     qCDebug(LOG_LIB) << "Set process line to" << _processLine;
 
     m_processLine = _processLine;
-    for (auto process : m_processes.values())
+    for (auto process : processes().values())
         process->setProcessLine(processLine());
 }
 
@@ -302,35 +313,35 @@ QueuedLimits::Limits QueuedProcessManager::usedLimits()
     long long cpu = std::accumulate(
         tasks.cbegin(), tasks.cend(), 0,
         [](long long value, QueuedProcess *process) {
-            return process->pstate() == QueuedEnums::ProcessState::Running
+            return process->state() == QProcess::ProcessState::Running
                        ? value + process->nativeLimits().cpu
                        : value;
         });
     long long gpu = std::accumulate(
         tasks.cbegin(), tasks.cend(), 0,
         [](long long value, QueuedProcess *process) {
-            return process->pstate() == QueuedEnums::ProcessState::Running
+            return process->state() == QProcess::ProcessState::Running
                        ? value + process->nativeLimits().gpu
                        : value;
         });
     long long memory = std::accumulate(
         tasks.cbegin(), tasks.cend(), 0,
         [](long long value, QueuedProcess *process) {
-            return process->pstate() == QueuedEnums::ProcessState::Running
+            return process->state() == QProcess::ProcessState::Running
                        ? value + process->nativeLimits().memory
                        : value;
         });
     long long gpumemory = std::accumulate(
         tasks.cbegin(), tasks.cend(), 0,
         [](long long value, QueuedProcess *process) {
-            return process->pstate() == QueuedEnums::ProcessState::Running
+            return process->state() == QProcess::ProcessState::Running
                        ? value + process->nativeLimits().gpumemory
                        : value;
         });
     long long storage = std::accumulate(
         tasks.cbegin(), tasks.cend(), 0,
         [](long long value, QueuedProcess *process) {
-            return process->pstate() == QueuedEnums::ProcessState::Running
+            return process->state() == QProcess::ProcessState::Running
                        ? value + process->nativeLimits().storage
                        : value;
         });
@@ -352,7 +363,7 @@ void QueuedProcessManager::taskFinished(const int _exitCode,
     auto pr = process(_index);
     if (pr) {
         auto endTime = QDateTime::currentDateTimeUtc();
-        pr->setEndTime(endTime);
+        remove(_index);
         emit(taskStopTimeReceived(_index, endTime));
     }
 

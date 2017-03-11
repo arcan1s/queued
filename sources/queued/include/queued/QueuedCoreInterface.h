@@ -68,26 +68,21 @@ public slots:
      * option key to edit
      * @param value
      * option value to edit
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return true on successful option edition
      */
     bool OptionEdit(const QString &key, const QDBusVariant &value,
-                    const QString &whoAmI, const QString &token);
+                    const QString &token);
     /**
      * @brief add plugin
      * @param plugin
      * plugin name
-     * @param whoAmI
-     * auth user name
      * @param token
      * auth user token
      * @return  true on successful plugin addition
      */
-    bool PluginAdd(const QString &plugin, const QString &whoAmI,
-                   const QString &token);
+    bool PluginAdd(const QString &plugin, const QString &token);
     /**
      * @brief remove plugin
      * @param plugin
@@ -98,8 +93,7 @@ public slots:
      * auth user token
      * @return  true on successful plugin removal
      */
-    bool PluginRemove(const QString &plugin, const QString &whoAmI,
-                      const QString &token);
+    bool PluginRemove(const QString &plugin, const QString &token);
     /**
      * @brief add new task
      * @param command
@@ -132,8 +126,7 @@ public slots:
                  const QString &workingDirectory, const uint nice,
                  const long long user, const long long cpu, const long long gpu,
                  const QString &memory, const QString &gpumemory,
-                 const QString &storage, const QString &whoAmI,
-                 const QString &token);
+                 const QString &storage, const QString &token);
     /**
      * @brief edit task
      * @param id
@@ -175,8 +168,7 @@ public slots:
                   const uint nice, const uint uid, const uint gid,
                   const uint state, const long long cpu, const long long gpu,
                   const QString &memory, const QString &gpumemory,
-                  const QString &storage, const QString &whoAmI,
-                  const QString &token);
+                  const QString &storage, const QString &token);
     /**
      * @brief force start task
      * @param id
@@ -187,8 +179,7 @@ public slots:
      * auth user token
      * @return true on successful task start
      */
-    bool TaskStart(const qlonglong id, const QString &whoAmI,
-                   const QString &token);
+    bool TaskStart(const qlonglong id, const QString &token);
     /**
      * @brief force stop task
      * @param id
@@ -199,8 +190,7 @@ public slots:
      * auth user token
      * @return true on successful task stop
      */
-    bool TaskStop(const qlonglong id, const QString &whoAmI,
-                  const QString &token);
+    bool TaskStop(const qlonglong id, const QString &token);
     /**
      * @brief add new user
      * @param name
@@ -231,8 +221,7 @@ public slots:
                  const QString &password, const uint permissions,
                  const long long cpu, const long long gpu,
                  const QString &memory, const QString &gpumemory,
-                 const QString &storage, const QString &whoAmI,
-                 const QString &token);
+                 const QString &storage, const QString &token);
     /**
      * @brief edit user
      * @param id
@@ -263,8 +252,7 @@ public slots:
                   const QString &password, const QString &email,
                   const long long cpu, const long long gpu,
                   const QString &memory, const QString &gpumemory,
-                  const QString &storage, const QString &whoAmI,
-                  const QString &token);
+                  const QString &storage, const QString &token);
     /**
      * @brief add permission to user
      * @param id
@@ -278,7 +266,7 @@ public slots:
      * @return true on successful permission addition
      */
     bool UserPermissionAdd(const qlonglong id, const uint permission,
-                           const QString &whoAmI, const QString &token);
+                           const QString &token);
     /**
      * @brief remove permission from user
      * @param id
@@ -292,7 +280,7 @@ public slots:
      * @return true on successful permission removal
      */
     bool UserPermissionRemove(const qlonglong id, const uint permission,
-                              const QString &whoAmI, const QString &token);
+                              const QString &token);
 
 private:
     /**

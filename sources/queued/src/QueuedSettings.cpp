@@ -39,6 +39,10 @@ QueuedSettings::QueuedSettings(QObject *parent, const QString path)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
+    qRegisterMetaType<QueuedCfg::QueuedAdminSetup>(
+        "QueuedCfg::QueuedAdminSetup");
+    qRegisterMetaType<QueuedCfg::QueuedDBSetup>("QueuedCfg::QueuedDBSetup");
+
     readConfiguration();
 }
 

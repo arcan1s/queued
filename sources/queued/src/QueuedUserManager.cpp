@@ -94,22 +94,6 @@ QueuedUserManager::add(const QueuedUser::QueuedUserDefinitions &_definitions,
 
 
 /**
- * @fn auth
- */
-QueuedUserManager::QueuedUserAuthorization
-QueuedUserManager::auth(const QString &_user, const QString &_token)
-{
-    qCDebug(LOG_LIB) << "Generate auth structure for user" << _user;
-
-    QueuedUserAuthorization authObj;
-    authObj.user = _user;
-    authObj.token = _token;
-
-    return authObj;
-}
-
-
-/**
  * @fn authorize
  */
 QString QueuedUserManager::authorize(const QString &_user,
@@ -117,7 +101,7 @@ QString QueuedUserManager::authorize(const QString &_user,
 {
     qCDebug(LOG_LIB) << "Authorize user" << _user;
 
-    auto userObj = user(_user);
+    auto userObj = user(_user, false);
     if (!userObj) {
         qCInfo(LOG_LIB) << "No user found" << _user;
         return QString();
@@ -132,28 +116,27 @@ QString QueuedUserManager::authorize(const QString &_user,
     auto time = QDateTime::currentDateTimeUtc();
     QDateTime expiry = time.addDays(tokenExpiration());
     emit(userLoggedIn(userObj->index(), time));
-    return m_tokens->registerToken(expiry);
+    return m_tokens->registerToken(_user, expiry);
 }
 
 
 /**
  * @fn authorize
  */
-bool QueuedUserManager::authorize(const QueuedUserAuthorization &_auth,
+bool QueuedUserManager::authorize(const QString &_token,
                                   const QueuedEnums::Permission _service)
 {
-    qCDebug(LOG_LIB) << "Authorize user" << _auth.user << "for"
-                     << static_cast<int>(_service);
+    qCDebug(LOG_LIB) << "Authorize user for" << static_cast<int>(_service);
 
-    bool status = m_tokens->isTokenValid(_auth.token);
-    if (!status) {
-        qCInfo(LOG_LIB) << "Token invalid for user" << _auth.user;
+    QString username = m_tokens->isTokenValid(_token);
+    if (username.isEmpty()) {
+        qCInfo(LOG_LIB) << "Token" << _token << "invalid";
         return false;
     }
 
-    auto userObj = user(_auth.user);
+    auto userObj = user(username, false);
     if (!userObj) {
-        qCInfo(LOG_LIB) << "No user found" << _auth.user;
+        qCInfo(LOG_LIB) << "No user found" << username;
         return false;
     }
 
@@ -167,8 +150,10 @@ bool QueuedUserManager::authorize(const QueuedUserAuthorization &_auth,
 QDateTime QueuedUserManager::checkToken(const QString &_token,
                                         bool *_valid) const
 {
-    if (_valid)
-        *_valid = m_tokens->isTokenValid(_token);
+    if (_valid) {
+        QString user = m_tokens->isTokenValid(_token);
+        *_valid = !user.isEmpty();
+    }
 
     return m_tokens->tokenExpiration(_token);
 }
@@ -235,11 +220,14 @@ QueuedUser *QueuedUserManager::user(const long long _id)
 /**
  * @fn user
  */
-QueuedUser *QueuedUserManager::user(const QString &_name)
+QueuedUser *QueuedUserManager::user(const QString &_name, const bool _isToken)
 {
-    qCDebug(LOG_LIB) << "Look for user" << _name;
+    qCDebug(LOG_LIB) << "Look for user" << _name << "is token" << _isToken;
 
-    return m_users.value(_name, nullptr);
+    if (_isToken)
+        return m_users.value(m_tokens->isTokenValid(_name), nullptr);
+    else
+        return m_users.value(_name, nullptr);
 }
 
 
