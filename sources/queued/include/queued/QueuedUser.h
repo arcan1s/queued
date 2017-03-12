@@ -66,7 +66,7 @@ public:
         QString name;
         QString email;
         QString password;
-        uint permissions;
+        uint permissions = 0;
         QString limits;
     } QueuedUserDefinitions;
 

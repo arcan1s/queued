@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file QueuedCOnfiguration.h
+ * @file QueuedStaticConfig.h
  * Header of Queued library
  * @author Evgeniy Alekseev
  * @copyright MIT
@@ -32,10 +32,10 @@
 
 
 /**
- * @addtogroup QueuedCfg
+ * @addtogroup QueuedConfig
  * @brief Queued configuration related types
  */
-namespace QueuedCfg
+namespace QueuedConfig
 {
 /**
  * @struct QueuedAdminSetup

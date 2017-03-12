@@ -59,11 +59,10 @@ QDBusVariant QueuedCorePropertiesInterface::Option(const QString &property)
 
 
 /**
- * @fn TaskProperty
+ * @fn Task
  */
-QDBusVariant
-QueuedCorePropertiesInterface::TaskProperty(const long long id,
-                                            const QString &property)
+QDBusVariant QueuedCorePropertiesInterface::Task(const long long id,
+                                                 const QString &property)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from task" << id;
 
@@ -78,11 +77,10 @@ QueuedCorePropertiesInterface::TaskProperty(const long long id,
 
 
 /**
- * @fn UserProperty
+ * @fn User
  */
-QDBusVariant
-QueuedCorePropertiesInterface::UserProperty(const long long id,
-                                            const QString &property)
+QDBusVariant QueuedCorePropertiesInterface::User(const long long id,
+                                                 const QString &property)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from user" << id;
 

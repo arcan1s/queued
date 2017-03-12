@@ -22,7 +22,6 @@
 
 
 #include "queued/Queued.h"
-#include <queued/QueuedConfiguration.h>
 
 
 /**
@@ -52,7 +51,7 @@ QueuedAdvancedSettings::~QueuedAdvancedSettings()
  */
 bool QueuedAdvancedSettings::checkDatabaseVersion() const
 {
-    QString key = internalId(QueuedCfg::QueuedSettings::DatabaseVersion);
+    QString key = internalId(QueuedConfig::QueuedSettings::DatabaseVersion);
 
     if (m_values.contains(key.toLower()))
         return get(key).toInt() == QueuedConfig::DATABASE_VERSION;
@@ -72,19 +71,21 @@ QVariant QueuedAdvancedSettings::get(const QString &_key) const
     if (m_values.contains(key))
         return m_values.value(key);
     else
-        return QueuedCfg::QueuedSettingsDefaults[internalId(_key)].defaultValue;
+        return QueuedConfig::QueuedSettingsDefaults[internalId(_key)]
+            .defaultValue;
 }
 
 
 /**
  * @fn get
  */
-QVariant QueuedAdvancedSettings::get(const QueuedCfg::QueuedSettings _key) const
+QVariant
+QueuedAdvancedSettings::get(const QueuedConfig::QueuedSettings _key) const
 {
     qCDebug(LOG_LIB) << "Looking for key" << static_cast<int>(_key);
 
-    for (auto &key : QueuedCfg::QueuedSettingsDefaults.keys()) {
-        if (QueuedCfg::QueuedSettingsDefaults[key].id != _key)
+    for (auto &key : QueuedConfig::QueuedSettingsDefaults.keys()) {
+        if (QueuedConfig::QueuedSettingsDefaults[key].id != _key)
             continue;
         return get(key);
     }
@@ -112,7 +113,7 @@ QString QueuedAdvancedSettings::internalId(const QString &_key)
     qCDebug(LOG_LIB) << "Looking for key" << _key;
 
     QString key = _key.toLower();
-    for (auto &internal : QueuedCfg::QueuedSettingsDefaults.keys()) {
+    for (auto &internal : QueuedConfig::QueuedSettingsDefaults.keys()) {
         if (internal.toLower() != key)
             continue;
         return internal;
@@ -125,12 +126,13 @@ QString QueuedAdvancedSettings::internalId(const QString &_key)
 /**
  * @fn internalId
  */
-QString QueuedAdvancedSettings::internalId(const QueuedCfg::QueuedSettings _key)
+QString
+QueuedAdvancedSettings::internalId(const QueuedConfig::QueuedSettings _key)
 {
     qCDebug(LOG_LIB) << "Looking for key" << static_cast<int>(_key);
 
-    for (auto &internal : QueuedCfg::QueuedSettingsDefaults.keys()) {
-        if (QueuedCfg::QueuedSettingsDefaults[internal].id != _key)
+    for (auto &internal : QueuedConfig::QueuedSettingsDefaults.keys()) {
+        if (QueuedConfig::QueuedSettingsDefaults[internal].id != _key)
             continue;
         return internal;
     }
@@ -147,7 +149,7 @@ void QueuedAdvancedSettings::set(const QString &_key, const QVariant &_value)
     qCDebug(LOG_LIB) << "Set value" << _value << "for key" << _key;
 
     m_values[_key.toLower()] = _value;
-    auto id = QueuedCfg::QueuedSettingsDefaults[internalId(_key)].id;
+    auto id = QueuedConfig::QueuedSettingsDefaults[internalId(_key)].id;
     emit(valueUpdated(id, _key, _value));
 }
 

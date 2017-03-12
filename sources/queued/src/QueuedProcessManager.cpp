@@ -35,8 +35,7 @@ QueuedProcessManager::QueuedProcessManager(QObject *parent,
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
-    qRegisterMetaType<QueuedEnums::ExitAction>(
-        "QueuedEnums::ExitAction");
+    qRegisterMetaType<QueuedEnums::ExitAction>("QueuedEnums::ExitAction");
 
     setExitAction(onExit);
     setProcessLine(processLine);

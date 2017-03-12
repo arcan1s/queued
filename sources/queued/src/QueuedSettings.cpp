@@ -39,9 +39,10 @@ QueuedSettings::QueuedSettings(QObject *parent, const QString path)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
-    qRegisterMetaType<QueuedCfg::QueuedAdminSetup>(
-        "QueuedCfg::QueuedAdminSetup");
-    qRegisterMetaType<QueuedCfg::QueuedDBSetup>("QueuedCfg::QueuedDBSetup");
+    qRegisterMetaType<QueuedConfig::QueuedAdminSetup>(
+        "QueuedConfig::QueuedAdminSetup");
+    qRegisterMetaType<QueuedConfig::QueuedDBSetup>(
+        "QueuedConfig::QueuedDBSetup");
 
     readConfiguration();
 }
@@ -59,7 +60,7 @@ QueuedSettings::~QueuedSettings()
 /**
  * @fn admin
  */
-QueuedCfg::QueuedAdminSetup QueuedSettings::admin() const
+QueuedConfig::QueuedAdminSetup QueuedSettings::admin() const
 {
     return m_cfgAdmin;
 }
@@ -68,7 +69,7 @@ QueuedCfg::QueuedAdminSetup QueuedSettings::admin() const
 /**
  * @fn db
  */
-QueuedCfg::QueuedDBSetup QueuedSettings::db() const
+QueuedConfig::QueuedDBSetup QueuedSettings::db() const
 {
     return m_cfgDB;
 }

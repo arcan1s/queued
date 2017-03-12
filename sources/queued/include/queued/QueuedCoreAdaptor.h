@@ -27,6 +27,9 @@
 #include <QDBusArgument>
 #include <QVariant>
 
+#include "QueuedProcess.h"
+#include "QueuedUser.h"
+
 
 /**
  * @addtogroup QueuedCoreAdaptor
@@ -34,6 +37,164 @@
  */
 namespace QueuedCoreAdaptor
 {
+// specific methods for control interface
+/**
+ * @brief send auth method
+ * @param _name
+ * user name
+ * @param _password
+ * user password
+ * @return generated token ID or empty string in case of invalid password
+ */
+QString auth(const QString &_name, const QString &_password);
+/**
+ * @brief send OptionEdit
+ * @param _key
+ * option key to edit
+ * @param _value
+ * option value to edit
+ * @param _token
+ * auth user token
+ * @return true on successful option edition
+ */
+bool sendOptionEdit(const QString &_key, const QVariant &_value,
+                    const QString &_token);
+/**
+ * @brief send PluginAdd
+ * @param _plugin
+ * plugin name
+ * @param _token
+ * auth user token
+ * @return true on successful plugin addition
+ */
+bool sendPluginAdd(const QString &_plugin, const QString &_token);
+/**
+ * @brief send PluginRemove
+ * @param _plugin
+ * plugin name
+ * @param _token
+ * auth user token
+ * @return true on successful plugin removal
+ */
+bool sendPluginRemove(const QString &_plugin, const QString &_token);
+/**
+ * @brief send TaskAdd
+ * @param _definitions
+ * process definitions
+ * @param _token
+ * auth user token
+ * @return task ID or -1 if no task found
+ */
+long long
+sendTaskAdd(const QueuedProcess::QueuedProcessDefinitions &_definitions,
+            const QString &_token);
+/**
+ * @brief send TaskEdit
+ * @param _id
+ * task ID to edit
+ * @param _definitions
+ * process definitions
+ * @param _token
+ * auth user token
+ * @return true on successful task edition
+ */
+bool sendTaskEdit(const long long _id,
+                  const QueuedProcess::QueuedProcessDefinitions &_definitions,
+                  const QString &_token);
+/**
+ * @brief send TaskStart
+ * @param _id
+ * task ID
+ * @param _token
+ * auth user token
+ * @return true on successful task start
+ */
+bool sendTaskStart(const long long _id, const QString &_token);
+/**
+ * @brief send TaskStop
+ * @param _id
+ * task ID
+ * @param _token
+ * auth user token
+ * @return true on successful task stop
+ */
+bool sendTaskStop(const long long _id, const QString &_token);
+/**
+ * @brief send UserAdd
+ * @param _definitions
+ * user definitions
+ * @param _token
+ * auth user token
+ * @return user ID or -1 if no user added
+ */
+long long sendUserAdd(const QueuedUser::QueuedUserDefinitions &_definitions,
+                      const QString &_token);
+/**
+ * @brief send UserEdit
+ * @param _id
+ * user ID to edit
+ * @param _definitions
+ * user definitions
+ * @param _token
+ * auth user token
+ * @return true on successful user edition
+ */
+bool sendUserEdit(const long long _id,
+                  const QueuedUser::QueuedUserDefinitions &_definitions,
+                  const QString &_token);
+/**
+ * @brief send UserPermissionsAdd
+ * @param _id
+ * user ID
+ * @param _permission
+ * permission to add
+ * @param _token
+ * auth user token
+ * @return true on successful permission addition
+ */
+bool sendUserPermissionAdd(const long long _id,
+                           const QueuedEnums::Permission _permission,
+                           const QString &_token);
+/**
+ * @brief send sendUserPermissionRemove
+ * @param _id
+ * user ID
+ * @param _permission
+ * permission to remove
+ * @param _token
+ * auth user token
+ * @return true on successful permission removal
+ */
+bool sendUserPermissionRemove(const long long _id,
+                              const QueuedEnums::Permission _permission,
+                              const QString &_token);
+// specific methods for properties
+/**
+ * @brief get option
+ * @param _property
+ * option name
+ * @return option value
+ */
+QVariant getOption(const QString &_property);
+/**
+ * @brief get task property
+ * @param _id
+ * task id
+ * @param _property
+ * task property name
+ * @return task property value
+ */
+QVariant getTask(const long long _id, const QString &_property);
+/**
+ * @brief get user property
+ * @param _id
+ * user id
+ * @param _property
+ * user property name
+ * @return user property value
+ */
+QVariant getUser(const long long _id, const QString &_property);
+// common methods
 /**
  * @brief common DBus request
  * @param _service

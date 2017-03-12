@@ -73,11 +73,10 @@ bool QueuedCore::addPlugin(const QString &_plugin, const QString &_token)
 /**
  * @addTask
  */
-bool QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
-                         const QString &_workingDirectory, const uint _nice,
-                         const long long _userId,
-                         const QueuedLimits::Limits &_limits,
-                         const QString &_token)
+long long
+QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
+                    const QString &_workingDirectory, const long long _userId,
+                    const QueuedLimits::Limits &_limits, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
                      << "from user" << _userId;
@@ -97,28 +96,28 @@ bool QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
         // it means that user places task as own one
         if (!isUser) {
             qCInfo(LOG_LIB) << "User" << _token << "not allowed to add task";
-            return false;
+            return -1;
         }
     } else {
         // user tries to place task as another one
         if (!isAdmin) {
             qCInfo(LOG_LIB) << "User" << _token << "not allowed to add task";
-            return false;
+            return -1;
         }
     }
 
-    return addTaskPrivate(_command, _arguments, _workingDirectory, _nice,
-                          _userId, _limits);
+    return addTaskPrivate(_command, _arguments, _workingDirectory, _userId,
+                          _limits);
 }
 
 
 /**
  * @fn addUser
  */
-bool QueuedCore::addUser(const QString &_name, const QString &_email,
-                         const QString &_password, const uint _permissions,
-                         const QueuedLimits::Limits &_limits,
-                         const QString &_token)
+long long QueuedCore::addUser(const QString &_name, const QString &_email,
+                              const QString &_password, const uint _permissions,
+                              const QueuedLimits::Limits &_limits,
+                              const QString &_token)
 {
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
                      << "and permissions" << _permissions;
@@ -127,14 +126,14 @@ bool QueuedCore::addUser(const QString &_name, const QString &_email,
     bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
     if (!isAdmin) {
         qCInfo(LOG_LIB) << "User" << _token << "not allowed to add user";
-        return false;
+        return -1;
     }
 
     // check if already exists
     auto user = m_users->user(_name, false);
     if (user) {
         qCWarning(LOG_LIB) << "User" << _name << "already exists";
-        return false;
+        return -1;
     }
 
     return addUserPrivate(_name, _email, _password, _permissions, _limits);
@@ -499,9 +498,9 @@ void QueuedCore::init(const QString &_configuration)
     // settings update notifier
     m_connections += connect(
         m_advancedSettings,
-        SIGNAL(valueUpdated(const QueuedCfg::QueuedSettings, const QString &,
+        SIGNAL(valueUpdated(const QueuedConfig::QueuedSettings, const QString &,
                             const QVariant &)),
-        this, SLOT(updateSettings(const QueuedCfg::QueuedSettings,
+        this, SLOT(updateSettings(const QueuedConfig::QueuedSettings,
                                   const QString &, const QVariant &)));
 
     // dbus session
@@ -515,7 +514,7 @@ void QueuedCore::init(const QString &_configuration)
 /**
  * @fn updateSettings
  */
-void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _id,
+void QueuedCore::updateSettings(const QueuedConfig::QueuedSettings _id,
                                 const QString &_key, const QVariant &_value)
 {
     qCDebug(LOG_LIB) << "Received update for" << static_cast<int>(_id) << _key
@@ -523,36 +522,36 @@ void QueuedCore::updateSettings(const QueuedCfg::QueuedSettings _id,
 
     // FIXME propbably there is a better way to change settings
     switch (_id) {
-    case QueuedCfg::QueuedSettings::Invalid:
+    case QueuedConfig::QueuedSettings::Invalid:
         // check if it is plugin settings
         if (_key.startsWith("Plugin."))
             m_plugins->optionChanged(_key, _value);
         // do nothing otherwise
         break;
-    case QueuedCfg::QueuedSettings::DatabaseInterval:
+    case QueuedConfig::QueuedSettings::DatabaseInterval:
         m_databaseManager->setInterval(_value.toLongLong());
         break;
-    case QueuedCfg::QueuedSettings::DatabaseVersion:
+    case QueuedConfig::QueuedSettings::DatabaseVersion:
         break;
-    case QueuedCfg::QueuedSettings::DefaultLimits:
+    case QueuedConfig::QueuedSettings::DefaultLimits:
         break;
-    case QueuedCfg::QueuedSettings::KeepTasks:
+    case QueuedConfig::QueuedSettings::KeepTasks:
         m_databaseManager->setKeepTasks(_value.toLongLong());
         break;
-    case QueuedCfg::QueuedSettings::KeepUsers:
+    case QueuedConfig::QueuedSettings::KeepUsers:
         m_databaseManager->setKeepUsers(_value.toLongLong());
         break;
-    case QueuedCfg::QueuedSettings::OnExitAction:
+    case QueuedConfig::QueuedSettings::OnExitAction:
         m_processes->setExitAction(
             static_cast<QueuedEnums::ExitAction>(_value.toInt()));
         break;
-    case QueuedCfg::QueuedSettings::Plugins:
+    case QueuedConfig::QueuedSettings::Plugins:
         // do nothing here
         break;
-    case QueuedCfg::QueuedSettings::ProcessCommandLine:
+    case QueuedConfig::QueuedSettings::ProcessCommandLine:
         m_processes->setProcessLine(_value.toString());
         break;
-    case QueuedCfg::QueuedSettings::TokenExpiration:
+    case QueuedConfig::QueuedSettings::TokenExpiration:
         m_users->setTokenExpiration(_value.toLongLong());
         break;
     }
@@ -656,7 +655,7 @@ void QueuedCore::initDBus()
 void QueuedCore::initPlugins()
 {
     QStringList pluginList
-        = m_advancedSettings->get(QueuedCfg::QueuedSettings::Plugins)
+        = m_advancedSettings->get(QueuedConfig::QueuedSettings::Plugins)
               .toString()
               .split('\n');
 
@@ -673,10 +672,11 @@ void QueuedCore::initProcesses()
 {
     // init processes
     auto onExitAction = static_cast<QueuedEnums::ExitAction>(
-        m_advancedSettings->get(QueuedCfg::QueuedSettings::OnExitAction)
+        m_advancedSettings->get(QueuedConfig::QueuedSettings::OnExitAction)
             .toInt());
     auto processLine
-        = m_advancedSettings->get(QueuedCfg::QueuedSettings::ProcessCommandLine)
+        = m_advancedSettings
+              ->get(QueuedConfig::QueuedSettings::ProcessCommandLine)
               .toString();
 
     m_processes = new QueuedProcessManager(this, processLine, onExitAction);
@@ -726,7 +726,7 @@ void QueuedCore::initSettings(const QString &_configuration)
         qCInfo(LOG_LIB) << "Bump database version to"
                         << QueuedConfig::DATABASE_VERSION;
         editOptionPrivate(m_advancedSettings->internalId(
-                              QueuedCfg::QueuedSettings::DatabaseVersion),
+                              QueuedConfig::QueuedSettings::DatabaseVersion),
                           QueuedConfig::DATABASE_VERSION);
     }
 
@@ -744,7 +744,7 @@ void QueuedCore::initUsers()
 {
     // load users and tokens
     auto expiry
-        = m_advancedSettings->get(QueuedCfg::QueuedSettings::TokenExpiration)
+        = m_advancedSettings->get(QueuedConfig::QueuedSettings::TokenExpiration)
               .toLongLong();
 
     m_users = new QueuedUserManager(this);
@@ -766,11 +766,11 @@ void QueuedCore::initUsers()
 /**
  * @addTaskPrivate
  */
-bool QueuedCore::addTaskPrivate(const QString &_command,
-                                const QStringList &_arguments,
-                                const QString &_workingDirectory,
-                                const uint _nice, const long long _userId,
-                                const QueuedLimits::Limits &_limits)
+long long QueuedCore::addTaskPrivate(const QString &_command,
+                                     const QStringList &_arguments,
+                                     const QString &_workingDirectory,
+                                     const long long _userId,
+                                     const QueuedLimits::Limits &_limits)
 {
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
                      << "from user" << _userId;
@@ -785,35 +785,36 @@ bool QueuedCore::addTaskPrivate(const QString &_command,
     auto taskLimits = QueuedLimits::minimalLimits(
         _limits, user->nativeLimits(),
         QueuedLimits::Limits(
-            m_advancedSettings->get(QueuedCfg::QueuedSettings::DefaultLimits)
+            m_advancedSettings->get(QueuedConfig::QueuedSettings::DefaultLimits)
                 .toString()));
     QVariantHash properties = {{"user", _userId},
                                {"command", _command},
                                {"commandArguments", _arguments},
                                {"workDirectory", _workingDirectory},
-                               {"nice", _nice},
+                               {"nice", 0},
                                {"uid", ids.first},
                                {"gid", ids.second},
                                {"limits", taskLimits.toString()}};
     auto id = m_database->add(QueuedDB::TASKS_TABLE, properties);
     if (id == -1) {
         qCWarning(LOG_LIB) << "Could not add task" << _command;
-        return false;
+        return id;
     }
 
     // add to child object
     m_processes->add(properties, id);
-    return true;
+    return id;
 }
 
 
 /**
  * @fn addUserPrivate
  */
-bool QueuedCore::addUserPrivate(const QString &_name, const QString &_email,
-                                const QString &_password,
-                                const uint _permissions,
-                                const QueuedLimits::Limits &_limits)
+long long QueuedCore::addUserPrivate(const QString &_name,
+                                     const QString &_email,
+                                     const QString &_password,
+                                     const uint _permissions,
+                                     const QueuedLimits::Limits &_limits)
 {
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
                      << "and permissions" << _permissions;
@@ -827,12 +828,12 @@ bool QueuedCore::addUserPrivate(const QString &_name, const QString &_email,
     auto id = m_database->add(QueuedDB::USERS_TABLE, properties);
     if (id == -1) {
         qCWarning(LOG_LIB) << "Could not add user" << _name;
-        return false;
+        return id;
     }
 
     // add to child object
     m_users->add(properties, id);
-    return true;
+    return id;
 }
 
 
@@ -875,7 +876,7 @@ bool QueuedCore::editPluginPrivate(const QString &_plugin, const bool _add)
     qCDebug(LOG_LIB) << "Edit plugin" << _plugin << "add" << _add;
 
     QStringList pluginList
-        = m_advancedSettings->get(QueuedCfg::QueuedSettings::Plugins)
+        = m_advancedSettings->get(QueuedConfig::QueuedSettings::Plugins)
               .toString()
               .split('\n');
 

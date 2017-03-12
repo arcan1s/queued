@@ -27,7 +27,7 @@
 #include <QObject>
 #include <QVariant>
 
-#include "QueuedConfiguration.h"
+#include "QueuedStaticConfig.h"
 
 
 /**
@@ -66,7 +66,7 @@ public:
      * key to search in
      * @return value by key if found
      */
-    QVariant get(const QueuedCfg::QueuedSettings _key) const;
+    QVariant get(const QueuedConfig::QueuedSettings _key) const;
     /**
      * @brief get database value ID
      * @param _key
@@ -87,7 +87,7 @@ public:
      * string key
      * @return ID in settings representation
      */
-    static QString internalId(const QueuedCfg::QueuedSettings _key);
+    static QString internalId(const QueuedConfig::QueuedSettings _key);
     /**
      * @brief set value
      * @param _key
@@ -113,8 +113,8 @@ signals:
      * @param _value
      * changed value
      */
-    void valueUpdated(const QueuedCfg::QueuedSettings _id, const QString &_key,
-                      const QVariant &_value);
+    void valueUpdated(const QueuedConfig::QueuedSettings _id,
+                      const QString &_key, const QVariant &_value);
 
 private:
     /**

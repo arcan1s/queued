@@ -82,12 +82,12 @@ public:
         QString command;
         QStringList arguments;
         QString workingDirectory;
-        uint uid;
-        uint gid;
-        uint nice;
+        uint uid = 0;
+        uint gid = 0;
+        uint nice = 0;
         QDateTime startTime;
         QDateTime endTime;
-        long long user;
+        long long user = 0;
         QString limits;
     } QueuedProcessDefinitions;
 

@@ -100,8 +100,6 @@ public slots:
      * command line arguments
      * @param workingDirectory
      * working directory
-     * @param nice
-     * nice level
      * @param user
      * user ID
      * @param cpu
@@ -116,13 +114,13 @@ public slots:
      * limit by storage
      * @param token
      * auth user token
-     * @return true on successful task addition
+     * @return task ID or -1 if no task added
      */
-    bool TaskAdd(const QString &command, const QStringList &arguments,
-                 const QString &workingDirectory, const uint nice,
-                 const long long user, const long long cpu, const long long gpu,
-                 const QString &memory, const QString &gpumemory,
-                 const QString &storage, const QString &token);
+    qlonglong TaskAdd(const QString &command, const QStringList &arguments,
+                      const QString &workingDirectory, const qlonglong user,
+                      const qlonglong cpu, const qlonglong gpu,
+                      const QString &memory, const QString &gpumemory,
+                      const QString &storage, const QString &token);
     /**
      * @brief edit task
      * @param id
@@ -139,8 +137,8 @@ public slots:
      * new uid or 0
      * @param gid
      * new gid or 0
-     * @param state
-     * new state or 0
+     * @param user
+     * new user ID or 0
      * @param cpu
      * new limit by CPU cores or -1
      * @param gpu
@@ -158,9 +156,10 @@ public slots:
     bool TaskEdit(const qlonglong id, const QString &command,
                   const QStringList &arguments, const QString &directory,
                   const uint nice, const uint uid, const uint gid,
-                  const uint state, const long long cpu, const long long gpu,
-                  const QString &memory, const QString &gpumemory,
-                  const QString &storage, const QString &token);
+                  const qlonglong user, const qlonglong cpu,
+                  const qlonglong gpu, const QString &memory,
+                  const QString &gpumemory, const QString &storage,
+                  const QString &token);
     /**
      * @brief force start task
      * @param id
@@ -201,13 +200,13 @@ public slots:
      * limit by storage
      * @param token
      * auth user token
-     * @return true on successful task addition
+     * @return user ID or -1 if no user found
      */
-    bool UserAdd(const QString &name, const QString &email,
-                 const QString &password, const uint permissions,
-                 const long long cpu, const long long gpu,
-                 const QString &memory, const QString &gpumemory,
-                 const QString &storage, const QString &token);
+    qlonglong UserAdd(const QString &name, const QString &email,
+                      const QString &password, const uint permissions,
+                      const qlonglong cpu, const qlonglong gpu,
+                      const QString &memory, const QString &gpumemory,
+                      const QString &storage, const QString &token);
     /**
      * @brief edit user
      * @param id
@@ -234,7 +233,7 @@ public slots:
      */
     bool UserEdit(const qlonglong id, const QString &name,
                   const QString &password, const QString &email,
-                  const long long cpu, const long long gpu,
+                  const qlonglong cpu, const qlonglong gpu,
                   const QString &memory, const QString &gpumemory,
                   const QString &storage, const QString &token);
     /**

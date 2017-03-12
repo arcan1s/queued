@@ -71,8 +71,8 @@ QString QueuedTokenManager::isTokenValid(const QString &_token) const
 void QueuedTokenManager::loadToken(
     const QueuedTokenManager::QueuedTokenDefinitions &_definitions)
 {
-    qCDebug(LOG_LIB) << "Add toen for user" << _definitions.user
-                     << "valud until" << _definitions.validUntil;
+    qCDebug(LOG_LIB) << "Add token for user" << _definitions.user
+                     << "valid until" << _definitions.validUntil;
 
     m_tokens[_definitions.token] = _definitions;
 

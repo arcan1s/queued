@@ -25,7 +25,6 @@
 #define QUEUED_H
 
 #include "QueuedAdvancedSettings.h"
-#include "QueuedConfiguration.h"
 #include "QueuedCore.h"
 #include "QueuedCoreAdaptor.h"
 #include "QueuedCoreInterface.h"
@@ -43,6 +42,7 @@
 #include "QueuedProcessManager.h"
 #include "QueuedReportManager.h"
 #include "QueuedSettings.h"
+#include "QueuedStaticConfig.h"
 #include "QueuedSystemInfo.h"
 #include "QueuedTokenManager.h"
 #include "QueuedUser.h"

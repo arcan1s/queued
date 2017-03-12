@@ -97,17 +97,17 @@ bool QueuedCoreInterface::PluginRemove(const QString &plugin,
 /**
  * @fn TaskAdd
  */
-bool QueuedCoreInterface::TaskAdd(
+qlonglong QueuedCoreInterface::TaskAdd(
     const QString &command, const QStringList &arguments,
-    const QString &workingDirectory, const uint nice, const long long user,
-    const long long cpu, const long long gpu, const QString &memory,
-    const QString &gpumemory, const QString &storage, const QString &token)
+    const QString &workingDirectory, const qlonglong user, const qlonglong cpu,
+    const qlonglong gpu, const QString &memory, const QString &gpumemory,
+    const QString &storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new task with parameters" << command << arguments
-                      << workingDirectory << nice << "from user" << user;
+                      << workingDirectory << "from user" << user;
 
     return m_core->addTask(
-        command, arguments, workingDirectory, nice, user,
+        command, arguments, workingDirectory, user,
         QueuedLimits::Limits(cpu, gpu, QueuedLimits::convertMemory(memory),
                              QueuedLimits::convertMemory(gpumemory),
                              QueuedLimits::convertMemory(storage)),
@@ -122,14 +122,14 @@ bool QueuedCoreInterface::TaskEdit(const qlonglong id, const QString &command,
                                    const QStringList &arguments,
                                    const QString &directory, const uint nice,
                                    const uint uid, const uint gid,
-                                   const uint state, const long long cpu,
-                                   const long long gpu, const QString &memory,
+                                   const qlonglong user, const qlonglong cpu,
+                                   const qlonglong gpu, const QString &memory,
                                    const QString &gpumemory,
                                    const QString &storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Edit task" << id << command << arguments << directory
-                      << nice << uid << gid << state << cpu << gpu << memory
-                      << gpumemory << storage;
+                      << nice << uid << gid << cpu << gpu << memory << gpumemory
+                      << storage;
 
     auto task = m_core->task(id);
     if (!task) {
@@ -151,8 +151,8 @@ bool QueuedCoreInterface::TaskEdit(const qlonglong id, const QString &command,
         data[QString("uid")] = uid;
     if (gid > 0)
         data[QString("gid")] = gid;
-    if (state > 0)
-        data[QString("state")] = state;
+    if (user > 0)
+        data[QString("user")] = user;
     // append limits now
     auto limits = task->nativeLimits();
     if (cpu > -1)
@@ -196,12 +196,12 @@ bool QueuedCoreInterface::TaskStop(const qlonglong id, const QString &token)
 /**
  * @fn UserAdd
  */
-bool QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
-                                  const QString &password,
-                                  const uint permissions, const long long cpu,
-                                  const long long gpu, const QString &memory,
-                                  const QString &gpumemory,
-                                  const QString &storage, const QString &token)
+qlonglong
+QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
+                             const QString &password, const uint permissions,
+                             const qlonglong cpu, const qlonglong gpu,
+                             const QString &memory, const QString &gpumemory,
+                             const QString &storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new user with paramaters" << name << email
                       << permissions;
@@ -220,8 +220,8 @@ bool QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
  */
 bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
                                    const QString &password,
-                                   const QString &email, const long long cpu,
-                                   const long long gpu, const QString &memory,
+                                   const QString &email, const qlonglong cpu,
+                                   const qlonglong gpu, const QString &memory,
                                    const QString &gpumemory,
                                    const QString &storage, const QString &token)
 {

@@ -26,7 +26,7 @@
 
 #include <QObject>
 
-#include "QueuedConfiguration.h"
+#include "QueuedStaticConfig.h"
 
 
 /**
@@ -36,8 +36,8 @@ class QueuedSettings : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString path READ path)
-    Q_PROPERTY(QueuedCfg::QueuedAdminSetup admin READ admin)
-    Q_PROPERTY(QueuedCfg::QueuedDBSetup db READ db)
+    Q_PROPERTY(QueuedConfig::QueuedAdminSetup admin READ admin)
+    Q_PROPERTY(QueuedConfig::QueuedDBSetup db READ db)
 
 public:
     /**
@@ -56,12 +56,12 @@ public:
      * @brief administrator settings
      * @return QueuedAdminSetup structure
      */
-    QueuedCfg::QueuedAdminSetup admin() const;
+    QueuedConfig::QueuedAdminSetup admin() const;
     /**
      * @brief database settings
      * @return QueuedDBSetup structure
      */
-    QueuedCfg::QueuedDBSetup db() const;
+    QueuedConfig::QueuedDBSetup db() const;
     /**
      * @brief default path to configuration
      * @return default path to configuration file
@@ -83,11 +83,11 @@ private:
     /**
      * @brief admin configuration
      */
-    QueuedCfg::QueuedAdminSetup m_cfgAdmin;
+    QueuedConfig::QueuedAdminSetup m_cfgAdmin;
     /**
      * @brief database configuration
      */
-    QueuedCfg::QueuedDBSetup m_cfgDB;
+    QueuedConfig::QueuedDBSetup m_cfgDB;
     /**
      * @brief path to configuration
      */

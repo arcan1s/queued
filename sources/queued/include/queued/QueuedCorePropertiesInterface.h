@@ -68,7 +68,7 @@ public slots:
      * property name
      * @return property value or empty if task or property not found
      */
-    QDBusVariant TaskProperty(const long long id, const QString &property);
+    QDBusVariant Task(const long long id, const QString &property);
     /**
      * @brief get user property
      * @param id
@@ -77,7 +77,7 @@ public slots:
      * property name
      * @return property value or empty if user or property not found
      */
-    QDBusVariant UserProperty(const long long id, const QString &property);
+    QDBusVariant User(const long long id, const QString &property);
 
 private:
     /**

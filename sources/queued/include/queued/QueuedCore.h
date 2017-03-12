@@ -26,9 +26,9 @@
 
 #include <QObject>
 
-#include "QueuedConfiguration.h"
 #include "QueuedEnums.h"
 #include "QueuedLimits.h"
+#include "QueuedStaticConfig.h"
 
 
 class QueuedAdvancedSettings;
@@ -77,20 +77,18 @@ public:
      * command arguments
      * @param _workingDirectory
      * working directory
-     * @param _nice
-     * nice level
      * @param _userId
      * task owner user ID
      * @param _limits
      * task defined limits
      * @param _token
      * user auth token
-     * @return true on successfully addition
+     * @return task ID or -1 if no task added
      */
-    bool addTask(const QString &_command, const QStringList &_arguments,
-                 const QString &_workingDirectory, const uint _nice,
-                 const long long _userId, const QueuedLimits::Limits &_limits,
-                 const QString &_token);
+    long long addTask(const QString &_command, const QStringList &_arguments,
+                      const QString &_workingDirectory, const long long _userId,
+                      const QueuedLimits::Limits &_limits,
+                      const QString &_token);
     /**
      * @brief add new user
      * @param _name
@@ -105,11 +103,12 @@ public:
      * user limits
      * @param _token
      * user auth token
-     * @return true on successfully addition
+     * @return user ID or -1 if no user created
      */
-    bool addUser(const QString &_name, const QString &_email,
-                 const QString &_password, const uint _permissions,
-                 const QueuedLimits::Limits &_limits, const QString &_token);
+    long long addUser(const QString &_name, const QString &_email,
+                      const QString &_password, const uint _permissions,
+                      const QueuedLimits::Limits &_limits,
+                      const QString &_token);
     /**
      * @brief authorize and create new token for user
      * @param _name
@@ -253,7 +252,7 @@ private slots:
      * @param _value
      * new value
      */
-    void updateSettings(const QueuedCfg::QueuedSettings _id,
+    void updateSettings(const QueuedConfig::QueuedSettings _id,
                         const QString &_key, const QVariant &_value);
     /**
      * @brief update process time
@@ -356,18 +355,17 @@ private:
      * command arguments
      * @param _workingDirectory
      * working directory
-     * @param _nice
-     * nice level
      * @param _userId
      * task owner user ID
      * @param _limits
      * task defined limits
-     * @return true on successfully addition
+     * @return task ID or -1 if no task added
      */
-    bool addTaskPrivate(const QString &_command, const QStringList &_arguments,
-                        const QString &_workingDirectory, const uint _nice,
-                        const long long _userId,
-                        const QueuedLimits::Limits &_limits);
+    long long addTaskPrivate(const QString &_command,
+                             const QStringList &_arguments,
+                             const QString &_workingDirectory,
+                             const long long _userId,
+                             const QueuedLimits::Limits &_limits);
     /**
      * @brief add new user
      * @param _name
@@ -380,11 +378,11 @@ private:
      * user permissions
      * @param _limits
      * user limits
-     * @return true on successfully addition
+     * @return user ID or -1 if no user found
      */
-    bool addUserPrivate(const QString &_name, const QString &_email,
-                        const QString &_password, const uint _permissions,
-                        const QueuedLimits::Limits &_limits);
+    long long addUserPrivate(const QString &_name, const QString &_email,
+                             const QString &_password, const uint _permissions,
+                             const QueuedLimits::Limits &_limits);
     /**
      * @brief edit advanced settings
      * @param _key
