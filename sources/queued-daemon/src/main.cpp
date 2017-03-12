@@ -88,15 +88,15 @@ int main(int argc, char *argv[])
 
     // show info and exit
     if (parser.isSet(infoOption)) {
-        QueuedDebug::enableDebug();
         auto metadata = QueuedDebug::getBuildData();
         for (auto &string : metadata)
-            qCInfo(LOG_APP) << string;
+            QDebug(QtMsgType::QtInfoMsg).noquote() << string;
+        return 1;
     }
 
     // check if exists
     if (existingSessionOperation(QString("Active"))) {
-        qCWarning(LOG_APP) << "Another session is active";
+        qWarning() << "Another session is active";
         return 1;
     }
 
