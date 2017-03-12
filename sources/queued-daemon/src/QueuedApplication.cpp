@@ -34,6 +34,7 @@ QueuedApplication::QueuedApplication(QObject *parent, const QVariantHash &args)
         qCDebug(LOG_APP) << metadata;
 
     init();
+    initDBus();
 }
 
 
@@ -41,15 +42,14 @@ QueuedApplication::~QueuedApplication()
 {
     qCDebug(LOG_APP) << __PRETTY_FUNCTION__;
 
+    QDBusConnection::sessionBus().unregisterObject(
+            QueuedConfig::DBUS_APPLICATION_PATH);
     deinit();
 }
 
 
 void QueuedApplication::deinit()
 {
-    QDBusConnection::sessionBus().unregisterObject(
-        QueuedConfig::DBUS_APPLICATION_PATH);
-
     if (m_core)
         delete m_core;
 }
@@ -60,7 +60,6 @@ void QueuedApplication::init()
     deinit();
 
     initCore();
-    initDBus();
 }
 
 

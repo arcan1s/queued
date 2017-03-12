@@ -25,8 +25,12 @@
 #include "version.h"
 
 extern "C" {
+#include <signal.h>
 #include <unistd.h>
 }
+
+
+QueuedApplication *instance = nullptr;
 
 
 bool existingSessionOperation(const QString &operation)
@@ -108,6 +112,11 @@ int main(int argc, char *argv[])
     QVariantHash arguments = {{"config", parser.value(configOption)}};
 
     // start application
-    QueuedApplication instance(nullptr, arguments);
+    instance = new QueuedApplication(nullptr, arguments);
+    // catch SIGHUP
+    signal(SIGHUP, [](int sig) ->void {
+        qCInfo(LOG_APP) << "Received SIGHUP signal, reinit components";
+        instance->init();
+    });
     return app.exec();
 }
