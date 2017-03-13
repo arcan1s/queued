@@ -43,7 +43,7 @@ QueuedApplication::~QueuedApplication()
     qCDebug(LOG_APP) << __PRETTY_FUNCTION__;
 
     QDBusConnection::sessionBus().unregisterObject(
-            QueuedConfig::DBUS_APPLICATION_PATH);
+        QueuedConfig::DBUS_APPLICATION_PATH);
     deinit();
 }
 

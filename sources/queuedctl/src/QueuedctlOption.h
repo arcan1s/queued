@@ -14,32 +14,18 @@
  */
 
 
-#ifndef QUEUEDAPPLICATIONINTERFACE_H
-#define QUEUEDAPPLICATIONINTERFACE_H
+#ifndef QUEUEDCTLOPTION_H
+#define QUEUEDCTLOPTION_H
 
-#include <QDBusAbstractAdaptor>
-
-#include "QueuedConfig.h"
+#include <QCommandLineParser>
 
 
-class QueuedApplication;
-
-class QueuedApplicationInterface : public QDBusAbstractAdaptor
+namespace QueuedctlOption
 {
-    Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", DBUS_SERVICE_NAME)
-
-public:
-    explicit QueuedApplicationInterface(QueuedApplication *parent);
-    virtual ~QueuedApplicationInterface();
-
-public slots:
-    bool Active() const;
-    QStringList UIDs() const;
-
-private:
-    QueuedApplication *m_application = nullptr;
+bool editOption(const QString &_option, const QVariant &_value,
+                const QString &_cache, const QString &_user);
+void parser(QCommandLineParser &_parser);
 };
 
 
-#endif /* QUEUEDAPPLICATIONINTERFACE_H */
+#endif /* QUEUEDCTLOPTION_H */

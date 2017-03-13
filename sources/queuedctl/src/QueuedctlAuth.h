@@ -14,32 +14,21 @@
  */
 
 
-#ifndef QUEUEDAPPLICATIONINTERFACE_H
-#define QUEUEDAPPLICATIONINTERFACE_H
+#ifndef QUEUEDCTLAUTH_H
+#define QUEUEDCTLAUTH_H
 
-#include <QDBusAbstractAdaptor>
-
-#include "QueuedConfig.h"
+#include <QCommandLineParser>
 
 
-class QueuedApplication;
-
-class QueuedApplicationInterface : public QDBusAbstractAdaptor
+namespace QueuedctlAuth
 {
-    Q_OBJECT
-    Q_CLASSINFO("D-Bus Interface", DBUS_SERVICE_NAME)
-
-public:
-    explicit QueuedApplicationInterface(QueuedApplication *parent);
-    virtual ~QueuedApplicationInterface();
-
-public slots:
-    bool Active() const;
-    QStringList UIDs() const;
-
-private:
-    QueuedApplication *m_application = nullptr;
+QString auth(const QString &_user);
+QString getToken(const QString &_cache, const QString &_user);
+void parser(QCommandLineParser &_parser);
+void setToken(const QString &_token, const QString &_cache);
+QString token(const QString &_cache);
+bool tryAuth(const QString &_token);
 };
 
 
-#endif /* QUEUEDAPPLICATIONINTERFACE_H */
+#endif /* QUEUEDCTLAUTH_H */

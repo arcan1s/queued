@@ -39,6 +39,13 @@ namespace QueuedCoreAdaptor
 {
 // specific methods for control interface
 /**
+ * @brief send TryAuth
+ * @param _token
+ * token ID
+ * @return true if token is valid
+ */
+bool auth(const QString &_token);
+/**
  * @brief send auth method
  * @param _name
  * user name

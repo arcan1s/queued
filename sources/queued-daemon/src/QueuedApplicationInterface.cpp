@@ -48,12 +48,6 @@ bool QueuedApplicationInterface::Active() const
 }
 
 
-void QueuedApplicationInterface::Close() const
-{
-    return QCoreApplication::exit(0);
-}
-
-
 QStringList QueuedApplicationInterface::UIDs() const
 {
     QStringList uids;

@@ -179,6 +179,13 @@ public slots:
      */
     bool TaskStop(const qlonglong id, const QString &token);
     /**
+     * @brief try auth by token
+     * @param token
+     * token ID
+     * @return true if token is valid
+     */
+    bool TryAuth(const QString &token);
+    /**
      * @brief add new user
      * @param name
      * user name

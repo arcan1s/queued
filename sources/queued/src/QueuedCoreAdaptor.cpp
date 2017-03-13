@@ -25,8 +25,20 @@
 
 #include <QDBusConnection>
 #include <QDBusMessage>
-#include <queued/QueuedProcess.h>
-#include <queued/QueuedUser.h>
+
+
+/**
+ * @fn auth
+ */
+bool QueuedCoreAdaptor::auth(const QString &_token)
+{
+    QVariantList args = {_token};
+    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
+                                    QueuedConfig::DBUS_OBJECT_PATH,
+                                    QueuedConfig::DBUS_SERVICE, "/TryAuth",
+                                    args))
+        .toBool();
+}
 
 
 /**

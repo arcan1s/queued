@@ -16,44 +16,20 @@
 
 #include <QCommandLineParser>
 #include <QCoreApplication>
-#include <QDBusConnection>
-#include <QDBusMessage>
 
 #include <queued/Queued.h>
 
-#include "QueuedApplication.h"
+#include "QueuedctlAuth.h"
+#include "QueuedctlOption.h"
 #include "version.h"
 
 extern "C" {
-#include <signal.h>
 #include <unistd.h>
-}
-
-
-QueuedApplication *instance = nullptr;
-
-
-bool existingSessionOperation(const QString &operation)
-{
-    QVariantList arguments = QueuedCoreAdaptor::sendRequest(
-        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_APPLICATION_PATH,
-        QueuedConfig::DBUS_SERVICE, operation, QVariantList());
-
-    return (!arguments.isEmpty() && arguments.at(0).type() == QVariant::Bool
-            && arguments[0].toBool());
 }
 
 
 int main(int argc, char *argv[])
 {
-    // HACK preparse arguments to find out if --daemon is set
-    for (int i = 0; i < argc; i++) {
-        if (std::string(argv[i]) != "--daemon")
-            continue;
-        ::daemon(0, 0);
-    }
-
-
     QCoreApplication app(argc, argv);
     app.setApplicationName(NAME);
     app.setApplicationVersion(VERSION);
@@ -70,23 +46,48 @@ int main(int argc, char *argv[])
                                   "Show additional info.");
     parser.addOption(infoOption);
 
-    // configuration option
-    QCommandLineOption configOption(QStringList() << "c"
-                                                  << "config",
-                                    "Read initial configuration from file.",
-                                    "config", QueuedSettings::defaultPath());
-    parser.addOption(configOption);
-
     // debug mode
     QCommandLineOption debugOption(QStringList() << "d"
                                                  << "debug",
                                    "Print debug information.");
     parser.addOption(debugOption);
 
-    // daemon mode
-    QCommandLineOption daemonOption(QStringList() << "daemon",
-                                    "Start detached.");
-    parser.addOption(daemonOption);
+    // configuration option
+    QCommandLineOption tokenOption(QStringList() << "t"
+                                                 << "token",
+                                   "Path to cached token.", "token",
+                                   QueuedSettings::defaultTokenPath());
+    parser.addOption(tokenOption);
+    QCommandLineOption userOption(QStringList() << "u"
+                                                << "user",
+                                  "User to login instead of current one.",
+                                  "user", ::getlogin());
+    parser.addOption(userOption);
+
+    parser.addPositionalArgument("command", "Command to execute.");
+
+    // pre-parse
+    parser.parse(QCoreApplication::arguments());
+    QStringList args = parser.positionalArguments();
+    QString command = args.isEmpty() ? QString() : args.first();
+
+    if (command == "auth") {
+        QueuedctlAuth::parser(parser);
+    } else if (command == "option-edit") {
+        QueuedctlOption::parser(parser);
+    } else if (command == "task-add") {
+        parser.clearPositionalArguments();
+    } else if (command == "task-edit") {
+        parser.clearPositionalArguments();
+    } else if (command == "user-add") {
+        parser.clearPositionalArguments();
+    } else if (command == "user-edit") {
+        parser.clearPositionalArguments();
+    } else {
+        parser.process(app);
+        qWarning() << "Unknown command" << command;
+        parser.showHelp(1);
+    }
 
     parser.process(app);
 
@@ -98,25 +99,9 @@ int main(int argc, char *argv[])
         return 0;
     }
 
-    // check if exists
-    if (existingSessionOperation(QString("Active"))) {
-        qWarning() << "Another session is active";
-        return 1;
-    }
-
     // enable debug
     if (parser.isSet(debugOption))
         QueuedDebug::enableDebug();
 
-    // build initial options hash
-    QVariantHash arguments = {{"config", parser.value(configOption)}};
-
-    // start application
-    instance = new QueuedApplication(nullptr, arguments);
-    // catch SIGHUP
-    signal(SIGHUP, [](int sig) -> void {
-        qCInfo(LOG_APP) << "Received SIGHUP signal, reinit components";
-        instance->init();
-    });
-    return app.exec();
+    return 0;
 }

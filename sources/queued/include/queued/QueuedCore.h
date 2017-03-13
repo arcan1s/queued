@@ -110,6 +110,13 @@ public:
                       const QueuedLimits::Limits &_limits,
                       const QString &_token);
     /**
+     * @brief try to authorize by given token
+     * @param _token
+     * token ID
+     * @return true if token is valid
+     */
+    bool authorization(const QString &_token);
+    /**
      * @brief authorize and create new token for user
      * @param _name
      * user name

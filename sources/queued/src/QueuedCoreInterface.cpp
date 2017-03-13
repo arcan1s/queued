@@ -194,6 +194,15 @@ bool QueuedCoreInterface::TaskStop(const qlonglong id, const QString &token)
 
 
 /**
+ * @fn TryAuth
+ */
+bool QueuedCoreInterface::TryAuth(const QString &token)
+{
+    return m_core->authorization(token);
+}
+
+
+/**
  * @fn UserAdd
  */
 qlonglong

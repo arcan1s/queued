@@ -89,6 +89,20 @@ QString QueuedSettings::defaultPath()
 
 
 /**
+ * @fn defaultTokenPath
+ */
+QString QueuedSettings::defaultTokenPath()
+{
+    QString fileName = QString("%1/queued")
+                           .arg(QStandardPaths::writableLocation(
+                               QStandardPaths::GenericCacheLocation));
+    qCInfo(LOG_LIB) << "Cache file location" << fileName;
+
+    return fileName;
+}
+
+
+/**
  * @fn path
  */
 QString QueuedSettings::path() const
@@ -106,24 +120,22 @@ void QueuedSettings::readConfiguration()
     qCInfo(LOG_LIB) << "Read configuration from" << settings.fileName();
 
     // administrator related settings
-    settings.beginGroup(QString("Administrator"));
-    m_cfgAdmin.name
-        = settings.value(QString("Username"), QString("root")).toString();
-    m_cfgAdmin.password = settings.value(QString("Password")).toString();
+    settings.beginGroup("Administrator");
+    m_cfgAdmin.name = settings.value("Username", "root").toString();
+    m_cfgAdmin.password = settings.value("Password").toString();
     settings.endGroup();
 
     // database related settings
-    settings.beginGroup(QString("Database"));
-    m_cfgDB.driver
-        = settings.value(QString("Driver"), QString("QSQLITE")).toString();
-    m_cfgDB.hostname = settings.value(QString("Hostname")).toString();
-    m_cfgDB.password = settings.value(QString("Password")).toString();
+    settings.beginGroup("Database");
+    m_cfgDB.driver = settings.value("Driver", "QSQLITE").toString();
+    m_cfgDB.hostname = settings.value("Hostname").toString();
+    m_cfgDB.password = settings.value("Password").toString();
     // get standard path for temporary files
     QString defaultDB = QString("%1/queued.db")
                             .arg(QStandardPaths::writableLocation(
                                 QStandardPaths::TempLocation));
-    m_cfgDB.path = settings.value(QString("Path"), defaultDB).toString();
-    m_cfgDB.port = settings.value(QString("Port")).toInt();
-    m_cfgDB.username = settings.value(QString("Username")).toString();
+    m_cfgDB.path = settings.value("Path", defaultDB).toString();
+    m_cfgDB.port = settings.value("Port").toInt();
+    m_cfgDB.username = settings.value("Username").toString();
     settings.endGroup();
 }

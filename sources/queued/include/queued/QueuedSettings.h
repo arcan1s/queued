@@ -68,6 +68,12 @@ public:
      */
     static QString defaultPath();
     /**
+     * @brief default path to cached token
+     * @return default path to cached token file
+     * @return
+     */
+    static QString defaultTokenPath();
+    /**
      * @brief path to database
      * @return path to used database
      */

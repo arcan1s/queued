@@ -143,6 +143,18 @@ long long QueuedCore::addUser(const QString &_name, const QString &_email,
 /**
  * @fn authorization
  */
+bool QueuedCore::authorization(const QString &_token)
+{
+    bool status = false;
+    m_users->checkToken(_token, &status);
+
+    return status;
+}
+
+
+/**
+ * @fn authorization
+ */
 QString QueuedCore::authorization(const QString &_name,
                                   const QString &_password)
 {
