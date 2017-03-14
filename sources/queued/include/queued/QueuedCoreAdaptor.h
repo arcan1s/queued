@@ -90,7 +90,7 @@ bool sendPluginRemove(const QString &_plugin, const QString &_token);
  * process definitions
  * @param _token
  * auth user token
- * @return task ID or -1 if no task found
+ * @return task ID or {0, -1} if no task added
  */
 long long
 sendTaskAdd(const QueuedProcess::QueuedProcessDefinitions &_definitions,

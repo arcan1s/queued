@@ -42,13 +42,13 @@ int main(int argc, char *argv[])
     // info
     QCommandLineOption infoOption(QStringList() << "i"
                                                 << "info",
-                                  "Show additional info.");
+                                  "Shows additional info.");
     parser.addOption(infoOption);
 
     // debug mode
     QCommandLineOption debugOption(QStringList() << "d"
                                                  << "debug",
-                                   "Print debug information.");
+                                   "Prints debug information.");
     parser.addOption(debugOption);
 
     // configuration option
@@ -62,6 +62,10 @@ int main(int argc, char *argv[])
                                   "User to login instead of current one.",
                                   "user", ::getlogin());
     parser.addOption(userOption);
+
+    // additional help option
+    QCommandLineOption commandsOption("commands", "Lists available commands.");
+    parser.addOption(commandsOption);
 
     parser.addPositionalArgument("command", "Command to execute.", "<command>");
 
@@ -78,6 +82,12 @@ int main(int argc, char *argv[])
         auto metadata = QueuedDebug::getBuildData();
         for (auto &string : metadata)
             QDebug(QtMsgType::QtInfoMsg).noquote() << string;
+        return 0;
+    }
+    if (parser.isSet(commandsOption)) {
+        QDebug(QtMsgType::QtInfoMsg).noquote() << parser.helpText();
+        QDebug(QtMsgType::QtInfoMsg).noquote()
+            << QueuedctlCommon::commandsHelp();
         return 0;
     }
 

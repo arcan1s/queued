@@ -119,8 +119,8 @@ public slots:
     qlonglong TaskAdd(const QString &command, const QStringList &arguments,
                       const QString &workingDirectory, const qlonglong user,
                       const qlonglong cpu, const qlonglong gpu,
-                      const QString &memory, const QString &gpumemory,
-                      const QString &storage, const QString &token);
+                      const qlonglong memory, const qlonglong gpumemory,
+                      const qlonglong storage, const QString &token);
     /**
      * @brief edit task
      * @param id
@@ -157,8 +157,8 @@ public slots:
                   const QStringList &arguments, const QString &directory,
                   const uint nice, const uint uid, const uint gid,
                   const qlonglong user, const qlonglong cpu,
-                  const qlonglong gpu, const QString &memory,
-                  const QString &gpumemory, const QString &storage,
+                  const qlonglong gpu, const qlonglong memory,
+                  const qlonglong gpumemory, const qlonglong storage,
                   const QString &token);
     /**
      * @brief force start task

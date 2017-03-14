@@ -100,32 +100,27 @@ bool QueuedCoreInterface::PluginRemove(const QString &plugin,
 qlonglong QueuedCoreInterface::TaskAdd(
     const QString &command, const QStringList &arguments,
     const QString &workingDirectory, const qlonglong user, const qlonglong cpu,
-    const qlonglong gpu, const QString &memory, const QString &gpumemory,
-    const QString &storage, const QString &token)
+    const qlonglong gpu, const qlonglong memory, const qlonglong gpumemory,
+    const qlonglong storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new task with parameters" << command << arguments
                       << workingDirectory << "from user" << user;
 
     return m_core->addTask(
         command, arguments, workingDirectory, user,
-        QueuedLimits::Limits(cpu, gpu, QueuedLimits::convertMemory(memory),
-                             QueuedLimits::convertMemory(gpumemory),
-                             QueuedLimits::convertMemory(storage)),
-        token);
+        QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token);
 }
 
 
 /**
  * @fn TaskEdit
  */
-bool QueuedCoreInterface::TaskEdit(const qlonglong id, const QString &command,
-                                   const QStringList &arguments,
-                                   const QString &directory, const uint nice,
-                                   const uint uid, const uint gid,
-                                   const qlonglong user, const qlonglong cpu,
-                                   const qlonglong gpu, const QString &memory,
-                                   const QString &gpumemory,
-                                   const QString &storage, const QString &token)
+bool QueuedCoreInterface::TaskEdit(
+    const qlonglong id, const QString &command, const QStringList &arguments,
+    const QString &directory, const uint nice, const uint uid, const uint gid,
+    const qlonglong user, const qlonglong cpu, const qlonglong gpu,
+    const qlonglong memory, const qlonglong gpumemory, const qlonglong storage,
+    const QString &token)
 {
     qCDebug(LOG_DBUS) << "Edit task" << id << command << arguments << directory
                       << nice << uid << gid << cpu << gpu << memory << gpumemory
@@ -160,11 +155,11 @@ bool QueuedCoreInterface::TaskEdit(const qlonglong id, const QString &command,
     if (gpu > -1)
         limits.gpu = gpu;
     if (memory > -1)
-        limits.memory = QueuedLimits::convertMemory(memory);
+        limits.memory = memory;
     if (gpumemory > -1)
-        limits.gpumemory = QueuedLimits::convertMemory(gpumemory);
+        limits.gpumemory = gpumemory;
     if (storage > -1)
-        limits.storage = QueuedLimits::convertMemory(storage);
+        limits.storage = storage;
     data[QString("limits")] = limits.toString();
 
     return m_core->editTask(id, data, token);

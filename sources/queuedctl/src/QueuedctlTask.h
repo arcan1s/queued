@@ -24,8 +24,10 @@
 
 namespace QueuedctlTask
 {
+long long addTask(const QueuedProcess::QueuedProcessDefinitions &_definitions,
+                  const QString &_token);
 QueuedProcess::QueuedProcessDefinitions
-getDefinitions(const QCommandLineParser &_parser);
+getDefinitions(const QCommandLineParser &_parser, const bool _expandAll);
 QVariant getTask(const long long _id, const QString &_property);
 void parserAdd(QCommandLineParser &_parser);
 void parserGet(QCommandLineParser &_parser);

@@ -21,25 +21,33 @@
 #include <queued/Queued.h>
 
 
-QueuedProcess::QueuedProcessDefinitions
-QueuedctlTask::getDefinitions(const QCommandLineParser &_parser)
+long long QueuedctlTask::addTask(
+    const QueuedProcess::QueuedProcessDefinitions &_definitions,
+    const QString &_token)
 {
+    qCDebug(LOG_APP) << "Add task" << _definitions.command;
+
+    return QueuedCoreAdaptor::sendTaskAdd(_definitions, _token);
+}
+
+
+QueuedProcess::QueuedProcessDefinitions
+QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
+                              const bool _expandAll)
+{
+    qCDebug(LOG_APP) << "Parse task definitions from parser, expand all"
+                     << _expandAll;
+
     QueuedProcess::QueuedProcessDefinitions definitions;
 
-    definitions.command = _parser.value("program");
     std::for_each(_parser.values("argument").cbegin(),
                   _parser.values("argument").cend(),
                   [&definitions](const QString &arg) {
                       if (!arg.isEmpty())
                           definitions.arguments += arg;
                   });
-    definitions.endTime
-        = QDateTime::fromString(_parser.value("stop"), Qt::ISODate);
-    definitions.gid = _parser.value("gid").toUInt();
+
     definitions.nice = _parser.value("nice").toUInt();
-    definitions.startTime
-        = QDateTime::fromString(_parser.value("start"), Qt::ISODate);
-    definitions.uid = _parser.value("uid").toUInt();
     definitions.user = _parser.value("task-user").toLongLong();
     definitions.workingDirectory = _parser.value("directory");
     // limits now
@@ -50,6 +58,17 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser)
         QueuedLimits::convertMemory(_parser.value("limit-gpumemory")),
         QueuedLimits::convertMemory(_parser.value("limit-storage")));
     definitions.limits = limits.toString();
+
+    // all options
+    if (_expandAll) {
+        definitions.command = _parser.value("program");
+        definitions.endTime
+            = QDateTime::fromString(_parser.value("stop"), Qt::ISODate);
+        definitions.gid = _parser.value("gid").toUInt();
+        definitions.startTime
+            = QDateTime::fromString(_parser.value("start"), Qt::ISODate);
+        definitions.uid = _parser.value("uid").toUInt();
+    }
 
     return definitions;
 }
@@ -73,8 +92,7 @@ void QueuedctlTask::parserAdd(QCommandLineParser &_parser)
                                       "Command line argument.", "argument", "");
     _parser.addOption(argumentOption);
     // working directory
-    QCommandLineOption directoryOption(QStringList() << "d"
-                                                     << "directory",
+    QCommandLineOption directoryOption("directory",
                                        "Command working directory.",
                                        "directory", QDir::currentPath());
     _parser.addOption(directoryOption);
@@ -131,10 +149,8 @@ void QueuedctlTask::parserSet(QCommandLineParser &_parser)
                                       "Command line argument.", "argument", "");
     _parser.addOption(argumentOption);
     // working directory
-    QCommandLineOption directoryOption(QStringList() << "d"
-                                                     << "directory",
-                                       "Command working directory.",
-                                       "directory", "");
+    QCommandLineOption directoryOption(
+        "directory", "Command working directory.", "directory", "");
     _parser.addOption(directoryOption);
     // user
     QCommandLineOption userOption("task-user", "Task user.", "task-user", "0");

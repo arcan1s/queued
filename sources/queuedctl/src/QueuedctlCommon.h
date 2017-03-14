@@ -22,14 +22,44 @@
 
 namespace QueuedctlCommon
 {
+// types and constants
+enum class QueuedctlArgument {
+    Invalid,
+    Auth,
+    OptionGet,
+    OptionSet,
+    TaskAdd,
+    TaskGet,
+    TaskSet,
+    UserAdd,
+    UserGet,
+    UserSet
+};
 typedef struct {
     bool status = false;
     QString output;
 } QueuedctlResult;
+typedef struct {
+    QueuedctlArgument id;
+    QString description;
+    int positionalArgsCount;
+} QueuedctlArgumentInfo;
+const QHash<QString, QueuedctlArgumentInfo> QueuedctlArguments
+    = {{"auth", {QueuedctlArgument::Auth, "Gets new auth token.", 1}},
+       {"option-get", {QueuedctlArgument::OptionGet, "Gets option value.", 2}},
+       {"option-set", {QueuedctlArgument::OptionSet, "Sets option value.", 3}},
+       {"task-add", {QueuedctlArgument::TaskAdd, "Adds new task.", 2}},
+       {"task-get", {QueuedctlArgument::TaskGet, "Gets task properties.", 3}},
+       {"task-set", {QueuedctlArgument::TaskSet, "Sets task properties.", 2}},
+       {"user-add", {QueuedctlArgument::UserAdd, "Adds new user."}},
+       {"user-get", {QueuedctlArgument::UserGet, "Gets user properties."}},
+       {"user-set", {QueuedctlArgument::UserSet, "Sets user properties."}}};
+// methods
 void checkArgs(const QStringList &_args, const int _count,
                QCommandLineParser &_parser);
+QString commandsHelp();
 void preprocess(const QStringList &_args, QCommandLineParser &_parser);
-void print(QueuedctlResult &_result);
+void print(const QueuedctlResult &_result);
 QueuedctlResult process(QCommandLineParser &_parser, const QString &_cache,
                         const QString &_user);
 };
