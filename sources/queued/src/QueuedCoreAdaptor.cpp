@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Evgeniy Alekseev
+ * Copyright (c) 2017 Evgeniy Alekseev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -33,10 +33,10 @@
 bool QueuedCoreAdaptor::auth(const QString &_token)
 {
     QVariantList args = {_token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/TryAuth",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "TryAuth", args)
+        .at(0)
         .toBool();
 }
 
@@ -49,9 +49,10 @@ QString QueuedCoreAdaptor::auth(const QString &_name, const QString &_password)
     qCDebug(LOG_DBUS) << "Auth user" << _name;
 
     QVariantList args = {_name, _password};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/Auth", args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "Auth", args)
+        .at(0)
         .toString();
 }
 
@@ -65,11 +66,12 @@ bool QueuedCoreAdaptor::sendOptionEdit(const QString &_key,
 {
     qCDebug(LOG_DBUS) << "Edit option" << _key << "to" << _value;
 
-    QVariantList args = {_key, _value, _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/OptionEdit",
-                                    args))
+    QVariantList args
+        = {_key, QVariant::fromValue(QDBusVariant(_value)), _token};
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "OptionEdit", args)
+        .at(0)
         .toBool();
 }
 
@@ -83,10 +85,10 @@ bool QueuedCoreAdaptor::sendPluginAdd(const QString &_plugin,
     qCDebug(LOG_DBUS) << "Add plugin" << _plugin;
 
     QVariantList args = {_plugin, _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/PluginAdd",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "PluginAdd", args)
+        .at(0)
         .toBool();
 }
 
@@ -100,10 +102,10 @@ bool QueuedCoreAdaptor::sendPluginRemove(const QString &_plugin,
     qCDebug(LOG_DBUS) << "Remove plugin" << _plugin;
 
     QVariantList args = {_plugin, _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/PluginRemove",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "PluginRemove", args)
+        .at(0)
         .toBool();
 }
 
@@ -128,10 +130,10 @@ long long QueuedCoreAdaptor::sendTaskAdd(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/TaskAdd",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "TaskAdd", args)
+        .at(0)
         .toLongLong();
 }
 
@@ -161,10 +163,10 @@ bool QueuedCoreAdaptor::sendTaskEdit(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/TaskEdit",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "TaskEdit", args)
+        .at(0)
         .toBool();
 }
 
@@ -178,10 +180,10 @@ bool QueuedCoreAdaptor::sendTaskStart(const long long _id,
     qCDebug(LOG_DBUS) << "Start task" << _id;
 
     QVariantList args = {_id, _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/TaskStart",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "TaskStart", args)
+        .at(0)
         .toBool();
 }
 
@@ -194,10 +196,10 @@ bool QueuedCoreAdaptor::sendTaskStop(const long long _id, const QString &_token)
     qCDebug(LOG_DBUS) << "Stop task" << _id;
 
     QVariantList args = {_id, _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/TaskStop",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "TaskStop", args)
+        .at(0)
         .toBool();
 }
 
@@ -222,10 +224,10 @@ long long QueuedCoreAdaptor::sendUserAdd(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/UserAdd",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "UserAdd", args)
+        .at(0)
         .toLongLong();
 }
 
@@ -250,10 +252,10 @@ bool QueuedCoreAdaptor::sendUserEdit(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/UserEdit",
-                                    args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "UserEdit", args)
+        .at(0)
         .toBool();
 }
 
@@ -269,10 +271,10 @@ bool QueuedCoreAdaptor::sendUserPermissionAdd(
                       << "to" << _id;
 
     QVariantList args = {_id, static_cast<uint>(_permission), _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE,
-                                    "/UserPermissionAdd", args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "UserPermissionAdd", args)
+        .at(0)
         .toBool();
 }
 
@@ -288,10 +290,10 @@ bool QueuedCoreAdaptor::sendUserPermissionRemove(
                       << "from" << _id;
 
     QVariantList args = {_id, static_cast<uint>(_permission), _token};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_OBJECT_PATH,
-                                    QueuedConfig::DBUS_SERVICE,
-                                    "/UserPermissionRemove", args))
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_OBJECT_PATH,
+                       QueuedConfig::DBUS_SERVICE, "UserPermissionRemove", args)
+        .at(0)
         .toBool();
 }
 
@@ -304,9 +306,10 @@ QVariant QueuedCoreAdaptor::getOption(const QString &_property)
     qCDebug(LOG_DBUS) << "Get option" << _property;
 
     QVariantList args = {_property};
-    return toNativeType(sendRequest(
-        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_PROPERTY_PATH,
-        QueuedConfig::DBUS_SERVICE, "/Option", args));
+    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
+                                    QueuedConfig::DBUS_PROPERTY_PATH,
+                                    QueuedConfig::DBUS_SERVICE, "Option", args)
+                            .at(0));
 }
 
 
@@ -321,7 +324,8 @@ QVariant QueuedCoreAdaptor::getTask(const long long _id,
     QVariantList args = {_id, _property};
     return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
                                     QueuedConfig::DBUS_PROPERTY_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/Task", args));
+                                    QueuedConfig::DBUS_SERVICE, "Task", args)
+                            .at(0));
 }
 
 
@@ -336,7 +340,8 @@ QVariant QueuedCoreAdaptor::getUser(const long long _id,
     QVariantList args = {_id, _property};
     return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
                                     QueuedConfig::DBUS_PROPERTY_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "/User", args));
+                                    QueuedConfig::DBUS_SERVICE, "User", args)
+                            .at(0));
 }
 
 

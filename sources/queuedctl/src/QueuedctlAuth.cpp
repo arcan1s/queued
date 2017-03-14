@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Evgeniy Alekseev
+ * Copyright (c) 2017 Evgeniy Alekseev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -64,7 +64,6 @@ QString QueuedctlAuth::getToken(const QString &_cache, const QString &_user)
 
 void QueuedctlAuth::parser(QCommandLineParser &_parser)
 {
-    _parser.clearPositionalArguments();
 }
 
 

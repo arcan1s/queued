@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Evgeniy Alekseev
+ * Copyright (c) 2017 Evgeniy Alekseev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -19,8 +19,7 @@
 
 #include <queued/Queued.h>
 
-#include "QueuedctlAuth.h"
-#include "QueuedctlOption.h"
+#include "QueuedctlCommon.h"
 #include "version.h"
 
 extern "C" {
@@ -64,31 +63,14 @@ int main(int argc, char *argv[])
                                   "user", ::getlogin());
     parser.addOption(userOption);
 
-    parser.addPositionalArgument("command", "Command to execute.");
+    parser.addPositionalArgument("command", "Command to execute.", "<command>");
 
     // pre-parse
     parser.parse(QCoreApplication::arguments());
     QStringList args = parser.positionalArguments();
-    QString command = args.isEmpty() ? QString() : args.first();
-
-    if (command == "auth") {
-        QueuedctlAuth::parser(parser);
-    } else if (command == "option-edit") {
-        QueuedctlOption::parser(parser);
-    } else if (command == "task-add") {
-        parser.clearPositionalArguments();
-    } else if (command == "task-edit") {
-        parser.clearPositionalArguments();
-    } else if (command == "user-add") {
-        parser.clearPositionalArguments();
-    } else if (command == "user-edit") {
-        parser.clearPositionalArguments();
-    } else {
-        parser.process(app);
-        qWarning() << "Unknown command" << command;
-        parser.showHelp(1);
-    }
-
+    parser.clearPositionalArguments();
+    QueuedctlCommon::preprocess(args, parser);
+    // parse
     parser.process(app);
 
     // show info and exit
@@ -103,5 +85,10 @@ int main(int argc, char *argv[])
     if (parser.isSet(debugOption))
         QueuedDebug::enableDebug();
 
-    return 0;
+    // process
+    auto result = QueuedctlCommon::process(parser, parser.value(tokenOption),
+                                           parser.value(userOption));
+    QueuedctlCommon::print(result);
+
+    return result.status ? 0 : 1;
 }

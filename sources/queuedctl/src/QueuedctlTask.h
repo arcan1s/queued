@@ -14,20 +14,26 @@
  */
 
 
-#ifndef QUEUEDCTLOPTION_H
-#define QUEUEDCTLOPTION_H
+#ifndef QUEUEDCTLTASK_H
+#define QUEUEDCTLTASK_H
 
 #include <QCommandLineParser>
 
+#include <queued/QueuedProcess.h>
 
-namespace QueuedctlOption
+
+namespace QueuedctlTask
 {
-bool editOption(const QString &_option, const QVariant &_value,
-                const QString &_token);
-QVariant getOption(const QString &_option);
+QueuedProcess::QueuedProcessDefinitions
+getDefinitions(const QCommandLineParser &_parser);
+QVariant getTask(const long long _id, const QString &_property);
+void parserAdd(QCommandLineParser &_parser);
 void parserGet(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
+bool setTask(const long long _id,
+             const QueuedProcess::QueuedProcessDefinitions &_definitions,
+             const QString &_token);
 };
 
 
-#endif /* QUEUEDCTLOPTION_H */
+#endif /* QUEUEDCTLTASK_H */

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016 Evgeniy Alekseev
+ * Copyright (c) 2017 Evgeniy Alekseev
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -52,7 +52,6 @@ int main(int argc, char *argv[])
             continue;
         ::daemon(0, 0);
     }
-
 
     QCoreApplication app(argc, argv);
     app.setApplicationName(NAME);

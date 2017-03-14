@@ -14,20 +14,25 @@
  */
 
 
-#ifndef QUEUEDCTLOPTION_H
-#define QUEUEDCTLOPTION_H
+#ifndef QUEUEDCTLCOMMON_H
+#define QUEUEDCTLCOMMON_H
 
 #include <QCommandLineParser>
 
 
-namespace QueuedctlOption
+namespace QueuedctlCommon
 {
-bool editOption(const QString &_option, const QVariant &_value,
-                const QString &_token);
-QVariant getOption(const QString &_option);
-void parserGet(QCommandLineParser &_parser);
-void parserSet(QCommandLineParser &_parser);
+typedef struct {
+    bool status = false;
+    QString output;
+} QueuedctlResult;
+void checkArgs(const QStringList &_args, const int _count,
+               QCommandLineParser &_parser);
+void preprocess(const QStringList &_args, QCommandLineParser &_parser);
+void print(QueuedctlResult &_result);
+QueuedctlResult process(QCommandLineParser &_parser, const QString &_cache,
+                        const QString &_user);
 };
 
 
-#endif /* QUEUEDCTLOPTION_H */
+#endif /* QUEUEDCTLCOMMON_H */
