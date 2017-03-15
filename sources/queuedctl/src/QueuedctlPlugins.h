@@ -14,22 +14,19 @@
  */
 
 
-#ifndef QUEUEDCTLAUTH_H
-#define QUEUEDCTLAUTH_H
+#ifndef QUEUEDCTLPLUGINS_H
+#define QUEUEDCTLPLUGINS_H
 
 #include <QCommandLineParser>
 
 
-namespace QueuedctlAuth
+namespace QueuedctlPlugins
 {
-QString auth(const QString &_user);
-QString getToken(const QString &_cache, const QString &_user);
+bool addPlugin(const QString &_plugin, const QString &_token);
+QStringList listPlugins();
+bool removePlugin(const QString &_plugin, const QString &_token);
 void parser(QCommandLineParser &_parser);
-void setToken(const QString &_token, const QString &_user,
-              const QString &_cache);
-QString token(const QString &_user, const QString &_cache);
-bool tryAuth(const QString &_token);
 };
 
 
-#endif /* QUEUEDCTLAUTH_H */
+#endif /* QUEUEDCTLPLUGINS_H */

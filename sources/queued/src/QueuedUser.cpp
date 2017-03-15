@@ -62,13 +62,13 @@ QueuedUser::~QueuedUser()
  * @fn addPermissions
  */
 QueuedEnums::Permissions
-QueuedUser::addPermissions(const QueuedEnums::Permissions _permissions)
+QueuedUser::addPermission(const QueuedEnums::Permission _permission)
 {
-    qCDebug(LOG_LIB) << "Add user permission" << _permissions;
+    qCDebug(LOG_LIB) << "Add user permission" << static_cast<uint>(_permission);
 
     setPermissions(
         static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
-        & _permissions);
+        | _permission);
 
     return static_cast<QueuedEnums::Permissions>(m_definitions.permissions);
 }
@@ -108,7 +108,7 @@ QPair<uint, uint> QueuedUser::ids()
 {
     QPair<uint, uint> system = {1, 1};
 
-    auto pwd = ::getpwnam(name().toLocal8Bit().constData());
+    auto pwd = ::getpwnam(qPrintable(name()));
     if (!pwd) {
         qCWarning(LOG_LIB) << "No user found by name" << name();
         return system;
@@ -129,13 +129,15 @@ bool QueuedUser::isPasswordValid(const QString &_password) const
 
 
 QueuedEnums::Permissions
-QueuedUser::removePermissions(const QueuedEnums::Permissions _permissions)
+QueuedUser::removePermission(const QueuedEnums::Permission _permission)
 {
-    qCDebug(LOG_LIB) << "Remove user permission" << _permissions;
+    qCDebug(LOG_LIB) << "Remove user permission"
+                     << static_cast<uint>(_permission);
 
-    setPermissions(
-        static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
-        & ~_permissions);
+    if (hasPermission(_permission))
+        setPermissions(
+            static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
+            ^ _permission);
 
     return static_cast<QueuedEnums::Permissions>(m_definitions.permissions);
 }

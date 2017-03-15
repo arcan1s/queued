@@ -67,6 +67,10 @@ QueuedPluginManager::convertOptionName(const QString &_key)
     qCDebug(LOG_PL) << "Convert option name" << _key;
 
     QStringList fields = _key.split('.');
+    if (fields.count() < 3) {
+        qCWarning(LOG_PL) << "Invalid option name" << _key;
+        return {"", ""};
+    }
     // Plugin.
     fields.takeFirst();
     // plugin name

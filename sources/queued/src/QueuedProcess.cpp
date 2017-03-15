@@ -164,6 +164,24 @@ QString QueuedProcess::limits() const
 
 
 /**
+ * @fn logError
+ */
+QString QueuedProcess::logError() const
+{
+    return QString("%1/%2-err.log").arg(workDirectory()).arg(name());
+}
+
+
+/**
+ * @fn logOutput
+ */
+QString QueuedProcess::logOutput() const
+{
+    return QString("%1/%2-out.log").arg(workDirectory()).arg(name());
+}
+
+
+/**
  * @fn nativeLimits
  */
 QueuedLimits::Limits QueuedProcess::nativeLimits() const
@@ -274,7 +292,7 @@ void QueuedProcess::setGid(const uint _gid)
 
 
 /**
- * setLimits
+ * @fn setLimits
  */
 void QueuedProcess::setLimits(const QString &_limits)
 {
@@ -282,6 +300,24 @@ void QueuedProcess::setLimits(const QString &_limits)
 
     m_definitions.limits = _limits;
     updateArguments();
+}
+
+
+/**
+ * @fn setLogError
+ */
+void QueuedProcess::setLogError(const QString &)
+{
+    setStandardErrorFile(logError(), QIODevice::Append);
+}
+
+
+/**
+ * @fn setLogOutput
+ */
+void QueuedProcess::setLogOutput(const QString &)
+{
+    setStandardOutputFile(logOutput(), QIODevice::Append);
 }
 
 
@@ -350,12 +386,8 @@ void QueuedProcess::setWorkDirectory(const QString &_workDirectory)
     qCDebug(LOG_LIB) << "Set working directory to" << _workDirectory;
 
     m_definitions.workingDirectory = _workDirectory;
-    setStandardErrorFile(
-        QString("%1/%2-err.log").arg(_workDirectory).arg(name()),
-        QIODevice::Append);
-    setStandardOutputFile(
-        QString("%1/%2-out.log").arg(_workDirectory).arg(name()),
-        QIODevice::Append);
+    setLogError("");
+    setLogOutput("");
     setWorkingDirectory(_workDirectory);
 }
 

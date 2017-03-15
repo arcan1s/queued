@@ -91,7 +91,7 @@ QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
 
     // check permissions
     bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
-    bool isUser = m_users->authorize(_token, QueuedEnums::Permission::JobOwner);
+    bool isUser = m_users->authorize(_token, QueuedEnums::Permission::Job);
     if (userAuthId == actualUserId) {
         // it means that user places task as own one
         if (!isUser) {
@@ -130,8 +130,8 @@ long long QueuedCore::addUser(const QString &_name, const QString &_email,
     }
 
     // check if already exists
-    auto user = m_users->user(_name, false);
-    if (user) {
+    auto userObj = user(_name);
+    if (userObj) {
         qCWarning(LOG_LIB) << "User" << _name << "already exists";
         return -1;
     }
@@ -214,7 +214,7 @@ bool QueuedCore::editTask(const long long _id, const QVariantHash &_taskData,
     }
     long long userAuthId = authUser->index();
     bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
-    bool isUser = m_users->authorize(_token, QueuedEnums::Permission::JobOwner);
+    bool isUser = m_users->authorize(_token, QueuedEnums::Permission::Job);
     if (userAuthId == task->user()) {
         // it means that user edits own task
         if (!isUser) {
@@ -254,8 +254,8 @@ bool QueuedCore::editUser(const long long _id, const QVariantHash &_userData,
 {
     qCDebug(LOG_LIB) << "Edit user with ID" << _id;
 
-    auto user = m_users->user(_id);
-    if (!user) {
+    auto userObj = user(_id);
+    if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
         return false;
     }
@@ -411,7 +411,7 @@ bool QueuedCore::stopTask(const long long _id, const QString &_token)
     }
     long long userAuthId = authUser->index();
     bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
-    bool isUser = m_users->authorize(_token, QueuedEnums::Permission::JobOwner);
+    bool isUser = m_users->authorize(_token, QueuedEnums::Permission::Job);
     if (userAuthId == task->user()) {
         // it means that user edits own task
         if (!isUser) {
@@ -451,6 +451,17 @@ const QueuedUser *QueuedCore::user(const long long _id)
     qCDebug(LOG_LIB) << "Get user by ID" << _id;
 
     return m_users->user(_id);
+}
+
+
+/**
+ * @fn user
+ */
+const QueuedUser *QueuedCore::user(const QString &_name)
+{
+    qCDebug(LOG_LIB) << "Get user by name" << _name;
+
+    return m_users->user(_name, false);
 }
 
 
@@ -789,13 +800,13 @@ long long QueuedCore::addTaskPrivate(const QString &_command,
 
     // add to database
     auto ids = m_users->ids(_userId);
-    auto user = m_users->user(_userId);
-    if (!user) {
+    auto userObj = user(_userId);
+    if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find task user" << _userId;
         return false;
     }
     auto taskLimits = QueuedLimits::minimalLimits(
-        _limits, user->nativeLimits(),
+        _limits, userObj->nativeLimits(),
         QueuedLimits::Limits(
             m_advancedSettings->get(QueuedConfig::QueuedSettings::DefaultLimits)
                 .toString()));
@@ -929,8 +940,7 @@ bool QueuedCore::editTaskPrivate(const long long _id,
 
     // modify values stored in memory
     for (auto &property : _taskData.keys())
-        task->setProperty(property.toLocal8Bit().constData(),
-                          _taskData[property]);
+        task->setProperty(qPrintable(property), _taskData[property]);
 
     return true;
 }
@@ -944,8 +954,8 @@ bool QueuedCore::editUserPrivate(const long long _id,
 {
     qCDebug(LOG_LIB) << "Edit user with ID" << _id;
 
-    auto user = m_users->user(_id);
-    if (!user) {
+    auto userObj = m_users->user(_id);
+    if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
         return false;
     };
@@ -960,8 +970,7 @@ bool QueuedCore::editUserPrivate(const long long _id,
 
     // modify values stored in memory
     for (auto &property : _userData.keys())
-        user->setProperty(property.toLocal8Bit().constData(),
-                          _userData[property]);
+        userObj->setProperty(qPrintable(property), _userData[property]);
 
     return true;
 }
@@ -977,19 +986,17 @@ bool QueuedCore::editUserPermissionPrivate(
     qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission)
                      << "for user" << _id << "add" << _add;
 
-    auto user = m_users->user(_id);
-    if (!user) {
+    auto userObj = m_users->user(_id);
+    if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
         return false;
     }
 
     // edit runtime permissions to get value
-    if (_add)
-        user->addPermissions(_permission);
-    else
-        user->removePermissions(_permission);
-    uint permissions = user->permissions();
-    qCInfo(LOG_LIB) << "New user permissions";
+    auto perms = _add ? userObj->addPermission(_permission)
+                      : userObj->removePermission(_permission);
+    uint permissions = static_cast<uint>(perms);
+    qCInfo(LOG_LIB) << "New user permissions" << perms << permissions;
 
     // modify in database now
     QVariantHash payload = {{"permissions", permissions}};
@@ -999,9 +1006,9 @@ bool QueuedCore::editUserPermissionPrivate(
                            << "in database, do not edit it in memory";
         // rollback in-memory values
         if (_add)
-            user->removePermissions(_permission);
+            userObj->removePermission(_permission);
         else
-            user->addPermissions(_permission);
+            userObj->addPermission(_permission);
         return false;
     }
 

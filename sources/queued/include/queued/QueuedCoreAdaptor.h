@@ -201,6 +201,13 @@ QVariant getTask(const long long _id, const QString &_property);
  * @return user property value
  */
 QVariant getUser(const long long _id, const QString &_property);
+/**
+ * @brief get user ID
+ * @param _name
+ * user name
+ * @return user ID or {0, -1} if no user found
+ */
+long long getUserId(const QString &_name);
 // common methods
 /**
  * @brief common DBus request

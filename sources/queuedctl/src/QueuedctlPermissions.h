@@ -14,22 +14,20 @@
  */
 
 
-#ifndef QUEUEDCTLAUTH_H
-#define QUEUEDCTLAUTH_H
+#ifndef QUEUEDCTLPERMISSIONS_H
+#define QUEUEDCTLPERMISSIONS_H
 
 #include <QCommandLineParser>
 
 
-namespace QueuedctlAuth
+namespace QueuedctlPermissions
 {
-QString auth(const QString &_user);
-QString getToken(const QString &_cache, const QString &_user);
+bool addPermission(const long long _id, const QString &_permission,
+                   const QString &_token);
+bool removePermission(const long long _id, const QString &_permission,
+                      const QString &_token);
 void parser(QCommandLineParser &_parser);
-void setToken(const QString &_token, const QString &_user,
-              const QString &_cache);
-QString token(const QString &_user, const QString &_cache);
-bool tryAuth(const QString &_token);
 };
 
 
-#endif /* QUEUEDCTLAUTH_H */
+#endif /* QUEUEDCTLPERMISSIONS_H */

@@ -204,18 +204,15 @@ qlonglong
 QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
                              const QString &password, const uint permissions,
                              const qlonglong cpu, const qlonglong gpu,
-                             const QString &memory, const QString &gpumemory,
-                             const QString &storage, const QString &token)
+                             const qlonglong memory, const qlonglong gpumemory,
+                             const qlonglong storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new user with paramaters" << name << email
                       << permissions;
 
     return m_core->addUser(
         name, email, password, permissions,
-        QueuedLimits::Limits(cpu, gpu, QueuedLimits::convertMemory(memory),
-                             QueuedLimits::convertMemory(gpumemory),
-                             QueuedLimits::convertMemory(storage)),
-        token);
+        QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token);
 }
 
 
@@ -225,9 +222,10 @@ QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
 bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
                                    const QString &password,
                                    const QString &email, const qlonglong cpu,
-                                   const qlonglong gpu, const QString &memory,
-                                   const QString &gpumemory,
-                                   const QString &storage, const QString &token)
+                                   const qlonglong gpu, const qlonglong memory,
+                                   const qlonglong gpumemory,
+                                   const qlonglong storage,
+                                   const QString &token)
 {
     qCDebug(LOG_DBUS) << "Edit user" << id << name << email << cpu << gpu
                       << memory << gpumemory << storage;
@@ -254,11 +252,11 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
     if (gpu > -1)
         limits.gpu = gpu;
     if (memory > -1)
-        limits.memory = QueuedLimits::convertMemory(memory);
+        limits.memory = memory;
     if (gpumemory > -1)
-        limits.gpumemory = QueuedLimits::convertMemory(gpumemory);
+        limits.gpumemory = gpumemory;
     if (storage > -1)
-        limits.storage = QueuedLimits::convertMemory(storage);
+        limits.storage = storage;
     data[QString("limits")] = limits.toString();
 
     return m_core->editUser(id, data, token);

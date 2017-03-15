@@ -28,9 +28,16 @@ enum class QueuedctlArgument {
     Auth,
     OptionGet,
     OptionSet,
+    PermissionAdd,
+    PermissionRemove,
+    PluginAdd,
+    PluginList,
+    PluginRemove,
     TaskAdd,
     TaskGet,
     TaskSet,
+    TaskStart,
+    TaskStop,
     UserAdd,
     UserGet,
     UserSet
@@ -44,20 +51,32 @@ typedef struct {
     QString description;
     int positionalArgsCount;
 } QueuedctlArgumentInfo;
-const QHash<QString, QueuedctlArgumentInfo> QueuedctlArguments
-    = {{"auth", {QueuedctlArgument::Auth, "Gets new auth token.", 1}},
-       {"option-get", {QueuedctlArgument::OptionGet, "Gets option value.", 2}},
-       {"option-set", {QueuedctlArgument::OptionSet, "Sets option value.", 3}},
-       {"task-add", {QueuedctlArgument::TaskAdd, "Adds new task.", 2}},
-       {"task-get", {QueuedctlArgument::TaskGet, "Gets task properties.", 3}},
-       {"task-set", {QueuedctlArgument::TaskSet, "Sets task properties.", 2}},
-       {"user-add", {QueuedctlArgument::UserAdd, "Adds new user."}},
-       {"user-get", {QueuedctlArgument::UserGet, "Gets user properties."}},
-       {"user-set", {QueuedctlArgument::UserSet, "Sets user properties."}}};
+const QHash<QString, QueuedctlArgumentInfo> QueuedctlArguments = {
+    {"auth", {QueuedctlArgument::Auth, "Gets new auth token.", 1}},
+    {"option-get", {QueuedctlArgument::OptionGet, "Gets option value.", 2}},
+    {"option-set", {QueuedctlArgument::OptionSet, "Sets option value.", 3}},
+    {"perm-add",
+     {QueuedctlArgument::PermissionAdd, "Sets user permission.", 3}},
+    {"perm-remove",
+     {QueuedctlArgument::PermissionRemove, "Removes user permission.", 3}},
+    {"plugin-add", {QueuedctlArgument::PluginAdd, "Adds plugin to load.", 2}},
+    {"plugin-list",
+     {QueuedctlArgument::PluginList, "Shows enabled plugins.", 1}},
+    {"plugin-remove",
+     {QueuedctlArgument::PluginRemove, "Removes plugin to load.", 2}},
+    {"task-add", {QueuedctlArgument::TaskAdd, "Adds new task.", 2}},
+    {"task-get", {QueuedctlArgument::TaskGet, "Gets task properties.", 3}},
+    {"task-set", {QueuedctlArgument::TaskSet, "Sets task properties.", 2}},
+    {"task-start", {QueuedctlArgument::TaskStart, "Starts task.", 2}},
+    {"task-stop", {QueuedctlArgument::TaskStop, "Stops task.", 2}},
+    {"user-add", {QueuedctlArgument::UserAdd, "Adds new user.", 2}},
+    {"user-get", {QueuedctlArgument::UserGet, "Gets user properties.", 3}},
+    {"user-set", {QueuedctlArgument::UserSet, "Sets user properties.", 2}}};
 // methods
 void checkArgs(const QStringList &_args, const int _count,
                QCommandLineParser &_parser);
 QString commandsHelp();
+QString hashToString(const QVariantHash &_hash);
 void preprocess(const QStringList &_args, QCommandLineParser &_parser);
 void print(const QueuedctlResult &_result);
 QueuedctlResult process(QCommandLineParser &_parser, const QString &_cache,

@@ -14,31 +14,30 @@
  */
 
 
-#ifndef QUEUEDCTLTASK_H
-#define QUEUEDCTLTASK_H
+#ifndef QUEUEDCTLUSER_H
+#define QUEUEDCTLUSER_H
 
 #include <QCommandLineParser>
 
-#include <queued/QueuedProcess.h>
+#include <queued/QueuedUser.h>
 
 
-namespace QueuedctlTask
+namespace QueuedctlUser
 {
-long long addTask(const QueuedProcess::QueuedProcessDefinitions &_definitions,
+long long addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
                   const QString &_token);
-QueuedProcess::QueuedProcessDefinitions
+QueuedUser::QueuedUserDefinitions
 getDefinitions(const QCommandLineParser &_parser, const bool _expandAll);
-QVariant getTask(const long long _id, const QString &_property);
+QString getPassword();
+QVariant getUser(const long long _id, const QString &_property);
+long long getUserId(const QString &_name);
 void parserAdd(QCommandLineParser &_parser);
 void parserGet(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
-void parserStart(QCommandLineParser &_parser);
-bool setTask(const long long _id,
-             const QueuedProcess::QueuedProcessDefinitions &_definitions,
+bool setUser(const long long _id,
+             const QueuedUser::QueuedUserDefinitions &_definitions,
              const QString &_token);
-bool startTask(const long long _id, const QString &_token);
-bool stopTask(const long long _id, const QString &_token);
 };
 
 
-#endif /* QUEUEDCTLTASK_H */
+#endif /* QUEUEDCTLUSER_H */

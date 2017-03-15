@@ -212,8 +212,8 @@ public slots:
     qlonglong UserAdd(const QString &name, const QString &email,
                       const QString &password, const uint permissions,
                       const qlonglong cpu, const qlonglong gpu,
-                      const QString &memory, const QString &gpumemory,
-                      const QString &storage, const QString &token);
+                      const qlonglong memory, const qlonglong gpumemory,
+                      const qlonglong storage, const QString &token);
     /**
      * @brief edit user
      * @param id
@@ -241,8 +241,8 @@ public slots:
     bool UserEdit(const qlonglong id, const QString &name,
                   const QString &password, const QString &email,
                   const qlonglong cpu, const qlonglong gpu,
-                  const QString &memory, const QString &gpumemory,
-                  const QString &storage, const QString &token);
+                  const qlonglong memory, const qlonglong gpumemory,
+                  const qlonglong storage, const QString &token);
     /**
      * @brief add permission to user
      * @param id

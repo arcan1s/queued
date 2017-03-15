@@ -20,29 +20,14 @@
 
 #include <queued/Queued.h>
 
-extern "C" {
-#include <termios.h>
-#include <unistd.h>
-}
+#include "QueuedctlUser.h"
 
 
 QString QueuedctlAuth::auth(const QString &_user)
 {
     qCDebug(LOG_APP) << "Auth as user" << _user;
 
-    // read password
-    // do not show input characters
-    struct termios tty;
-    ::tcgetattr(STDIN_FILENO, &tty);
-    tty.c_lflag &= ~ECHO;
-    tcsetattr(STDIN_FILENO, TCSANOW, &tty);
-
-    qInfo() << "Password for" << _user;
-    QTextStream stream(stdin);
-    QString password;
-    stream >> password;
-
-    return QueuedCoreAdaptor::auth(_user, password);
+    return QueuedCoreAdaptor::auth(_user, QueuedctlUser::getPassword());
 }
 
 
@@ -51,12 +36,12 @@ QString QueuedctlAuth::getToken(const QString &_cache, const QString &_user)
     qCDebug(LOG_APP) << "Get token using cache" << _cache << "and user"
                      << _user;
 
-    QString tokenId = token(_cache);
+    QString tokenId = token(_user, _cache);
     if (tryAuth(tokenId)) {
         return tokenId;
     } else {
         tokenId = auth(_user);
-        setToken(tokenId, _cache);
+        setToken(tokenId, _user, _cache);
         return getToken(_cache, _user);
     }
 }
@@ -67,12 +52,13 @@ void QueuedctlAuth::parser(QCommandLineParser &_parser)
 }
 
 
-void QueuedctlAuth::setToken(const QString &_token, const QString &_cache)
+void QueuedctlAuth::setToken(const QString &_token, const QString &_user,
+                             const QString &_cache)
 {
-    qCDebug(LOG_APP) << "Save token to" << _cache;
+    qCDebug(LOG_APP) << "Save token to" << _cache << "from user" << _user;
 
     QSettings settings(_cache, QSettings::IniFormat);
-    settings.beginGroup("queuedctl");
+    settings.beginGroup(QString("queuedctl/%1").arg(_user));
     settings.setValue("Token", _token);
     settings.endGroup();
 
@@ -80,14 +66,14 @@ void QueuedctlAuth::setToken(const QString &_token, const QString &_cache)
 }
 
 
-QString QueuedctlAuth::token(const QString &_cache)
+QString QueuedctlAuth::token(const QString &_user, const QString &_cache)
 {
-    qCDebug(LOG_APP) << "Load token from" << _cache;
+    qCDebug(LOG_APP) << "Load token from" << _cache << "for user" << _user;
 
     QString token;
 
     QSettings settings(_cache, QSettings::IniFormat);
-    settings.beginGroup("queuedctl");
+    settings.beginGroup(QString("queuedctl/%1").arg(_user));
     token = settings.value("Token").toString();
     settings.endGroup();
 

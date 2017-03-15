@@ -23,6 +23,8 @@
 
 #include "queued/Queued.h"
 
+#include <QMetaProperty>
+
 
 /**
  * @class QueuedCorePropertiesInterface
@@ -72,7 +74,11 @@ QDBusVariant QueuedCorePropertiesInterface::Task(const long long id,
         return QDBusVariant();
     }
 
-    return QDBusVariant(task->property(property.toLocal8Bit().constData()));
+    if (property.isEmpty())
+        return QDBusVariant(
+            QVariant::fromValue<QVariantHash>(getProperties(task)));
+    else
+        return QDBusVariant(task->property(qPrintable(property)));
 }
 
 
@@ -90,5 +96,50 @@ QDBusVariant QueuedCorePropertiesInterface::User(const long long id,
         return QDBusVariant();
     }
 
-    return QDBusVariant(user->property(property.toLocal8Bit().constData()));
+    if (property.isEmpty())
+        return QDBusVariant(
+            QVariant::fromValue<QVariantHash>(getProperties(user)));
+    else
+        return QDBusVariant(user->property(qPrintable(property)));
+}
+
+
+/**
+ * @fn UserIdByName
+ */
+qlonglong QueuedCorePropertiesInterface::UserIdByName(const QString &name)
+{
+    qCDebug(LOG_DBUS) << "Look for user ID" << name;
+
+    auto user = m_core->user(name);
+    if (!user) {
+        qCWarning(LOG_DBUS) << "Could not find user" << name;
+        return -1;
+    }
+
+    return user->index();
+}
+
+
+/**
+ * @fn getProperties
+ */
+QVariantHash
+QueuedCorePropertiesInterface::getProperties(const QObject *_object)
+{
+    qCDebug(LOG_DBUS) << "Get all properties from" << _object->objectName();
+
+    QVariantHash result;
+
+    auto meta = _object->metaObject();
+    int count = meta->propertyCount();
+    for (int i = 0; i < count; i++) {
+        QMetaProperty prop = meta->property(i);
+        auto name = prop.name();
+        if (QString(name) == "objectName")
+            continue;
+        result[name] = _object->property(name);
+    }
+
+    return result;
 }

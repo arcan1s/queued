@@ -45,7 +45,6 @@ class QueuedUser : public QObject
     Q_PROPERTY(uint permissions READ permissions WRITE setPermissions)
     // limits
     Q_PROPERTY(QString limits READ limits WRITE setLimits)
-    Q_PROPERTY(QueuedLimits::Limits nativeLimtis READ nativeLimits)
 
 public:
     /**
@@ -89,12 +88,12 @@ public:
     // methods
     /**
      * @brief add permissions to user
-     * @param _permissions
-     * new user permissions
+     * @param _permission
+     * new user permission
      * @return current user permissions
      */
     QueuedEnums::Permissions
-    addPermissions(const QueuedEnums::Permissions _permissions);
+    addPermission(const QueuedEnums::Permission _permission);
     /**
      * @brief generates SHA512 hash from given password
      * @param _password
@@ -123,12 +122,12 @@ public:
     bool isPasswordValid(const QString &_password) const;
     /**
      * @brief remove permissions from user
-     * @param _permissions
-     * permissions to remove
+     * @param _permission
+     * permission to remove
      * @return current user permissions
      */
     QueuedEnums::Permissions
-    removePermissions(const QueuedEnums::Permissions _permissions);
+    removePermission(const QueuedEnums::Permission _permission);
     // main properties
     /**
      * @brief user email

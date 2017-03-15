@@ -24,6 +24,8 @@
 #ifndef QUEUEDENUMS_H
 #define QUEUEDENUMS_H
 
+#include <QHash>
+
 
 /**
  * @addtogroup QueuedEnums
@@ -34,26 +36,48 @@ namespace QueuedEnums
 /**
  * @enum Permission
  * @brief available user permissions
+ * @var Permission::Invalid
+ * invalid permission
  * @var Permission::SuperAdmin
  * "allow all" permissions
  * @var Permission::Admin
  * administrative permissions
- * @var Permission::JobOwner
- * owner job related permissions
+ * @var Permission::Job
+ * job related permissions
  * @var Permission::Web
  * web server access
  * @var Permission::Reports
  * access to reports
  */
 enum class Permission {
+    Invalid = 1 << 0,
     SuperAdmin = 1 << 1,
     Admin = 1 << 2,
-    JobOwner = 1 << 3,
+    Job = 1 << 3,
     Web = 1 << 4,
     Reports = 1 << 5
 };
 Q_DECLARE_FLAGS(Permissions, Permission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
+const QHash<QString, Permission> PermissionMap = {
+    {"superadmin", Permission::SuperAdmin},
+    {"admin", Permission::Admin},
+    {"job", Permission::Job},
+    {"web", Permission::Web},
+    {"reports", Permission::Reports},
+};
+/**
+ * @brief converts string to permission enum
+ * @param _permission
+ * permission string
+ * @return related Permission value
+ */
+inline Permission stringToPermission(const QString &_permission)
+{
+    return PermissionMap.contains(_permission.toLower())
+               ? PermissionMap[_permission.toLower()]
+               : Permission::Invalid;
+};
 /**
  * @enum ExitAction
  * @brief action with child process on destruction

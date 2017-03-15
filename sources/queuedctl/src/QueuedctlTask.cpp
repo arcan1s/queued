@@ -20,6 +20,12 @@
 
 #include <queued/Queued.h>
 
+#include "QueuedctlUser.h"
+
+extern "C" {
+#include <unistd.h>
+}
+
 
 long long QueuedctlTask::addTask(
     const QueuedProcess::QueuedProcessDefinitions &_definitions,
@@ -48,7 +54,10 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
                   });
 
     definitions.nice = _parser.value("nice").toUInt();
-    definitions.user = _parser.value("task-user").toLongLong();
+    definitions.user
+        = _parser.value("task-user").isEmpty()
+              ? 0
+              : QueuedctlUser::getUserId(_parser.value("task-user"));
     definitions.workingDirectory = _parser.value("directory");
     // limits now
     QueuedLimits::Limits limits(
@@ -68,6 +77,9 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
         definitions.startTime
             = QDateTime::fromString(_parser.value("start"), Qt::ISODate);
         definitions.uid = _parser.value("uid").toUInt();
+    } else {
+        // queuedctl -- task-add /path/to/application
+        definitions.command = _parser.positionalArguments().at(1);
     }
 
     return definitions;
@@ -78,7 +90,11 @@ QVariant QueuedctlTask::getTask(const long long _id, const QString &_property)
 {
     qCDebug(LOG_APP) << "Get property" << _property << "from task" << _id;
 
-    return QueuedCoreAdaptor::getTask(_id, _property);
+    auto value = QueuedCoreAdaptor::getTask(_id, _property);
+    if (_property.isEmpty())
+        return qdbus_cast<QVariantHash>(value.value<QDBusArgument>());
+    else
+        return value;
 }
 
 
@@ -97,8 +113,8 @@ void QueuedctlTask::parserAdd(QCommandLineParser &_parser)
                                        "directory", QDir::currentPath());
     _parser.addOption(directoryOption);
     // user
-    // TODO grab used user ID
-    QCommandLineOption userOption("task-user", "Task user.", "task-user", "0");
+    QCommandLineOption userOption("task-user", "Task user.", "task-user",
+                                  ::getlogin());
     _parser.addOption(userOption);
     // nice
     QCommandLineOption niceOption("nice", "Task nice level.", "nice", "0");
@@ -153,7 +169,7 @@ void QueuedctlTask::parserSet(QCommandLineParser &_parser)
         "directory", "Command working directory.", "directory", "");
     _parser.addOption(directoryOption);
     // user
-    QCommandLineOption userOption("task-user", "Task user.", "task-user", "0");
+    QCommandLineOption userOption("task-user", "Task user.", "task-user", "");
     _parser.addOption(userOption);
     // nice
     QCommandLineOption niceOption("nice", "Task nice level.", "nice", "0");
@@ -193,6 +209,12 @@ void QueuedctlTask::parserSet(QCommandLineParser &_parser)
 }
 
 
+void QueuedctlTask::parserStart(QCommandLineParser &_parser)
+{
+    _parser.addPositionalArgument("id", "Task ID.", "<id>");
+}
+
+
 bool QueuedctlTask::setTask(
     const long long _id,
     const QueuedProcess::QueuedProcessDefinitions &_definitions,
@@ -201,4 +223,20 @@ bool QueuedctlTask::setTask(
     qCDebug(LOG_APP) << "Edit task" << _id;
 
     return QueuedCoreAdaptor::sendTaskEdit(_id, _definitions, _token);
+}
+
+
+bool QueuedctlTask::startTask(const long long _id, const QString &_token)
+{
+    qCDebug(LOG_APP) << "Start task" << _id;
+
+    return QueuedCoreAdaptor::sendTaskStart(_id, _token);
+}
+
+
+bool QueuedctlTask::stopTask(const long long _id, const QString &_token)
+{
+    qCDebug(LOG_APP) << "Stop task" << _id;
+
+    return QueuedCoreAdaptor::sendTaskStop(_id, _token);
 }

@@ -22,7 +22,10 @@
 
 
 #include "queued/Queued.h"
-#include <queued/Queued.h>
+
+extern "C" {
+#include <unistd.h>
+}
 
 
 /**
@@ -361,6 +364,10 @@ void QueuedProcessManager::taskFinished(const int _exitCode,
 
     auto pr = process(_index);
     if (pr) {
+        // change log rights to valid one
+        ::chown(qPrintable(pr->logError()), pr->uid(), pr->gid());
+        ::chown(qPrintable(pr->logOutput()), pr->uid(), pr->gid());
+        // remove task
         auto endTime = QDateTime::currentDateTimeUtc();
         remove(_index);
         emit(taskStopTimeReceived(_index, endTime));

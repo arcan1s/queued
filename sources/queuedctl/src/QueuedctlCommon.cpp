@@ -20,7 +20,10 @@
 
 #include "QueuedctlAuth.h"
 #include "QueuedctlOption.h"
+#include "QueuedctlPermissions.h"
+#include "QueuedctlPlugins.h"
 #include "QueuedctlTask.h"
+#include "QueuedctlUser.h"
 
 
 void QueuedctlCommon::checkArgs(const QStringList &_args, const int _count,
@@ -47,6 +50,21 @@ QString QueuedctlCommon::commandsHelp()
             QueuedctlArguments[cmd].description);
 
     return cmdList.join('\n');
+}
+
+
+QString QueuedctlCommon::hashToString(const QVariantHash &_hash)
+{
+    qCDebug(LOG_APP) << "Convert hash to string" << _hash;
+
+    QStringList output;
+    QStringList keys = _hash.keys();
+    keys.sort();
+    for (auto &key : keys)
+        output += QString("%1: %2").arg(key).arg(
+            _hash[key].toString().replace('\n', ' '));
+
+    return output.join('\n');
 }
 
 
@@ -77,6 +95,16 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
     case QueuedctlArgument::OptionSet:
         QueuedctlOption::parserSet(_parser);
         break;
+    case QueuedctlArgument::PermissionAdd:
+    case QueuedctlArgument::PermissionRemove:
+        QueuedctlPermissions::parser(_parser);
+        break;
+    case QueuedctlArgument::PluginAdd:
+    case QueuedctlArgument::PluginRemove:
+        QueuedctlPlugins::parser(_parser);
+        break;
+    case QueuedctlArgument::PluginList:
+        break;
     case QueuedctlArgument::TaskAdd:
         QueuedctlTask::parserAdd(_parser);
         break;
@@ -86,11 +114,18 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
     case QueuedctlArgument::TaskSet:
         QueuedctlTask::parserSet(_parser);
         break;
+    case QueuedctlArgument::TaskStart:
+    case QueuedctlArgument::TaskStop:
+        QueuedctlTask::parserStart(_parser);
+        break;
     case QueuedctlArgument::UserAdd:
+        QueuedctlUser::parserAdd(_parser);
         break;
     case QueuedctlArgument::UserGet:
+        QueuedctlUser::parserGet(_parser);
         break;
     case QueuedctlArgument::UserSet:
+        QueuedctlUser::parserSet(_parser);
         break;
     case QueuedctlArgument::Invalid:
         checkArgs(_args, -1, _parser);
@@ -129,7 +164,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         QString token = QueuedctlAuth::auth(_user);
         result.status = !token.isEmpty();
         if (result.status)
-            QueuedctlAuth::setToken(token, _cache);
+            QueuedctlAuth::setToken(token, _user, _cache);
         break;
     }
     case QueuedctlArgument::OptionGet: {
@@ -150,6 +185,61 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                                 .arg(args.at(1), args.at(2));
         break;
     }
+    case QueuedctlArgument::PermissionAdd: {
+        auto userId = QueuedctlUser::getUserId(args.at(1));
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status
+            = QueuedctlPermissions::addPermission(userId, args.at(2), token);
+        if (result.status)
+            result.output = QString("Add permission %2 to user %1")
+                                .arg(args.at(1))
+                                .arg(args.at(2));
+        else
+            result.output = QString("Could not add permission %2 to user %1")
+                                .arg(args.at(1))
+                                .arg(args.at(2));
+        break;
+    }
+    case QueuedctlArgument::PermissionRemove: {
+        auto userId = QueuedctlUser::getUserId(args.at(1));
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status
+            = QueuedctlPermissions::removePermission(userId, args.at(2), token);
+        if (result.status)
+            result.output = QString("Remove permission %2 from user %1")
+                                .arg(args.at(1))
+                                .arg(args.at(2));
+        else
+            result.output
+                = QString("Could not remove permission %2 from user %1")
+                      .arg(args.at(1))
+                      .arg(args.at(2));
+        break;
+    }
+    case QueuedctlArgument::PluginAdd: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status = QueuedctlPlugins::addPlugin(args.at(1), token);
+        if (result.status)
+            result.output = QString("Add plugin %1").arg(args.at(1));
+        else
+            result.output = QString("Could not add plugin %1").arg(args.at(1));
+        break;
+    }
+    case QueuedctlArgument::PluginList: {
+        result.status = true;
+        result.output = QueuedctlPlugins::listPlugins().join('\n');
+        break;
+    }
+    case QueuedctlArgument::PluginRemove: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status = QueuedctlPlugins::removePlugin(args.at(1), token);
+        if (result.status)
+            result.output = QString("Remove plugin %1").arg(args.at(1));
+        else
+            result.output
+                = QString("Could not remove plugin %1").arg(args.at(1));
+        break;
+    }
     case QueuedctlArgument::TaskAdd: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlTask::getDefinitions(_parser, false);
@@ -165,7 +255,8 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         QVariant value
             = QueuedctlTask::getTask(args.at(1).toLongLong(), args.at(2));
         result.status = value.isValid();
-        result.output = value.toString();
+        result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
+                                             : value.toString();
         break;
     }
     case QueuedctlArgument::TaskSet: {
@@ -175,13 +266,41 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                                                definitions, token);
         break;
     }
+    case QueuedctlArgument::TaskStart: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status
+            = QueuedctlTask::startTask(args.at(1).toLongLong(), token);
+        break;
+    }
+    case QueuedctlArgument::TaskStop: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status = QueuedctlTask::stopTask(args.at(1).toLongLong(), token);
+        break;
+    }
     case QueuedctlArgument::UserAdd: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        auto definitions = QueuedctlUser::getDefinitions(_parser, false);
+        long long id = QueuedctlUser::addUser(definitions, token);
+        result.status = (id > 0);
+        if (result.status)
+            result.output = QString("User %1 added").arg(id);
+        else
+            result.output = QString("Could not add user");
         break;
     }
     case QueuedctlArgument::UserGet: {
+        auto userId = QueuedctlUser::getUserId(args.at(1));
+        QVariant value = QueuedctlUser::getUser(userId, args.at(2));
+        result.status = value.isValid();
+        result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
+                                             : value.toString();
         break;
     }
     case QueuedctlArgument::UserSet: {
+        auto userId = QueuedctlUser::getUserId(args.at(1));
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        auto definitions = QueuedctlUser::getDefinitions(_parser, true);
+        result.status = QueuedctlUser::setUser(userId, definitions, token);
         break;
     }
     case QueuedctlArgument::Invalid: {

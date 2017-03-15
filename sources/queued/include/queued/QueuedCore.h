@@ -235,6 +235,13 @@ public:
      * @return user object or nullptr if no user found
      */
     const QueuedUser *user(const long long _id);
+    /**
+     * @brief get user by name
+     * @param _name
+     * user name
+     * @return user object or nullptr if no user found
+     */
+    const QueuedUser *user(const QString &_name);
     // control methods
     /**
      * @brief deinit subclasses
