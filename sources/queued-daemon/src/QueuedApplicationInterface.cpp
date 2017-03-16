@@ -18,7 +18,7 @@
 
 #include <QCoreApplication>
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include "QueuedApplication.h"
 

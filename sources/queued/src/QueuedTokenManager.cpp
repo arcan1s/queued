@@ -21,7 +21,7 @@
  */
 
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include <QTimer>
 #include <QUuid>
@@ -97,7 +97,7 @@ void QueuedTokenManager::loadTokens(const QList<QVariantHash> &_values)
 
     for (auto &token : _values) {
         QDateTime validUntil = QDateTime::fromString(
-            token[QString("validUntil")].toString(), Qt::ISODate);
+            token[QString("validUntil")].toString(), Qt::ISODateWithMs);
         loadToken({token[QString("token")].toString(),
                    token[QString("user")].toString(), validUntil});
     }

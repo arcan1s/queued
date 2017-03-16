@@ -21,6 +21,8 @@
 
 #include <queued/Queued.h>
 
+#include <iostream>
+
 #include "QueuedApplication.h"
 #include "version.h"
 
@@ -51,7 +53,9 @@ int main(int argc, char *argv[])
         if (std::string(argv[i]) != "--daemon")
             continue;
         ::daemon(0, 0);
+        break;
     }
+    QueuedDebug::applyLogFormat();
 
     QCoreApplication app(argc, argv);
     app.setApplicationName(NAME);
@@ -93,13 +97,13 @@ int main(int argc, char *argv[])
     if (parser.isSet(infoOption)) {
         auto metadata = QueuedDebug::getBuildData();
         for (auto &string : metadata)
-            QDebug(QtMsgType::QtInfoMsg).noquote() << string;
+            std::cout << qPrintable(string) << std::endl;
         return 0;
     }
 
     // check if exists
     if (existingSessionOperation(QString("Active"))) {
-        qWarning() << "Another session is active";
+        qCWarning(LOG_APP) << "Another session is active";
         return 1;
     }
 

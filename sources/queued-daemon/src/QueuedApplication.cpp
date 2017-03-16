@@ -19,7 +19,7 @@
 #include <QDBusConnection>
 #include <QDBusMessage>
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include "QueuedApplicationInterface.h"
 
@@ -28,10 +28,7 @@ QueuedApplication::QueuedApplication(QObject *parent, const QVariantHash &args)
     : QObject(parent)
     , m_configuration(args)
 {
-    qSetMessagePattern(QueuedDebug::LOG_FORMAT);
     qCDebug(LOG_APP) << __PRETTY_FUNCTION__;
-    for (auto &metadata : QueuedDebug::getBuildData())
-        qCDebug(LOG_APP) << metadata;
 
     init();
     initDBus();

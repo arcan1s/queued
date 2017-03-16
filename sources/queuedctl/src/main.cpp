@@ -19,6 +19,8 @@
 
 #include <queued/Queued.h>
 
+#include <iostream>
+
 #include "QueuedctlCommon.h"
 #include "version.h"
 
@@ -29,6 +31,8 @@ extern "C" {
 
 int main(int argc, char *argv[])
 {
+    QueuedDebug::applyLogFormat();
+
     QCoreApplication app(argc, argv);
     app.setApplicationName(NAME);
     app.setApplicationVersion(VERSION);
@@ -81,13 +85,12 @@ int main(int argc, char *argv[])
     if (parser.isSet(infoOption)) {
         auto metadata = QueuedDebug::getBuildData();
         for (auto &string : metadata)
-            QDebug(QtMsgType::QtInfoMsg).noquote() << string;
+            std::cout << qPrintable(string) << std::endl;
         return 0;
     }
     if (parser.isSet(commandsOption)) {
-        QDebug(QtMsgType::QtInfoMsg).noquote() << parser.helpText();
-        QDebug(QtMsgType::QtInfoMsg).noquote()
-            << QueuedctlCommon::commandsHelp();
+        std::cout << qPrintable(parser.helpText()) << std::endl;
+        std::cout << qPrintable(QueuedctlCommon::commandsHelp()) << std::endl;
         return 0;
     }
 

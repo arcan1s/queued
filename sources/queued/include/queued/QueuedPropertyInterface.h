@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file QueuedCorePropertiesInterface.h
+ * @file QueuedPropertyInterface.h
  * Header of Queued library
  * @author Evgeniy Alekseev
  * @copyright MIT
@@ -21,8 +21,8 @@
  */
 
 
-#ifndef QUEUEDCOREPROPERTIESINTERFACE_H
-#define QUEUEDCOREPROPERTIESINTERFACE_H
+#ifndef QUEUEDPROPERTYINTERFACE_H
+#define QUEUEDPROPERTYINTERFACE_H
 
 #include <QDBusAbstractAdaptor>
 #include <QDBusVariant>
@@ -35,22 +35,22 @@ class QueuedCore;
 /**
  * @brief DBus interface for QueuedCore class
  */
-class QueuedCorePropertiesInterface : public QDBusAbstractAdaptor
+class QueuedPropertyInterface : public QDBusAbstractAdaptor
 {
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", DBUS_SERVICE_NAME)
 
 public:
     /**
-     * @brief QueuedCorePropertiesInterface class constructor
+     * @brief QueuedPropertyInterface class constructor
      * @param parent
      * pointer to QueuedCore object
      */
-    explicit QueuedCorePropertiesInterface(QueuedCore *parent);
+    explicit QueuedPropertyInterface(QueuedCore *parent);
     /**
-     * @brief QueuedCorePropertiesInterface class destructor
+     * @brief QueuedPropertyInterface class destructor
      */
-    virtual ~QueuedCorePropertiesInterface();
+    virtual ~QueuedPropertyInterface();
 
 public slots:
     /**
@@ -103,4 +103,4 @@ private:
 };
 
 
-#endif /* QUEUEDCOREPROPERTIESINTERFACE_H */
+#endif /* QUEUEDPROPERTYINTERFACE_H */

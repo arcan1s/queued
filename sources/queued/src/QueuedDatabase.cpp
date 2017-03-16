@@ -21,13 +21,13 @@
  */
 
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include <QSqlError>
 #include <QSqlQuery>
 #include <QSqlRecord>
 
-#include "queued/QueuedDatabaseSchema.h"
+#include <queued/QueuedDatabaseSchema.h>
 
 
 /**
@@ -115,7 +115,7 @@ QList<QVariantHash> QueuedDatabase::get(const QString &_table,
 
     QList<QVariantHash> output;
     QSqlQuery query
-        = m_database.exec(QString("SELECT * FROM '%1' %2 ORDER BY _id DESC")
+        = m_database.exec(QString("SELECT * FROM '%1' %2 ORDER BY _id ASC")
                               .arg(_table)
                               .arg(_condition));
 
@@ -278,7 +278,7 @@ void QueuedDatabase::removeTasks(const QDateTime &_endTime)
     QSqlQuery query = m_database.exec(
         QString("DELETE FROM %1 WHERE datetime(endTime) < datetime('%2')")
             .arg(QueuedDB::TASKS_TABLE)
-            .arg(_endTime.toString(Qt::ISODate)));
+            .arg(_endTime.toString(Qt::ISODateWithMs)));
 
     QSqlError error = query.lastError();
     if (error.isValid())
@@ -292,7 +292,7 @@ void QueuedDatabase::removeTasks(const QDateTime &_endTime)
  */
 void QueuedDatabase::removeTokens()
 {
-    QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
     QSqlQuery query = m_database.exec(
         QString("DELETE FROM %1 WHERE datetime(validUntil) > datetime('%2')")
             .arg(QueuedDB::TOKENS_TABLE)
@@ -316,7 +316,7 @@ void QueuedDatabase::removeUsers(const QDateTime &_lastLogin)
     QSqlQuery query = m_database.exec(
         QString("DELETE FROM %1 WHERE datetime(lastLogin) < datetime('%2')")
             .arg(QueuedDB::USERS_TABLE)
-            .arg(_lastLogin.toString(Qt::ISODate)));
+            .arg(_lastLogin.toString(Qt::ISODateWithMs)));
 
     QSqlError error = query.lastError();
     if (error.isValid())

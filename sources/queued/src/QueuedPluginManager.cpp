@@ -21,7 +21,7 @@
  */
 
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include <QDir>
 #include <QPluginLoader>

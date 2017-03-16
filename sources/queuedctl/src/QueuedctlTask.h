@@ -29,8 +29,11 @@ long long addTask(const QueuedProcess::QueuedProcessDefinitions &_definitions,
 QueuedProcess::QueuedProcessDefinitions
 getDefinitions(const QCommandLineParser &_parser, const bool _expandAll);
 QVariant getTask(const long long _id, const QString &_property);
+QList<QVariantHash> getTasks(const QCommandLineParser &_parser,
+                             const QString &_token);
 void parserAdd(QCommandLineParser &_parser);
 void parserGet(QCommandLineParser &_parser);
+void parserList(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
 void parserStart(QCommandLineParser &_parser);
 bool setTask(const long long _id,

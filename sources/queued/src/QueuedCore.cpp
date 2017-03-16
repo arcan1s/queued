@@ -21,12 +21,12 @@
  */
 
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include <QDBusConnection>
 #include <QDBusMessage>
 
-#include "queued/QueuedDatabaseSchema.h"
+#include <queued/QueuedDatabaseSchema.h>
 
 
 /**
@@ -162,10 +162,11 @@ QString QueuedCore::authorization(const QString &_name,
 
     QString token = m_users->authorize(_name, _password);
     if (!token.isEmpty()) {
-        QVariantHash payload = {
-            {"token", token},
-            {"user", _name},
-            {"validUntil", m_users->checkToken(token).toString(Qt::ISODate)}};
+        QVariantHash payload
+            = {{"token", token},
+               {"user", _name},
+               {"validUntil",
+                m_users->checkToken(token).toString(Qt::ISODateWithMs)}};
         m_database->add(QueuedDB::TOKENS_TABLE, payload);
     }
 
@@ -326,6 +327,39 @@ QVariant QueuedCore::option(const QString &_key)
 
 
 /**
+ * @fn performanceReport
+ */
+QList<QVariantHash> QueuedCore::performanceReport(const QDateTime &_from,
+                                                  const QDateTime &_to,
+                                                  const QString &_token) const
+{
+    qCDebug(LOG_LIB) << "Get performance report for" << _from << _to;
+
+    // check permissions
+    auto authUser = m_users->user(_token, true);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _token;
+        return QList<QVariantHash>();
+    }
+    long long userAuthId = authUser->index();
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Reports);
+
+    if (isAdmin) {
+        return m_reports->performance(this, _from, _to);
+    } else {
+        auto data = m_reports->performance(this, _from, _to);
+        QList<QVariantHash> output;
+        for (auto &userData : data) {
+            if (userData["_id"].toLongLong() != userAuthId)
+                continue;
+            output.append(userData);
+        }
+        return output;
+    }
+}
+
+
+/**
  * @fn pluginSettings
  */
 QVariantHash QueuedCore::pluginSettings(const QString &_plugin)
@@ -435,7 +469,7 @@ bool QueuedCore::stopTask(const long long _id, const QString &_token)
 /**
  * @fn task
  */
-const QueuedProcess *QueuedCore::task(const long long _id)
+const QueuedProcess *QueuedCore::task(const long long _id) const
 {
     qCDebug(LOG_LIB) << "Get task by ID" << _id;
 
@@ -444,9 +478,42 @@ const QueuedProcess *QueuedCore::task(const long long _id)
 
 
 /**
+ * @fn taskReport
+ */
+QList<QVariantHash> QueuedCore::taskReport(const long long _user,
+                                           const QDateTime &_from,
+                                           const QDateTime &_to,
+                                           const QString &_token) const
+{
+    qCDebug(LOG_LIB) << "Get tasks table by" << _user << _from << _to;
+
+    // check permissions
+    auto authUser = m_users->user(_token, true);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _token;
+        return QList<QVariantHash>();
+    }
+    long long userAuthId = authUser->index();
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Reports);
+    long long effectiveUserId = _user;
+    if (_user == -1) {
+        effectiveUserId = userAuthId;
+    } else if (userAuthId != _user) {
+        if (!isAdmin) {
+            qCInfo(LOG_LIB) << "User" << _token
+                            << "not allowed to get task report";
+            return QList<QVariantHash>();
+        }
+    }
+
+    return m_reports->tasks(effectiveUserId, _from, _to);
+}
+
+
+/**
  * @fn user
  */
-const QueuedUser *QueuedCore::user(const long long _id)
+const QueuedUser *QueuedCore::user(const long long _id) const
 {
     qCDebug(LOG_LIB) << "Get user by ID" << _id;
 
@@ -457,11 +524,33 @@ const QueuedUser *QueuedCore::user(const long long _id)
 /**
  * @fn user
  */
-const QueuedUser *QueuedCore::user(const QString &_name)
+const QueuedUser *QueuedCore::user(const QString &_name) const
 {
     qCDebug(LOG_LIB) << "Get user by name" << _name;
 
     return m_users->user(_name, false);
+}
+
+
+/**
+ * @fn userReport
+ */
+QList<QVariantHash>
+QueuedCore::userReport(const QDateTime &_lastLogged,
+                       const QueuedEnums::Permission _permission,
+                       const QString &_token) const
+{
+    qCDebug(LOG_LIB) << "Get users table by" << _lastLogged
+                     << static_cast<int>(_permission);
+
+    // check permissions
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Reports);
+    if (!isAdmin) {
+        qCInfo(LOG_LIB) << "User" << _token << "not allowed to get user report";
+        return QList<QVariantHash>();
+    }
+
+    return m_reports->users(_lastLogged, _permission);
 }
 
 
@@ -480,6 +569,8 @@ void QueuedCore::deinit()
         QueuedConfig::DBUS_OBJECT_PATH);
     QDBusConnection::sessionBus().unregisterObject(
         QueuedConfig::DBUS_PROPERTY_PATH);
+    QDBusConnection::sessionBus().unregisterObject(
+        QueuedConfig::DBUS_REPORTS_PATH);
     QDBusConnection::sessionBus().unregisterService(QueuedConfig::DBUS_SERVICE);
 
     // delete objects now
@@ -593,9 +684,9 @@ void QueuedCore::updateTaskTime(const long long _id,
 
     QVariantHash record;
     if (_startTime.isValid())
-        record[QString("startTime")] = _startTime.toString(Qt::ISODate);
+        record[QString("startTime")] = _startTime.toString(Qt::ISODateWithMs);
     if (_endTime.isValid())
-        record[QString("endTime")] = _endTime.toString(Qt::ISODate);
+        record[QString("endTime")] = _endTime.toString(Qt::ISODateWithMs);
 
     bool status = m_database->modify(QueuedDB::TASKS_TABLE, _id, record);
     if (!status)
@@ -611,7 +702,7 @@ void QueuedCore::updateUserLoginTime(const long long _id,
 {
     qCDebug(LOG_LIB) << "Update user" << _id << "with login time" << _time;
 
-    QVariantHash record = {{"lastLogin", _time.toString(Qt::ISODate)}};
+    QVariantHash record = {{"lastLogin", _time.toString(Qt::ISODateWithMs)}};
 
     bool status = m_database->modify(QueuedDB::USERS_TABLE, _id, record);
     if (!status)
@@ -662,9 +753,17 @@ void QueuedCore::initDBus()
         throw QueuedDBusException(message);
     }
     if (!bus.registerObject(QueuedConfig::DBUS_PROPERTY_PATH,
-                            new QueuedCorePropertiesInterface(this),
+                            new QueuedPropertyInterface(this),
                             QDBusConnection::ExportAllContents)) {
         QString message = QString("Could not register properties object %1")
+                              .arg(bus.lastError().message());
+        qCCritical(LOG_DBUS) << message;
+        throw QueuedDBusException(message);
+    }
+    if (!bus.registerObject(QueuedConfig::DBUS_REPORTS_PATH,
+                            new QueuedReportInterface(this),
+                            QDBusConnection::ExportAllContents)) {
+        QString message = QString("Could not register reports object %1")
                               .arg(bus.lastError().message());
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
@@ -772,7 +871,7 @@ void QueuedCore::initUsers()
 
     m_users = new QueuedUserManager(this);
     m_users->setTokenExpiration(expiry);
-    QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODate);
+    QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
     auto dbTokens = m_database->get(
         QueuedDB::TOKENS_TABLE,
         QString("WHERE datetime(validUntil) > datetime('%1')").arg(now));

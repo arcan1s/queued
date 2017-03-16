@@ -118,6 +118,21 @@ struct Limits {
         , gpumemory(_gpumemory)
         , storage(_storage)
         , valid(true){};
+    /**
+     * @brief *= operator overload
+     * @param _count
+     * multiplier
+     * @return multiplied values
+     */
+    Limits &operator*=(const long long _count)
+    {
+        cpu *= _count;
+        gpu *= _count;
+        memory *= _count;
+        gpumemory *= _count;
+
+        return *this;
+    };
 };
 /**
  * @brief convert QString memory value to integer

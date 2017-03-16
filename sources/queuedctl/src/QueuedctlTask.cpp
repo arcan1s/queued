@@ -72,10 +72,10 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
     if (_expandAll) {
         definitions.command = _parser.value("program");
         definitions.endTime
-            = QDateTime::fromString(_parser.value("stop"), Qt::ISODate);
+            = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
         definitions.gid = _parser.value("gid").toUInt();
         definitions.startTime
-            = QDateTime::fromString(_parser.value("start"), Qt::ISODate);
+            = QDateTime::fromString(_parser.value("start"), Qt::ISODateWithMs);
         definitions.uid = _parser.value("uid").toUInt();
     } else {
         // queuedctl -- task-add /path/to/application
@@ -95,6 +95,21 @@ QVariant QueuedctlTask::getTask(const long long _id, const QString &_property)
         return qdbus_cast<QVariantHash>(value.value<QDBusArgument>());
     else
         return value;
+}
+
+
+QList<QVariantHash> QueuedctlTask::getTasks(const QCommandLineParser &_parser,
+                                            const QString &_token)
+{
+    long long user = _parser.value("task-user").isEmpty()
+                         ? -1
+                         : QueuedctlUser::getUserId(_parser.value("task-user"));
+    QDateTime stop
+        = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
+    QDateTime start
+        = QDateTime::fromString(_parser.value("start"), Qt::ISODateWithMs);
+
+    return QueuedCoreAdaptor::getTasks(user, start, stop, _token);
 }
 
 
@@ -147,6 +162,20 @@ void QueuedctlTask::parserGet(QCommandLineParser &_parser)
     _parser.addPositionalArgument("id", "Task ID.", "<id>");
     _parser.addPositionalArgument("property", "Task property name.",
                                   "<property>");
+}
+
+
+void QueuedctlTask::parserList(QCommandLineParser &_parser)
+{
+    // user
+    QCommandLineOption userOption("task-user", "Task user.", "task-user", "");
+    _parser.addOption(userOption);
+    // start
+    QCommandLineOption startOption("start", "Task start time.", "start", "");
+    _parser.addOption(startOption);
+    // stop
+    QCommandLineOption stopOption("stop", "Task stop time.", "stop", "");
+    _parser.addOption(stopOption);
 }
 
 

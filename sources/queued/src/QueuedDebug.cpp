@@ -21,7 +21,7 @@
  */
 
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include "version.h"
 
@@ -32,6 +32,15 @@ Q_LOGGING_CATEGORY(LOG_DBUS, "org.queued.dbus", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_LIB, "org.queued.library", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_PL, "org.queued.plugin", QtMsgType::QtWarningMsg)
 Q_LOGGING_CATEGORY(LOG_SERV, "org.queued.server", QtMsgType::QtWarningMsg)
+
+
+/**
+ * @fn applyLogFormat
+ */
+void QueuedDebug::applyLogFormat()
+{
+    qSetMessagePattern(QueuedDebug::LOG_FORMAT);
+}
 
 
 /**

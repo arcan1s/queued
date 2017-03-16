@@ -24,9 +24,13 @@
 #ifndef QUEUEDREPORTMANAGER_H
 #define QUEUEDREPORTMANAGER_H
 
+#include <QDateTime>
 #include <QObject>
 
+#include <queued/QueuedEnums.h>
 
+
+class QueuedCore;
 class QueuedDatabase;
 
 /**
@@ -49,6 +53,43 @@ public:
      * @brief QueuedReportManager class destructor
      */
     virtual ~QueuedReportManager();
+    /**
+     * @brief usage report
+     * @param _from
+     * start report date
+     * @param _to
+     * stop report date
+     * @param _core
+     * pointer to core object
+     * @return performance table
+     */
+    QList<QVariantHash> performance(const QueuedCore *_core,
+                                    const QDateTime &_from = QDateTime(),
+                                    const QDateTime &_to = QDateTime()) const;
+    /**
+     * list of tasks which match criteria
+     * @param _user
+     * task user ID filter
+     * @param _from
+     * minimal start time
+     * @param _to
+     * maximal end time
+     * @return list of tasks in database format
+     */
+    QList<QVariantHash> tasks(const long long _user = -1,
+                              const QDateTime &_from = QDateTime(),
+                              const QDateTime &_to = QDateTime()) const;
+    /**
+     * list of users which match criteria
+     * @param _lastLogged
+     * last logged minimal date
+     * @param _permission
+     * user permission filter
+     * @return list of users in database format
+     */
+    QList<QVariantHash> users(const QDateTime &_lastLogged = QDateTime(),
+                              const QueuedEnums::Permission _permission
+                              = QueuedEnums::Permission::Invalid) const;
 
 private:
     /**

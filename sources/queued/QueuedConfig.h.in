@@ -25,7 +25,7 @@
 #define QUEUEDCONFIG_H
 
 /**
- * @defgroup QueuedConfig
+ * @addtogroup QueuedConfig
  * @brief Queued configuration constants
  */
 namespace QueuedConfig
@@ -37,68 +37,60 @@ namespace QueuedConfig
  */
 #define DBUS_SERVICE_NAME "org.queued.core"
 /**
- * @ingroup QueuedConfig
  * @brief DBus service name for library and application
  */
 const char DBUS_SERVICE[] = DBUS_SERVICE_NAME;
 /**
- * @ingroup QueuedConfig
  * @brief DBus object path for applicaiton
  */
 const char DBUS_APPLICATION_PATH[] = "/application";
 /**
- * @ingroup QueuedConfig
  * @brief DBus object path for library
  */
 const char DBUS_OBJECT_PATH[] = "/queued";
 /**
- * @ingroup QueuedConfig
- * @brief DBus properties path for library
+ * @brief DBus properties path for properties library
  */
 const char DBUS_PROPERTY_PATH[] = "/property";
+/**
+ * @brief DBus properties path for reports library
+ */
+const char DBUS_REPORTS_PATH[] = "/report";
 
 // path configuration
 // common paths
 /**
- * @ingroup QueuedConfig
  * @brief installation directory for executables
  */
 const char BIN_INSTALL_DIR[] = "@BIN_INSTALL_DIR@";
 /**
- * @ingroup QueuedConfig
  * @brief installation directory for data
  */
 const char DATA_INSTALL_DIR[] = "@DATA_INSTALL_DIR@";
 /**
- * @ingroup QueuedConfig
  * @brief installation directory for headers
  */
 const char INCLUDE_INSTALL_DIR[] = "@INCLUDE_INSTALL_DIR@";
 /**
- * @ingroup QueuedConfig
  * @brief installation directory for libraries
  */
 const char LIB_INSTALL_DIR[] = "@LIB_INSTALL_DIR@";
 /**
- * @ingroup QueuedConfig
  * @brief the same as CMAKE_INSTALL_PREFIX
  */
 const char ROOT_INSTALL_DIR[] = "@CMAKE_INSTALL_PREFIX@";
 // application specific
 /**
- * @def HOME_PATH
- * path to queued home directory
+ * @brief path to queued home directory
  */
 const char HOME_PATH[] = "queued";
 /**
- * @def PLUGIN_PATH
- * path to plugins inside @ref HOME_PATH
+ * @brief path to plugins inside @ref HOME_PATH
  */
 const char PLUGIN_PATH[] = "plugins";
 
 // internal configuration
 /**
- * @ingroup QueuedConfig
  * @brief version of internal storage
  */
 const int DATABASE_VERSION = 1;
@@ -111,7 +103,6 @@ const int DATABASE_VERSION = 1;
 #define PLUGIN_INTERFACE_NAME                                                  \
     "queued.plugin/@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@"
 /**
- * @ingroup QueuedConfig
  * @brief plugin interface name
  */
 const char PLUGIN_INTERFACE[] = PLUGIN_INTERFACE_NAME;

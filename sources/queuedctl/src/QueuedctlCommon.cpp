@@ -18,6 +18,8 @@
 
 #include <queued/Queued.h>
 
+#include <iostream>
+
 #include "QueuedctlAuth.h"
 #include "QueuedctlOption.h"
 #include "QueuedctlPermissions.h"
@@ -32,7 +34,7 @@ void QueuedctlCommon::checkArgs(const QStringList &_args, const int _count,
     qCDebug(LOG_APP) << "Check args count" << _args << _count;
 
     if (_args.count() != _count) {
-        qWarning() << "Invalid command";
+        qCWarning(LOG_APP) << "Invalid command";
         _parser.showHelp(1);
     }
 }
@@ -63,6 +65,32 @@ QString QueuedctlCommon::hashToString(const QVariantHash &_hash)
     for (auto &key : keys)
         output += QString("%1: %2").arg(key).arg(
             _hash[key].toString().replace('\n', ' '));
+
+    return output.join('\n');
+}
+
+
+QString QueuedctlCommon::hashListToString(const QList<QVariantHash> &_list)
+{
+    qCDebug(LOG_APP) << "Convert hash list to string" << _list;
+
+    if (_list.isEmpty())
+        return "";
+
+    QStringList output;
+    // get table header
+    QStringList header = _list.first().keys();
+    header.sort();
+    output += header.join(',');
+    // append rows
+    for (auto &hash : _list) {
+        QStringList row;
+        std::for_each(header.cbegin(), header.cend(),
+                      [&hash, &row](const QString &column) {
+                          row += hash[column].toString().replace('\n', ' ');
+                      });
+        output += row.join(',');
+    }
 
     return output.join('\n');
 }
@@ -105,11 +133,17 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
         break;
     case QueuedctlArgument::PluginList:
         break;
+    case QueuedctlArgument::Report:
+        QueuedctlUser::parserReport(_parser);
+        break;
     case QueuedctlArgument::TaskAdd:
         QueuedctlTask::parserAdd(_parser);
         break;
     case QueuedctlArgument::TaskGet:
         QueuedctlTask::parserGet(_parser);
+        break;
+    case QueuedctlArgument::TaskList:
+        QueuedctlTask::parserList(_parser);
         break;
     case QueuedctlArgument::TaskSet:
         QueuedctlTask::parserSet(_parser);
@@ -124,6 +158,9 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
     case QueuedctlArgument::UserGet:
         QueuedctlUser::parserGet(_parser);
         break;
+    case QueuedctlArgument::UserList:
+        QueuedctlUser::parserList(_parser);
+        break;
     case QueuedctlArgument::UserSet:
         QueuedctlUser::parserSet(_parser);
         break;
@@ -137,9 +174,9 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
 void QueuedctlCommon::print(const QueuedctlResult &_result)
 {
     if (!_result.status)
-        qInfo() << "Subprocess returns error";
+        std::cout << "Subprocess returns error" << std::endl;
     if (!_result.output.isEmpty())
-        QDebug(QtMsgType::QtInfoMsg).noquote() << _result.output;
+        std::cout << qPrintable(_result.output) << std::endl;
 }
 
 
@@ -240,6 +277,13 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                 = QString("Could not remove plugin %1").arg(args.at(1));
         break;
     }
+    case QueuedctlArgument::Report: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status = true;
+        result.output
+            = hashListToString(QueuedctlUser::getReport(_parser, token));
+        break;
+    }
     case QueuedctlArgument::TaskAdd: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlTask::getDefinitions(_parser, false);
@@ -257,6 +301,13 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         result.status = value.isValid();
         result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
                                              : value.toString();
+        break;
+    }
+    case QueuedctlArgument::TaskList: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status = true;
+        result.output
+            = hashListToString(QueuedctlTask::getTasks(_parser, token));
         break;
     }
     case QueuedctlArgument::TaskSet: {
@@ -294,6 +345,13 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         result.status = value.isValid();
         result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
                                              : value.toString();
+        break;
+    }
+    case QueuedctlArgument::UserList: {
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result.status = true;
+        result.output
+            = hashListToString(QueuedctlUser::getUsers(_parser, token));
         break;
     }
     case QueuedctlArgument::UserSet: {

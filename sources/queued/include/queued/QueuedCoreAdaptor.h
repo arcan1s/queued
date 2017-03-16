@@ -184,6 +184,18 @@ bool sendUserPermissionRemove(const long long _id,
  */
 QVariant getOption(const QString &_property);
 /**
+ * @brief performance report
+ * @param _from
+ * minimal start task time
+ * @param _to
+ * maximal stop task time
+ * @param _token
+ * user auth token
+ * @return list of user with used resources
+ */
+QList<QVariantHash> getPerformance(const QDateTime &_from, const QDateTime &_to,
+                                   const QString &_token);
+/**
  * @brief get task property
  * @param _id
  * task id
@@ -193,6 +205,20 @@ QVariant getOption(const QString &_property);
  */
 QVariant getTask(const long long _id, const QString &_property);
 /**
+ * @brief get tasks list
+ * @param _user
+ * task user ID
+ * @param _from
+ * minimal start time
+ * @param _to
+ * maximal end time
+ * @param _token
+ * user auth token
+ * @return list of task in database representation
+ */
+QList<QVariantHash> getTasks(const long long _user, const QDateTime &_from,
+                             const QDateTime &_to, const QString &_token);
+/**
  * @brief get user property
  * @param _id
  * user id
@@ -201,6 +227,19 @@ QVariant getTask(const long long _id, const QString &_property);
  * @return user property value
  */
 QVariant getUser(const long long _id, const QString &_property);
+/**
+ * @brief get users list
+ * @param _lastLogged
+ * minimal last logged in time
+ * @param _permission
+ * permission to search
+ * @param _token
+ * user auth token
+ * @return list of users in database representation
+ */
+QList<QVariantHash> getUsers(const QDateTime &_lastLogged,
+                             const QueuedEnums::Permission _permission,
+                             const QString &_token);
 /**
  * @brief get user ID
  * @param _name

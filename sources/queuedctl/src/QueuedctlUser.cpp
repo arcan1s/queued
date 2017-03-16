@@ -18,6 +18,8 @@
 
 #include <queued/Queued.h>
 
+#include <iostream>
+
 extern "C" {
 #include <termios.h>
 #include <unistd.h>
@@ -34,6 +36,20 @@ QueuedctlUser::addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
 }
 
 
+QList<QVariantHash> QueuedctlUser::getReport(const QCommandLineParser &_parser,
+                                             const QString &_token)
+{
+    qCDebug(LOG_APP) << "Get usage report";
+
+    QDateTime stop
+        = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
+    QDateTime start
+        = QDateTime::fromString(_parser.value("start"), Qt::ISODateWithMs);
+
+    return QueuedCoreAdaptor::getPerformance(start, stop, _token);
+}
+
+
 QueuedUser::QueuedUserDefinitions
 QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
                               const bool _expandAll)
@@ -47,6 +63,11 @@ QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
     definitions.password = _parser.isSet("stdin-password")
                                ? getPassword()
                                : _parser.value("password");
+    // transform to hash
+    definitions.password
+        = definitions.password.isEmpty()
+              ? ""
+              : QueuedUser::hashFromPassword(definitions.password);
     // limits now
     QueuedLimits::Limits limits(
         _parser.value("limit-cpu").toLongLong(),
@@ -77,7 +98,7 @@ QString QueuedctlUser::getPassword()
     tty.c_lflag &= ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &tty);
 
-    qInfo() << "Password";
+    std::cout << "Password" << std::endl;
     QTextStream stream(stdin);
     QString password;
     stream >> password;
@@ -95,6 +116,20 @@ QVariant QueuedctlUser::getUser(const long long _id, const QString &_property)
         return qdbus_cast<QVariantHash>(value.value<QDBusArgument>());
     else
         return value;
+}
+
+
+QList<QVariantHash> QueuedctlUser::getUsers(const QCommandLineParser &_parser,
+                                            const QString &_token)
+{
+    QDateTime lastLogin = QDateTime::fromString(_parser.value("last-logged"),
+                                                Qt::ISODateWithMs);
+    auto permission
+        = _parser.value("access").isEmpty()
+              ? QueuedEnums::Permission::Invalid
+              : QueuedEnums::Permission(_parser.value("access").toInt());
+
+    return QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
 }
 
 
@@ -161,6 +196,29 @@ void QueuedctlUser::parserGet(QCommandLineParser &_parser)
     _parser.addPositionalArgument("id", "User ID.", "<id>");
     _parser.addPositionalArgument("property", "User property name.",
                                   "<property>");
+}
+
+
+void QueuedctlUser::parserList(QCommandLineParser &_parser)
+{
+    // last logged in
+    QCommandLineOption loggedOption("last-logged", "User last logged time.",
+                                    "last-logged", "");
+    _parser.addOption(loggedOption);
+    // permissions
+    QCommandLineOption accessOption("access", "User permission.", "access", "");
+    _parser.addOption(accessOption);
+}
+
+
+void QueuedctlUser::parserReport(QCommandLineParser &_parser)
+{
+    // start
+    QCommandLineOption startOption("start", "Task start time.", "start", "");
+    _parser.addOption(startOption);
+    // stop
+    QCommandLineOption stopOption("stop", "Task stop time.", "stop", "");
+    _parser.addOption(stopOption);
 }
 
 

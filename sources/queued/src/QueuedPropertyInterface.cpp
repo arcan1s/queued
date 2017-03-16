@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file QueuedCorePropertiesInterface.cpp
+ * @file QueuedPropertyInterface.cpp
  * Source code of queued library
  * @author Evgeniy Alekseev
  * @copyright GPLv3
@@ -21,18 +21,18 @@
  */
 
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 #include <QMetaProperty>
 
 
 /**
- * @class QueuedCorePropertiesInterface
+ * @class QueuedPropertyInterface
  */
 /**
- * @fn QueuedCorePropertiesInterface
+ * @fn QueuedPropertyInterface
  */
-QueuedCorePropertiesInterface::QueuedCorePropertiesInterface(QueuedCore *parent)
+QueuedPropertyInterface::QueuedPropertyInterface(QueuedCore *parent)
     : QDBusAbstractAdaptor(parent)
     , m_core(parent)
 {
@@ -41,9 +41,9 @@ QueuedCorePropertiesInterface::QueuedCorePropertiesInterface(QueuedCore *parent)
 
 
 /**
- * @fn ~QueuedCorePropertiesInterface
+ * @fn ~QueuedPropertyInterface
  */
-QueuedCorePropertiesInterface::~QueuedCorePropertiesInterface()
+QueuedPropertyInterface::~QueuedPropertyInterface()
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
 }
@@ -52,7 +52,7 @@ QueuedCorePropertiesInterface::~QueuedCorePropertiesInterface()
 /**
  * @fn Option
  */
-QDBusVariant QueuedCorePropertiesInterface::Option(const QString &property)
+QDBusVariant QueuedPropertyInterface::Option(const QString &property)
 {
     qCDebug(LOG_DBUS) << "Get property" << property;
 
@@ -63,8 +63,8 @@ QDBusVariant QueuedCorePropertiesInterface::Option(const QString &property)
 /**
  * @fn Task
  */
-QDBusVariant QueuedCorePropertiesInterface::Task(const long long id,
-                                                 const QString &property)
+QDBusVariant QueuedPropertyInterface::Task(const long long id,
+                                           const QString &property)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from task" << id;
 
@@ -85,8 +85,8 @@ QDBusVariant QueuedCorePropertiesInterface::Task(const long long id,
 /**
  * @fn User
  */
-QDBusVariant QueuedCorePropertiesInterface::User(const long long id,
-                                                 const QString &property)
+QDBusVariant QueuedPropertyInterface::User(const long long id,
+                                           const QString &property)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from user" << id;
 
@@ -107,7 +107,7 @@ QDBusVariant QueuedCorePropertiesInterface::User(const long long id,
 /**
  * @fn UserIdByName
  */
-qlonglong QueuedCorePropertiesInterface::UserIdByName(const QString &name)
+qlonglong QueuedPropertyInterface::UserIdByName(const QString &name)
 {
     qCDebug(LOG_DBUS) << "Look for user ID" << name;
 
@@ -124,8 +124,7 @@ qlonglong QueuedCorePropertiesInterface::UserIdByName(const QString &name)
 /**
  * @fn getProperties
  */
-QVariantHash
-QueuedCorePropertiesInterface::getProperties(const QObject *_object)
+QVariantHash QueuedPropertyInterface::getProperties(const QObject *_object)
 {
     qCDebug(LOG_DBUS) << "Get all properties from" << _object->objectName();
 

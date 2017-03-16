@@ -67,6 +67,10 @@ const char LOG_FORMAT[] = "[%{time "
                           "fatal}FF%{endif}][%{category}][%{function}] "
                           "%{message}";
 /**
+ * @brief method to apply log format
+ */
+void applyLogFormat();
+/**
  * @brief method to enable debug messages
  */
 void enableDebug();

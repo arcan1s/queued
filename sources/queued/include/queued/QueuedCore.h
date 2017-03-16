@@ -188,6 +188,21 @@ public:
      */
     QVariant option(const QString &_key);
     /**
+     * @brief usage report
+     * @param _from
+     * start report date
+     * @param _to
+     * stop report date
+     * @param _core
+     * pointer to core object
+     * @param _token
+     * user auth token
+     * @return performance table
+     */
+    QList<QVariantHash> performanceReport(const QDateTime &_from,
+                                          const QDateTime &_to,
+                                          const QString &_token) const;
+    /**
      * @brief get plugin settings
      * @param _plugin
      * plugin name
@@ -227,21 +242,49 @@ public:
      * task ID
      * @return task object or nullptr if no task found
      */
-    const QueuedProcess *task(const long long _id);
+    const QueuedProcess *task(const long long _id) const;
+    /**
+     * list of tasks which match criteria
+     * @param _user
+     * task user ID filter
+     * @param _from
+     * minimal start time
+     * @param _to
+     * maximal end time
+     * @param _token
+     * user auth token
+     * @return list of tasks in database format
+     */
+    QList<QVariantHash> taskReport(const long long _user,
+                                   const QDateTime &_from, const QDateTime &_to,
+                                   const QString &_token) const;
     /**
      * @brief get user by ID
      * @param _id
      * user ID
      * @return user object or nullptr if no user found
      */
-    const QueuedUser *user(const long long _id);
+    const QueuedUser *user(const long long _id) const;
     /**
      * @brief get user by name
      * @param _name
      * user name
      * @return user object or nullptr if no user found
      */
-    const QueuedUser *user(const QString &_name);
+    const QueuedUser *user(const QString &_name) const;
+    /**
+     * list of users which match criteria
+     * @param _lastLogged
+     * last logged minimal date
+     * @param _permission
+     * user permission filter
+     * @param _token
+     * user auth token
+     * @return list of users in database format
+     */
+    QList<QVariantHash> userReport(const QDateTime &_lastLogged,
+                                   const QueuedEnums::Permission _permission,
+                                   const QString &_token) const;
     // control methods
     /**
      * @brief deinit subclasses

@@ -21,7 +21,7 @@
  */
 
 
-#include "queued/Queued.h"
+#include <queued/Queued.h>
 
 extern "C" {
 #include <unistd.h>
@@ -81,9 +81,9 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
     defs.user = _properties[QString("user")].toLongLong();
     // metadata
     defs.startTime = QDateTime::fromString(
-        _properties[QString("startTime")].toString(), Qt::ISODate);
+        _properties[QString("startTime")].toString(), Qt::ISODateWithMs);
     defs.endTime = QDateTime::fromString(
-        _properties[QString("endTime")].toString(), Qt::ISODate);
+        _properties[QString("endTime")].toString(), Qt::ISODateWithMs);
 
     return add(defs, _index);
 }
