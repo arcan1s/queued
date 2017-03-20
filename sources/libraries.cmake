@@ -1,5 +1,5 @@
 # main qt libraries
-find_package(Qt5 5.6.0 REQUIRED COMPONENTS Core DBus Sql Test)
+find_package(Qt5 5.8.0 REQUIRED COMPONENTS Core DBus Sql Test)
 add_definitions(
         ${Qt5Core_DEFINITIONS} ${Qt5DBus_DEFINITIONS} ${Qt5Sql_DEFINITIONS}
 )

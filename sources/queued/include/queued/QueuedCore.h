@@ -193,8 +193,6 @@ public:
      * start report date
      * @param _to
      * stop report date
-     * @param _core
-     * pointer to core object
      * @param _token
      * user auth token
      * @return performance table

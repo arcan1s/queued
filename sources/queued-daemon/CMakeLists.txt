@@ -2,6 +2,7 @@
 set (SUBPROJECT "queued-daemon")
 message (STATUS "Subproject ${SUBPROJECT}")
 
+include("adds.cmake")
 add_subdirectory ("src")
 # build man
 file (GLOB SUBPROJECT_MAN_IN "*.1")

@@ -1,0 +1,56 @@
+#
+# Copyright (c) 2017 Evgeniy Alekseev
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+#
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in
+# all copies or substantial portions of the Software.
+##
+# @file QueuedPaths.cmake
+# Additional file of queued library
+# @author Evgeniy Alekseev
+# @copyright MIT
+# @bug https://github.com/arcan1s/queued/issues
+##
+
+
+##
+# @brief Queued common paths
+##
+
+##
+# @def BIN_INSTALL_DIR
+# installation directory for executables
+##
+set(BIN_INSTALL_DIR "@BIN_INSTALL_DIR@")
+##
+# @def DATA_INSTALL_DIR
+# installation directory for data
+##
+set(DATA_INSTALL_DIR "@DATA_INSTALL_DIR@")
+##
+# @def INCLUDE_INSTALL_DIR
+# installation directory for headers
+##
+set(INCLUDE_INSTALL_DIR "@INCLUDE_INSTALL_DIR@")
+##
+# @def LIB_INSTALL_DIR
+# installation directory for libraries
+##
+set(LIB_INSTALL_DIR "@LIB_INSTALL_DIR@")
+##
+# @def QUEUED_ROOT
+# queued root directory
+##
+set(QUEUED_ROOT "${DATA_INSTALL_DIR}/queued")
+##
+# @def QUEUED_PLUGIN_ROOT
+# queued plugins root directory
+##
+set(QUEUED_PLUGIN_ROOT "${QUEUED_ROOT}/plugins")

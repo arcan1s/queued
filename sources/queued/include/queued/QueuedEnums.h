@@ -44,8 +44,6 @@ namespace QueuedEnums
  * administrative permissions
  * @var Permission::Job
  * job related permissions
- * @var Permission::Web
- * web server access
  * @var Permission::Reports
  * access to reports
  */
@@ -54,8 +52,7 @@ enum class Permission {
     SuperAdmin = 1 << 1,
     Admin = 1 << 2,
     Job = 1 << 3,
-    Web = 1 << 4,
-    Reports = 1 << 5
+    Reports = 1 << 4
 };
 Q_DECLARE_FLAGS(Permissions, Permission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
@@ -63,7 +60,6 @@ const QHash<QString, Permission> PermissionMap = {
     {"superadmin", Permission::SuperAdmin},
     {"admin", Permission::Admin},
     {"job", Permission::Job},
-    {"web", Permission::Web},
     {"reports", Permission::Reports},
 };
 /**
