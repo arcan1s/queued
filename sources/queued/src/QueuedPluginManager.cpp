@@ -34,8 +34,9 @@
 /**
  * @fn QueuedPluginManager
  */
-QueuedPluginManager::QueuedPluginManager(QObject *parent)
+QueuedPluginManager::QueuedPluginManager(QObject *parent, const QString &token)
     : QObject(parent)
+    , m_token(token)
 {
     qCDebug(LOG_PL) << __PRETTY_FUNCTION__;
 
@@ -121,6 +122,7 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
         if (item) {
             m_plugins[_name] = item;
             item->init(pluginSettings);
+            item->setToken(m_token);
             item->connect(interface());
         } else {
             qCCritical(LOG_PL) << "Could not cast plugin" << _name;

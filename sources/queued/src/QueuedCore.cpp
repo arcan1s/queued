@@ -27,6 +27,7 @@
 #include <QDBusMessage>
 
 #include <queued/QueuedDatabaseSchema.h>
+#include <queued/QueuedStaticConfig.h>
 
 
 /**
@@ -683,10 +684,14 @@ void QueuedCore::updateTaskTime(const long long _id,
                      << _endTime;
 
     QVariantHash record;
-    if (_startTime.isValid())
+    if (_startTime.isValid()) {
         record[QString("startTime")] = _startTime.toString(Qt::ISODateWithMs);
-    if (_endTime.isValid())
+        emit(m_plugins->interface()->onStartTask(_id));
+    }
+    if (_endTime.isValid()) {
         record[QString("endTime")] = _endTime.toString(Qt::ISODateWithMs);
+        emit(m_plugins->interface()->onStopTask(_id));
+    }
 
     bool status = m_database->modify(QueuedDB::TASKS_TABLE, _id, record);
     if (!status)
@@ -780,8 +785,9 @@ void QueuedCore::initPlugins()
         = m_advancedSettings->get(QueuedConfig::QueuedSettings::Plugins)
               .toString()
               .split('\n');
+    QString token = m_users->authorize(m_settings->admin().name);
 
-    m_plugins = new QueuedPluginManager(this);
+    m_plugins = new QueuedPluginManager(this, token);
     for (auto &plugin : pluginList)
         m_plugins->loadPlugin(plugin, pluginSettings(plugin));
 }
@@ -925,6 +931,9 @@ long long QueuedCore::addTaskPrivate(const QString &_command,
 
     // add to child object
     m_processes->add(properties, id);
+    // notify plugins
+    emit(m_plugins->interface()->onAddTask(id));
+
     return id;
 }
 
@@ -955,6 +964,9 @@ long long QueuedCore::addUserPrivate(const QString &_name,
 
     // add to child object
     m_users->add(properties, id);
+    // notify plugins
+    emit(m_plugins->interface()->onAddUser(id));
+
     return id;
 }
 
@@ -984,8 +996,15 @@ bool QueuedCore::editOptionPrivate(const QString &_key, const QVariant &_value)
     // add to child object
     if (status) {
         m_advancedSettings->set(_key, _value);
-        // notify plugin if required
+        // notify plugins if required
+        auto tryPluginOption = m_plugins->convertOptionName(_key);
+        if ((!tryPluginOption.first.isEmpty())
+            && (!tryPluginOption.second.isEmpty()))
+            m_plugins->optionChanged(_key, _value);
+        // notify plugins
+        emit(m_plugins->interface()->onEditOption(_key, _value));
     }
+
     return status;
 }
 
@@ -1003,13 +1022,27 @@ bool QueuedCore::editPluginPrivate(const QString &_plugin, const bool _add)
               .split('\n');
 
     bool status = false;
-    if (_add && !pluginList.contains(_plugin))
+    if (_add && !pluginList.contains(_plugin)) {
         status = m_plugins->loadPlugin(_plugin, pluginSettings(_plugin));
-    else if (!_add && pluginList.contains(_plugin))
+        pluginList.append(_plugin);
+    } else if (!_add && pluginList.contains(_plugin)) {
         status = m_plugins->unloadPlugin(_plugin);
-    else
+        pluginList.removeAll(_plugin);
+    } else {
         qCDebug(LOG_LIB) << "Plugin" << _plugin
                          << "not loaded or already loaded";
+    }
+
+    if (status) {
+        editOptionPrivate(m_advancedSettings->internalId(
+                              QueuedConfig::QueuedSettings::Plugins),
+                          pluginList.join('\n'));
+        // notify plugins
+        if (_add)
+            emit(m_plugins->interface()->onAddPlugin(_plugin));
+        else
+            emit(m_plugins->interface()->onRemovePlugin(_plugin));
+    }
 
     return status;
 }
@@ -1040,6 +1073,8 @@ bool QueuedCore::editTaskPrivate(const long long _id,
     // modify values stored in memory
     for (auto &property : _taskData.keys())
         task->setProperty(qPrintable(property), _taskData[property]);
+    // notify plugins
+    emit(m_plugins->interface()->onEditTask(_id, _taskData));
 
     return true;
 }
@@ -1070,6 +1105,8 @@ bool QueuedCore::editUserPrivate(const long long _id,
     // modify values stored in memory
     for (auto &property : _userData.keys())
         userObj->setProperty(qPrintable(property), _userData[property]);
+    // notify plugins
+    emit(m_plugins->interface()->onEditUser(_id, _userData));
 
     return true;
 }

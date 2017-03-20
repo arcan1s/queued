@@ -32,6 +32,8 @@
 #include "QueuedProcess.h"
 
 
+class QueuedPluginManagerInterface;
+
 /**
  * @brief implementation over QProcess to run processes
  */
