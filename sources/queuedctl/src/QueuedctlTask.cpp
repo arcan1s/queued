@@ -58,7 +58,8 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
         = _parser.value("task-user").isEmpty()
               ? 0
               : QueuedctlUser::getUserId(_parser.value("task-user"));
-    definitions.workingDirectory = _parser.value("directory");
+    definitions.workingDirectory
+        = QFileInfo(_parser.value("directory")).absoluteFilePath();
     // limits now
     QueuedLimits::Limits limits(
         _parser.value("limit-cpu").toLongLong(),
@@ -70,7 +71,8 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
 
     // all options
     if (_expandAll) {
-        definitions.command = _parser.value("program");
+        definitions.command
+            = QFileInfo(_parser.value("program")).absoluteFilePath();
         definitions.endTime
             = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
         definitions.gid = _parser.value("gid").toUInt();
@@ -79,7 +81,8 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
         definitions.uid = _parser.value("uid").toUInt();
     } else {
         // queuedctl -- task-add /path/to/application
-        definitions.command = _parser.positionalArguments().at(1);
+        definitions.command
+            = QFileInfo(_parser.positionalArguments().at(1)).absoluteFilePath();
     }
 
     return definitions;
