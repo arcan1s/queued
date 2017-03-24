@@ -50,8 +50,10 @@ public:
      * @brief QueuedPluginManager class constructor
      * @param parent
      * pointer to parent item
+     * @param token
+     * plugin auth token
      */
-    explicit QueuedPluginManager(QObject *parent);
+    explicit QueuedPluginManager(QObject *parent, const QString &token);
     /**
      * @brief QueuedPluginManager class destructor
      */
@@ -102,13 +104,17 @@ public slots:
 
 private:
     /**
+     * @brief pointer to database object
+     */
+    QueuedPluginManagerInterface *m_interface = nullptr;
+    /**
      * @brief loaded plugins
      */
     QueuedPluginMap m_plugins;
     /**
-     * @brief pointer to database object
+     * @brief plugin auth token
      */
-    QueuedPluginManagerInterface *m_interface = nullptr;
+    QString m_token;
 };
 
 

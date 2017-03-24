@@ -73,6 +73,14 @@ public:
     QueuedUser *add(const QueuedUser::QueuedUserDefinitions &_definitions,
                     const long long _id);
     /**
+     * @brief authorize user manually
+     * @remark it ignores password input and creates unlimited token
+     * @param _user
+     * user name
+     * @return generated token
+     */
+    QString authorize(const QString &_user);
+    /**
      * @brief authorize user
      * @param _user
      * user name

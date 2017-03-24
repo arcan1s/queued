@@ -96,6 +96,20 @@ QueuedUserManager::add(const QueuedUser::QueuedUserDefinitions &_definitions,
 /**
  * @fn authorize
  */
+QString QueuedUserManager::authorize(const QString &_user)
+{
+    qCDebug(LOG_LIB) << "Authorize user manually" << _user;
+
+    auto time = QDateTime::currentDateTimeUtc();
+    time = time.addDays(9999);
+
+    return m_tokens->registerToken(_user, time);
+}
+
+
+/**
+ * @fn authorize
+ */
 QString QueuedUserManager::authorize(const QString &_user,
                                      const QString &_password)
 {

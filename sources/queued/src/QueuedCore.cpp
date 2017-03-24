@@ -27,6 +27,7 @@
 #include <QDBusMessage>
 
 #include <queued/QueuedDatabaseSchema.h>
+#include <queued/QueuedStaticConfig.h>
 
 
 /**
@@ -786,8 +787,9 @@ void QueuedCore::initPlugins()
         = m_advancedSettings->get(QueuedConfig::QueuedSettings::Plugins)
               .toString()
               .split('\n');
+    QString token = m_users->authorize(m_settings->admin().name);
 
-    m_plugins = new QueuedPluginManager(this);
+    m_plugins = new QueuedPluginManager(this, token);
     for (auto &plugin : pluginList)
         m_plugins->loadPlugin(plugin, pluginSettings(plugin));
 }
@@ -998,10 +1000,15 @@ bool QueuedCore::editOptionPrivate(const QString &_key, const QVariant &_value)
     // add to child object
     if (status) {
         m_advancedSettings->set(_key, _value);
-        // TODO notify plugin if required
-        // notify plugins
-        if (m_plugins)
+        // notify plugins if required
+        if (m_plugins) {
+            auto tryPluginOption = m_plugins->convertOptionName(_key);
+            if ((!tryPluginOption.first.isEmpty())
+                && (!tryPluginOption.second.isEmpty()))
+                m_plugins->optionChanged(_key, _value);
+            // notify plugins
             emit(m_plugins->interface()->onEditOption(_key, _value));
+        }
     }
 
     return status;
@@ -1037,11 +1044,12 @@ bool QueuedCore::editPluginPrivate(const QString &_plugin, const bool _add)
                               QueuedConfig::QueuedSettings::Plugins),
                           pluginList.join('\n'));
         // notify plugins
-        if (_add)
-            if (m_plugins)
+        if (m_plugins) {
+            if (_add)
                 emit(m_plugins->interface()->onAddPlugin(_plugin));
-            else if (m_plugins)
+            else
                 emit(m_plugins->interface()->onRemovePlugin(_plugin));
+        }
     }
 
     return status;

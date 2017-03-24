@@ -55,13 +55,22 @@ public:
      */
     virtual void init(const QVariantHash &_settings) = 0;
     /**
+     * @brief set plugin token
+     * @remark this method may be safety ignored if plugin does not use methods
+     * require auth
+     * @param _token
+     * new token ID
+     */
+    virtual void setToken(const QString &_token) = 0;
+    /**
      * @brief method which will be called on option update
      * @param _key
      * option key
      * @param _value
      * option value
      */
-    virtual void updateSettings(const QString &_key, const QVariant &_value);
+    virtual void updateSettings(const QString &_key, const QVariant &_value)
+        = 0;
 };
 
 Q_DECLARE_INTERFACE(QueuedPluginInterface, PLUGIN_INTERFACE_NAME)
