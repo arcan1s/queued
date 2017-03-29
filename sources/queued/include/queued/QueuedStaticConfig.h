@@ -96,18 +96,27 @@ typedef struct {
  * control process command line
  * @var QueuedSettings::Plugins
  * plugin list
+ * @var QueuedSettings::ServerAddress
+ * queued server bind address
+ * @var QueuedSettings::ServerPort
+ * queued server bind port
+ * @var QueuedSettings::ServerMaxConnections
+ * queued server max connections
  */
 enum class QueuedSettings {
-    Invalid = 1 << 0,
-    DatabaseInterval = 1 << 1,
-    DefaultLimits = 1 << 2,
-    KeepTasks = 1 << 3,
-    KeepUsers = 1 << 4,
-    OnExitAction = 1 << 5,
-    TokenExpiration = 1 << 6,
-    DatabaseVersion = 1 << 7,
-    ProcessCommandLine = 1 << 8,
-    Plugins = 1 << 9,
+    Invalid,
+    DatabaseInterval,
+    DefaultLimits,
+    KeepTasks,
+    KeepUsers,
+    OnExitAction,
+    TokenExpiration,
+    DatabaseVersion,
+    ProcessCommandLine,
+    Plugins,
+    ServerAddress,
+    ServerPort,
+    ServerMaxConnections
 };
 /**
  * @struct QueuedSettingsField
@@ -143,7 +152,10 @@ const QueuedSettingsDefaultMap QueuedSettingsDefaults
         {QueuedSettings::ProcessCommandLine,
          "systemd-run\n--scope\n--unit={name}\n--uid={uid}\n--gid={gid}"
          "\n-p\nCPUQuota={cpu}%\n-p\nMemoryHigh={memory}\n{application}"}},
-       {"Plugins", {QueuedSettings::Plugins, ""}}};
+       {"Plugins", {QueuedSettings::Plugins, ""}},
+       {"ServerAddress", {QueuedSettings::ServerAddress, ""}},
+       {"ServerPort", {QueuedSettings::ServerPort, 8080}},
+       {"ServerMaxConnections", {QueuedSettings::ServerMaxConnections, 30}}};
 };
 
 #endif /* QUEUEDCONFIGURATION_H */

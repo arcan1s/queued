@@ -606,8 +606,8 @@ void QueuedCore::init(const QString &_configuration)
 
     // init parts
     initSettings(_configuration);
-    initPlugins();
     initUsers();
+    initPlugins();
     initProcesses();
 
     // settings update notifier
@@ -665,6 +665,11 @@ void QueuedCore::updateSettings(const QueuedConfig::QueuedSettings _id,
         break;
     case QueuedConfig::QueuedSettings::ProcessCommandLine:
         m_processes->setProcessLine(_value.toString());
+        break;
+    case QueuedConfig::QueuedSettings::ServerAddress:
+    case QueuedConfig::QueuedSettings::ServerPort:
+    case QueuedConfig::QueuedSettings::ServerMaxConnections:
+        // do nothing here
         break;
     case QueuedConfig::QueuedSettings::TokenExpiration:
         m_users->setTokenExpiration(_value.toLongLong());

@@ -1,5 +1,5 @@
 # set project name
-set (SUBPROJECT "queued-daemon")
+set (SUBPROJECT "queued-server")
 message (STATUS "Subproject ${SUBPROJECT}")
 
 add_subdirectory ("src")

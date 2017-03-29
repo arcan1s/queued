@@ -3,6 +3,7 @@ message (STATUS "Subproject ${SUBPROJECT}")
 
 configure_file ("QueuedConfig.h.in" "${CMAKE_BINARY_DIR}/QueuedConfig.h")
 
+include("adds.cmake")
 add_subdirectory ("src")
 # headers
 install (DIRECTORY "include/${SUBPROJECT}" DESTINATION "${INCLUDE_INSTALL_DIR}")
