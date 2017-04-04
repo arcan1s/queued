@@ -17,8 +17,9 @@
 #ifndef QUEUEDTCPSERVERTHREAD_H
 #define QUEUEDTCPSERVERTHREAD_H
 
-#include <QTcpSocket>
 #include <QThread>
+#include <QUrl>
+#include <QVariant>
 
 
 class QTcpSocket;
@@ -29,22 +30,30 @@ class QueuedTcpServerThread : public QThread
 
 public:
     typedef struct {
+        QList<QPair<QByteArray, QByteArray>> headers;
+        QString protocol;
+        QUrl query;
         QString request;
-        QString path;
+    } QueuedTcpServerHeaders;
+    typedef struct {
+        QueuedTcpServerHeaders headers;
         QVariantHash data;
-        bool valid = false;
     } QueuedTcpServerRequest;
+    typedef struct {
+        int code;
+        QVariantHash data;
+    } QueuedTcpServerResponse;
 
     explicit QueuedTcpServerThread(int socketDescriptor, QObject *parent);
     virtual ~QueuedTcpServerThread();
-    static QList<QByteArray> defaultResponse(const int code);
-    static QueuedTcpServerRequest getRequest(const QStringList &headers,
-                                             const QByteArray &body);
-    QVariantHash response(const QueuedTcpServerRequest &request) const;
+    static QByteArrayList defaultResponse(const int code,
+                                          const QVariantHash &json);
+    static QueuedTcpServerHeaders getHeaders(const QStringList &headers);
+    static QueuedTcpServerRequest
+    getRequest(const QByteArray &body, const QueuedTcpServerHeaders &headers);
+    QueuedTcpServerResponse
+    response(const QueuedTcpServerRequest &request) const;
     void run() override;
-
-signals:
-    void error(QTcpSocket::SocketError socketError);
 
 private slots:
     void disconnected();

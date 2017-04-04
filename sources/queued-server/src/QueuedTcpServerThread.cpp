@@ -18,7 +18,8 @@
 
 #include <QDataStream>
 #include <QJsonDocument>
-#include <QUrl>
+#include <QNetworkRequest>
+#include <QTcpSocket>
 #include <QUrlQuery>
 
 #include <queued/Queued.h>
@@ -39,9 +40,11 @@ QueuedTcpServerThread::~QueuedTcpServerThread()
 }
 
 
-QList<QByteArray> QueuedTcpServerThread::defaultResponse(const int code)
+QByteArrayList QueuedTcpServerThread::defaultResponse(const int code,
+                                                      const QVariantHash &json)
 {
-    qCDebug(LOG_SERV) << "Build server response with code" << code;
+    qCDebug(LOG_SERV) << "Build server response with code" << code
+                      << "and json";
 
     QList<QByteArray> output;
     output += "HTTP/1.1 " + QByteArray::number(code) + " OK\r\n";
@@ -55,35 +58,64 @@ QList<QByteArray> QueuedTcpServerThread::defaultResponse(const int code)
     output += "Content-Type: application/json\r\n";
     output += "\r\n";
 
+    // json response
+    if (!json.isEmpty()) {
+        auto jsonObj = QJsonObject::fromVariantHash(json);
+        auto jsonByte
+            = QJsonDocument(jsonObj).toJson(QJsonDocument::JsonFormat::Compact);
+        output += jsonByte;
+    }
+
     return output;
 }
 
 
-QueuedTcpServerThread::QueuedTcpServerRequest
-QueuedTcpServerThread::getRequest(const QStringList &headers,
-                                  const QByteArray &body)
+QueuedTcpServerThread::QueuedTcpServerHeaders
+QueuedTcpServerThread::getHeaders(const QStringList &headers)
 {
-    qCDebug(LOG_SERV) << "Get request object from headers" << headers
-                      << "and body" << body;
+    qCDebug(LOG_SERV) << "Get headers object from" << headers;
+
+    QueuedTcpServerThread::QueuedTcpServerHeaders headersObj;
+
+    // metadata
+    auto protocolData = headers.first().split(' ');
+    if (protocolData.count() >= 3) {
+        headersObj.request = protocolData.takeFirst();
+        headersObj.protocol = protocolData.takeLast();
+        headersObj.query = protocolData.join(' ');
+    }
+    // headers
+    for (auto &header : headers.mid(1)) {
+        auto parsed = header.split(": ");
+        if (parsed.count() < 2)
+            continue;
+        headersObj.headers
+            += {parsed.first().toUtf8(), parsed.mid(1).join(": ").toUtf8()};
+    }
+
+    return headersObj;
+}
+
+
+QueuedTcpServerThread::QueuedTcpServerRequest QueuedTcpServerThread::getRequest(
+    const QByteArray &body,
+    const QueuedTcpServerThread::QueuedTcpServerHeaders &headers)
+{
+    qCDebug(LOG_SERV) << "Get request object from body" << body;
 
     QueuedTcpServerThread::QueuedTcpServerRequest request;
-    request.valid = true;
-    // method
-    request.request = headers.first().split(' ').at(0);
-    // path
-    QUrl url(headers.first().split(' ').at(1));
-    request.path = url.path();
+    request.headers = headers;
+
     // body
     QJsonParseError error;
     auto jsonDoc = QJsonDocument::fromJson(body, &error);
-    if (error.error != QJsonParseError::NoError) {
-        qCWarning(LOG_SERV) << "Parse error" << error.errorString();
-        request.valid = false;
-    } else {
+    if (error.error == QJsonParseError::NoError)
         request.data = jsonDoc.object().toVariantHash();
-    }
+    else
+        qCWarning(LOG_SERV) << "Parse error" << error.errorString();
+
     // append from url if any
-    auto items = QUrlQuery(url.query()).queryItems();
+    auto items = QUrlQuery(headers.query.query()).queryItems();
     for (auto &item : items) {
         auto key = item.first;
         auto value = item.second;
@@ -106,11 +138,40 @@ QueuedTcpServerThread::getRequest(const QStringList &headers,
 }
 
 
+QueuedTcpServerThread::QueuedTcpServerResponse
+QueuedTcpServerThread::response(const QueuedTcpServerRequest &request) const
+{
+    qCDebug(LOG_SERV) << "Build response for request" << request.headers.query;
+
+    QueuedTcpServerThread::QueuedTcpServerResponse response;
+
+    // HACK additional workaround to parse content type header
+    QNetworkRequest netRequest;
+    for (auto &headers : request.headers.headers)
+        netRequest.setRawHeader(headers.first, headers.second);
+
+    // prepend code
+    if (!netRequest.header(QNetworkRequest::KnownHeaders::ContentTypeHeader)
+             .toString()
+             .startsWith("application/json"))
+        response.code = 415;
+    else
+        response.code = 200;
+
+    // json data
+    if (response.code == 200)
+        // TODO json response from helpers
+        response.data = {{"foo", "bar"}};
+
+    return response;
+}
+
+
 void QueuedTcpServerThread::run()
 {
     m_socket = new QTcpSocket(this);
     if (!m_socket->setSocketDescriptor(m_socketDescriptor)) {
-        emit(error(m_socket->error()));
+        qCWarning(LOG_SERV) << "Socket error" << m_socket->error();
         return;
     }
 
@@ -139,17 +200,14 @@ void QueuedTcpServerThread::readyRead()
     auto body = m_socket->readAll().simplified();
 
     // get request object
-    auto request = getRequest(headers, body);
-    if (!request.valid) {
-        emit(error(QTcpSocket::UnsupportedSocketOperationError));
-        return;
-    }
+    auto headersObj = getHeaders(headers);
+    auto requestObj = getRequest(body, headersObj);
+    auto responseObj = response(requestObj);
 
-    auto response = defaultResponse(200);
-    for (auto &resp : response) {
+    auto responseList = defaultResponse(responseObj.code, responseObj.data);
+    for (auto &resp : responseList)
         m_socket->write(resp);
-        m_socket->flush();
-    }
+    m_socket->flush();
 
     m_socket->waitForBytesWritten(3000);
     m_socket->disconnectFromHost();
