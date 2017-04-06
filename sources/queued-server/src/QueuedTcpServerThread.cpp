@@ -24,6 +24,8 @@
 
 #include <queued/Queued.h>
 
+#include "QueuedTcpServerResponseHelper.h"
+
 
 QueuedTcpServerThread::QueuedTcpServerThread(int socketDescriptor,
                                              QObject *parent)
@@ -47,7 +49,8 @@ QByteArrayList QueuedTcpServerThread::defaultResponse(const int code,
                       << "and json";
 
     QList<QByteArray> output;
-    output += "HTTP/1.1 " + QByteArray::number(code) + " OK\r\n";
+    output += "HTTP/1.1 " + QByteArray::number(code) + " "
+              + QueuedTcpServerResponseHelper::HTTPCodeMap[code] + "\r\n";
     output += "Server: QueuedServer/Qt" + QByteArray(qVersion()) + "\r\n";
     output += "Date: "
               + QLocale::c()
@@ -89,8 +92,8 @@ QueuedTcpServerThread::getHeaders(const QStringList &headers)
         auto parsed = header.split(": ");
         if (parsed.count() < 2)
             continue;
-        headersObj.headers
-            += {parsed.first().toUtf8(), parsed.mid(1).join(": ").toUtf8()};
+        headersObj.headers += {parsed.first().toUtf8().toLower(),
+                               parsed.mid(1).join(": ").toUtf8()};
     }
 
     return headersObj;
@@ -151,17 +154,27 @@ QueuedTcpServerThread::response(const QueuedTcpServerRequest &request) const
         netRequest.setRawHeader(headers.first, headers.second);
 
     // prepend code
-    if (!netRequest.header(QNetworkRequest::KnownHeaders::ContentTypeHeader)
-             .toString()
-             .startsWith("application/json"))
+    if (netRequest.header(QNetworkRequest::KnownHeaders::ContentTypeHeader)
+            .toString()
+        != "application/json")
         response.code = 415;
     else
         response.code = 200;
+    QString token = netRequest.rawHeader(QueuedConfig::WEBAPI_TOKEN_HEADER);
 
     // json data
-    if (response.code == 200)
-        // TODO json response from helpers
-        response.data = {{"foo", "bar"}};
+    if (response.code == 200) {
+        auto req = QueuedTcpServerResponseHelper::parsePath(
+            request.headers.query.path());
+        req.type = request.headers.request;
+        if (req.valid) {
+            response.data = QueuedTcpServerResponseHelper::getData(
+                req, request.data, token);
+            response.code = response.data["code"].toInt();
+        } else {
+            response.code = 404;
+        }
+    }
 
     return response;
 }

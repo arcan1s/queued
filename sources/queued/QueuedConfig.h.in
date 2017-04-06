@@ -94,6 +94,14 @@ const char PLUGIN_PATH[] = "plugins";
  * @brief version of internal storage
  */
 const int DATABASE_VERSION = 1;
+/**
+ * @brief header name for token
+ */
+const char WEBAPI_TOKEN_HEADER[] = "x-queued-token";
+/**
+ * @brief supported web server API versions
+ */
+const int WEBAPI_VERSIONS[] = {1};
 
 // plugin interfaces
 /**
