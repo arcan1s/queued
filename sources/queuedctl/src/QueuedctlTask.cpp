@@ -57,7 +57,7 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
     definitions.user
         = _parser.value("task-user").isEmpty()
               ? 0
-              : QueuedctlUser::getUserId(_parser.value("task-user"));
+              : QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
     definitions.workingDirectory
         = QFileInfo(_parser.value("directory")).absoluteFilePath();
     // limits now
@@ -95,7 +95,7 @@ QVariant QueuedctlTask::getTask(const long long _id, const QString &_property)
 
     auto value = QueuedCoreAdaptor::getTask(_id, _property);
     if (_property.isEmpty())
-        return qdbus_cast<QVariantHash>(value.value<QDBusArgument>());
+        return qdbus_cast<QVariantHash>(value);
     else
         return value;
 }
@@ -104,9 +104,10 @@ QVariant QueuedctlTask::getTask(const long long _id, const QString &_property)
 QList<QVariantHash> QueuedctlTask::getTasks(const QCommandLineParser &_parser,
                                             const QString &_token)
 {
-    long long user = _parser.value("task-user").isEmpty()
-                         ? -1
-                         : QueuedctlUser::getUserId(_parser.value("task-user"));
+    long long user
+        = _parser.value("task-user").isEmpty()
+              ? -1
+              : QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
     QDateTime stop
         = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
     QDateTime start

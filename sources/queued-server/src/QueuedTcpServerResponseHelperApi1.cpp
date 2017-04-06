@@ -22,6 +22,8 @@
 #include "QueuedTcpServerResponseHelperOption.h"
 #include "QueuedTcpServerResponseHelperPermissions.h"
 #include "QueuedTcpServerResponseHelperPlugins.h"
+#include "QueuedTcpServerResponseHelperTask.h"
+#include "QueuedTcpServerResponseHelperUser.h"
 
 
 QVariantHash QueuedTcpServerResponseHelperApi1::getData(
@@ -77,6 +79,75 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         else
             output = {{"code", 405}};
         break;
+    case QueuedTcpServerResponseHelper::RequestPath::Reports:
+        if (_type == "GET")
+            output
+                = QueuedTcpServerResponseHelperUser::getReport(_data, _token);
+        else
+            output = {{"code", 405}};
+        break;
+    case QueuedTcpServerResponseHelper::RequestPath::Status:
+        if (_type == "GET")
+            output = getStatus();
+        else
+            output = {{"code", 405}};
+        break;
+    case QueuedTcpServerResponseHelper::RequestPath::Task:
+        if (_type == "GET")
+            output = QueuedTcpServerResponseHelperTask::getTask(
+                _arg.toLongLong(), _data);
+        else if (_type == "POST")
+            output = QueuedTcpServerResponseHelperTask::addOrEditTask(
+                _arg.toLongLong(), _data, _token);
+        else
+            output = {{"code", 405}};
+        break;
+    case QueuedTcpServerResponseHelper::RequestPath::Tasks:
+        if (_type == "GET")
+            output = QueuedTcpServerResponseHelperTask::getTasks(_data, _token);
+        else
+            output = {{"code", 405}};
+        break;
+        break;
+    case QueuedTcpServerResponseHelper::RequestPath::User:
+        if (_type == "GET")
+            output = QueuedTcpServerResponseHelperUser::getUser(_arg, _data);
+        else if (_type == "POST")
+            output = QueuedTcpServerResponseHelperUser::addOrEditUser(
+                _arg, _data, _token);
+        else
+            output = {{"code", 405}};
+        break;
+    case QueuedTcpServerResponseHelper::RequestPath::Users:
+        if (_type == "GET")
+            output = QueuedTcpServerResponseHelperUser::getUsers(_data, _token);
+        else
+            output = {{"code", 405}};
+        break;
+    case QueuedTcpServerResponseHelper::RequestPath::Unknown:
+        output = {{"code", 404}};
+        break;
+    }
+
+    return output;
+}
+
+
+QVariantHash QueuedTcpServerResponseHelperApi1::getStatus()
+{
+    QVariantHash output = {{"code", 200}};
+
+    auto data = QueuedCoreAdaptor::getStatus();
+    auto sections = data.keys();
+    sections.sort();
+    for (auto &section : sections) {
+        QVariantHash sectionData;
+        auto keys = data[section].keys();
+        keys.sort();
+        for (auto &key : keys)
+            sectionData[key] = data[section][key];
+        // append output
+        output[section] = sectionData;
     }
 
     return output;

@@ -14,21 +14,23 @@
  */
 
 
-#ifndef QUEUEDTCPSERVERRESPONSEHELPERAPI1_H
-#define QUEUEDTCPSERVERRESPONSEHELPERAPI1_H
+#ifndef QUEUEDTCPSERVERRESPONSEHELTASK_H
+#define QUEUEDTCPSERVERRESPONSEHELTASK_H
 
 #include <QVariant>
 
-#include "QueuedTcpServerResponseHelper.h"
+#include <queued/QueuedProcess.h>
 
 
-namespace QueuedTcpServerResponseHelperApi1
+namespace QueuedTcpServerResponseHelperTask
 {
-QVariantHash getData(const QueuedTcpServerResponseHelper::RequestPath _request,
-                     const QString &_arg, const QString &_type,
-                     const QVariantHash &_data, const QString &_token);
-QVariantHash getStatus();
+QVariantHash addOrEditTask(const long long _id, const QVariantHash &_data,
+                           const QString &_token);
+QueuedProcess::QueuedProcessDefinitions
+getDefinitions(const QVariantHash &_data);
+QVariantHash getTask(const long long _id, const QVariantHash &_data);
+QVariantHash getTasks(const QVariantHash &_data, const QString &_token);
 };
 
 
-#endif /* QUEUEDTCPSERVERRESPONSEHELPERAPI1_H */
+#endif /* QUEUEDTCPSERVERRESPONSEHELTASK_H */

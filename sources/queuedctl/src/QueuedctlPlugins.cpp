@@ -29,9 +29,7 @@ bool QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
 
 QStringList QueuedctlPlugins::listPlugins()
 {
-    return QueuedCoreAdaptor::getOption(
-               QueuedAdvancedSettings::internalId(
-                   QueuedConfig::QueuedSettings::Plugins))
+    return QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins)
         .toString()
         .split('\n');
 }

@@ -88,10 +88,16 @@ QueuedTcpServerResponseHelper::pathToEnum(const QString &_path)
         return RequestPath::Plugins;
     else if (_path == "reports")
         return RequestPath::Reports;
+    else if (_path == "status")
+        return RequestPath::Status;
     else if (_path == "task")
         return RequestPath::Task;
+    else if (_path == "tasks")
+        return RequestPath::Tasks;
     else if (_path == "user")
         return RequestPath::User;
+    else if (_path == "users")
+        return RequestPath::Users;
 
     return RequestPath::Unknown;
 }

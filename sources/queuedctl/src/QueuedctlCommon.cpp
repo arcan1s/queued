@@ -223,7 +223,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::PermissionAdd: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QString token = QueuedctlAuth::getToken(_cache, _user);
         result.status
             = QueuedctlPermissions::addPermission(userId, args.at(2), token);
@@ -238,7 +238,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::PermissionRemove: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QString token = QueuedctlAuth::getToken(_cache, _user);
         result.status
             = QueuedctlPermissions::removePermission(userId, args.at(2), token);
@@ -340,7 +340,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::UserGet: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QVariant value = QueuedctlUser::getUser(userId, args.at(2));
         result.status = value.isValid();
         result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
@@ -355,7 +355,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::UserSet: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlUser::getDefinitions(_parser, true);
         result.status = QueuedctlUser::setUser(userId, definitions, token);

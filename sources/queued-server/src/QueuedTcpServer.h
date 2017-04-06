@@ -25,7 +25,7 @@ class QueuedTcpServer : public QTcpServer
     Q_OBJECT
 
 public:
-    explicit QueuedTcpServer(QObject *parent);
+    explicit QueuedTcpServer(const int timeout, QObject *parent);
     virtual ~QueuedTcpServer();
     void deinit();
     void init();
@@ -34,6 +34,7 @@ protected:
     void incomingConnection(qintptr socketDescriptor) override;
 
 private:
+    int m_timeout = -1;
 };
 
 

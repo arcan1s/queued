@@ -14,21 +14,23 @@
  */
 
 
-#ifndef QUEUEDTCPSERVERRESPONSEHELPERAPI1_H
-#define QUEUEDTCPSERVERRESPONSEHELPERAPI1_H
+#ifndef QUEUEDTCPSERVERRESPONSEHELUSER_H
+#define QUEUEDTCPSERVERRESPONSEHELUSER_H
 
 #include <QVariant>
 
-#include "QueuedTcpServerResponseHelper.h"
+#include <queued/QueuedUser.h>
 
 
-namespace QueuedTcpServerResponseHelperApi1
+namespace QueuedTcpServerResponseHelperUser
 {
-QVariantHash getData(const QueuedTcpServerResponseHelper::RequestPath _request,
-                     const QString &_arg, const QString &_type,
-                     const QVariantHash &_data, const QString &_token);
-QVariantHash getStatus();
+QVariantHash addOrEditUser(const QString &_user, const QVariantHash &_data,
+                           const QString &_token);
+QueuedUser::QueuedUserDefinitions getDefinitions(const QVariantHash &_data);
+QVariantHash getReport(const QVariantHash &_data, const QString &_token);
+QVariantHash getUser(const QString &_user, const QVariantHash &_data);
+QVariantHash getUsers(const QVariantHash &_data, const QString &_token);
 };
 
 
-#endif /* QUEUEDTCPSERVERRESPONSEHELPERAPI1_H */
+#endif /* QUEUEDTCPSERVERRESPONSEHELUSER_H */

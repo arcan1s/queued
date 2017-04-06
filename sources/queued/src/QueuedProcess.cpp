@@ -24,6 +24,9 @@
 #include <queued/Queued.h>
 
 #include <QMetaProperty>
+#include <QStandardPaths>
+
+#include <queued/QueuedProcess.h>
 
 
 /**
@@ -385,10 +388,14 @@ void QueuedProcess::setWorkDirectory(const QString &_workDirectory)
 {
     qCDebug(LOG_LIB) << "Set working directory to" << _workDirectory;
 
-    m_definitions.workingDirectory = _workDirectory;
+    m_definitions.workingDirectory
+        = _workDirectory.isEmpty()
+              ? QStandardPaths::writableLocation(
+                    QStandardPaths::StandardLocation::TempLocation)
+              : _workDirectory;
     setLogError("");
     setLogOutput("");
-    setWorkingDirectory(_workDirectory);
+    setWorkingDirectory(m_definitions.workingDirectory);
 }
 
 

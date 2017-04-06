@@ -29,8 +29,11 @@ enum class RequestPath {
     Permissions,
     Plugins,
     Reports,
+    Status,
     Task,
-    User
+    Tasks,
+    User,
+    Users
 };
 typedef struct {
     int apiVersion;

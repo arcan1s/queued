@@ -143,7 +143,7 @@ QList<QVariantHash> QueuedReportManager::tasks(const long long _user,
     qCDebug(LOG_LIB) << "Search for tasks in" << _user << _from << _to;
 
     QStringList conditions;
-    if (_user != -1)
+    if (_user > 0)
         conditions += QString("(user = %1)").arg(_user);
     if (_from.isValid())
         conditions += QString("((datetime(startTime) > datetime('%1')) OR "

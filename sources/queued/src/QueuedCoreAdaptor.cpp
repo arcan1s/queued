@@ -314,6 +314,18 @@ QVariant QueuedCoreAdaptor::getOption(const QString &_property)
 
 
 /**
+ * @fn getOption
+ */
+QVariant
+QueuedCoreAdaptor::getOption(const QueuedConfig::QueuedSettings _property)
+{
+    qCDebug(LOG_DBUS) << "Get option" << static_cast<int>(_property);
+
+    return getOption(QueuedAdvancedSettings::internalId(_property));
+}
+
+
+/**
  * @fn getPerformance
  */
 QList<QVariantHash> QueuedCoreAdaptor::getPerformance(const QDateTime &_from,
@@ -324,13 +336,22 @@ QList<QVariantHash> QueuedCoreAdaptor::getPerformance(const QDateTime &_from,
 
     QVariantList args = {_from.toString(Qt::ISODateWithMs),
                          _to.toString(Qt::ISODateWithMs), _token};
-    return qdbus_cast<QList<QVariantHash>>(
-        toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                 QueuedConfig::DBUS_REPORTS_PATH,
-                                 QueuedConfig::DBUS_SERVICE, "Performance",
-                                 args)
-                         .first())
-            .value<QDBusArgument>());
+    return qdbus_cast<QList<QVariantHash>>(toNativeType(
+        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+                    QueuedConfig::DBUS_SERVICE, "Performance", args)
+            .first()));
+}
+
+
+/**
+ * @fn getStatus
+ */
+QHash<QString, QHash<QString, QString>> QueuedCoreAdaptor::getStatus()
+{
+    return qdbus_cast<QHash<QString, QHash<QString, QString>>>(toNativeType(
+        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+                    QueuedConfig::DBUS_SERVICE, "Status", {})
+            .first()));
 }
 
 
@@ -362,12 +383,10 @@ QList<QVariantHash> QueuedCoreAdaptor::getTasks(const long long _user,
 
     QVariantList args = {_user, _from.toString(Qt::ISODateWithMs),
                          _to.toString(Qt::ISODateWithMs), _token};
-    return qdbus_cast<QList<QVariantHash>>(
-        toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                 QueuedConfig::DBUS_REPORTS_PATH,
-                                 QueuedConfig::DBUS_SERVICE, "Tasks", args)
-                         .first())
-            .value<QDBusArgument>());
+    return qdbus_cast<QList<QVariantHash>>(toNativeType(
+        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+                    QueuedConfig::DBUS_SERVICE, "Tasks", args)
+            .first()));
 }
 
 
@@ -388,6 +407,27 @@ QVariant QueuedCoreAdaptor::getUser(const long long _id,
 
 
 /**
+ * @fn getUserId
+ */
+long long QueuedCoreAdaptor::getUserId(const QString &_name)
+{
+    qCDebug(LOG_DBUS) << "Get user ID for" << _name;
+
+    bool status = false;
+    long long stringToLong = _name.toLongLong(&status);
+    if (status)
+        return stringToLong;
+
+    QVariantList args = {_name};
+    return sendRequest(QueuedConfig::DBUS_SERVICE,
+                       QueuedConfig::DBUS_PROPERTY_PATH,
+                       QueuedConfig::DBUS_SERVICE, "UserIdByName", args)
+        .first()
+        .toLongLong();
+}
+
+
+/**
  * @fn getUsers
  */
 QList<QVariantHash>
@@ -400,28 +440,10 @@ QueuedCoreAdaptor::getUsers(const QDateTime &_lastLogged,
 
     QVariantList args = {_lastLogged.toString(Qt::ISODateWithMs),
                          static_cast<uint>(_permission), _token};
-    return qdbus_cast<QList<QVariantHash>>(
-        toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                 QueuedConfig::DBUS_REPORTS_PATH,
-                                 QueuedConfig::DBUS_SERVICE, "Users", args)
-                         .first())
-            .value<QDBusArgument>());
-}
-
-
-/**
- * @fn getUserId
- */
-long long QueuedCoreAdaptor::getUserId(const QString &_name)
-{
-    qCDebug(LOG_DBUS) << "Get user ID for" << _name;
-
-    QVariantList args = {_name};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_PROPERTY_PATH,
-                       QueuedConfig::DBUS_SERVICE, "UserIdByName", args)
-        .first()
-        .toLongLong();
+    return qdbus_cast<QList<QVariantHash>>(toNativeType(
+        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+                    QueuedConfig::DBUS_SERVICE, "Users", args)
+            .first()));
 }
 
 

@@ -44,7 +44,8 @@ public:
         QVariantHash data;
     } QueuedTcpServerResponse;
 
-    explicit QueuedTcpServerThread(int socketDescriptor, QObject *parent);
+    explicit QueuedTcpServerThread(int socketDescriptor, const int timeout,
+                                   QObject *parent);
     virtual ~QueuedTcpServerThread();
     static QByteArrayList defaultResponse(const int code,
                                           const QVariantHash &json);
@@ -56,12 +57,12 @@ public:
     void run() override;
 
 private slots:
-    void disconnected();
     void readyRead();
 
 private:
     QTcpSocket *m_socket = nullptr;
     int m_socketDescriptor;
+    int m_timeout = -1;
 };
 
 

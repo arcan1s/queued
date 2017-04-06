@@ -33,9 +33,8 @@ QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
 QVariantHash QueuedTcpServerResponseHelperPlugins::listPlugins()
 {
     return {{"code", 200},
-            {"plugins",
-             QueuedCoreAdaptor::getOption(QueuedAdvancedSettings::internalId(
-                 QueuedConfig::QueuedSettings::Plugins))}};
+            {"plugins", QueuedCoreAdaptor::getOption(
+                            QueuedConfig::QueuedSettings::Plugins)}};
 }
 
 

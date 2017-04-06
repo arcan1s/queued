@@ -34,7 +34,6 @@ QString getPassword();
 QVariant getUser(const long long _id, const QString &_property);
 QList<QVariantHash> getUsers(const QCommandLineParser &_parser,
                              const QString &_token);
-long long getUserId(const QString &_name);
 void parserAdd(QCommandLineParser &_parser);
 void parserGet(QCommandLineParser &_parser);
 void parserList(QCommandLineParser &_parser);
