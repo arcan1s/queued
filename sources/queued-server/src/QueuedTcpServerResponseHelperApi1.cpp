@@ -99,9 +99,12 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         else if (_type == "POST")
             output = QueuedTcpServerResponseHelperTask::addOrEditTask(
                 _arg.toLongLong(), _data, _token);
+<<<<<<< HEAD
         else if (_type == "PUT")
             output = QueuedTcpServerResponseHelperTask::startOrStopTask(
                 _arg.toLongLong(), _token);
+=======
+>>>>>>> baa20af363cb4b97cb6f7b36f833cf40f34cc61d
         else
             output = {{"code", 405}};
         break;

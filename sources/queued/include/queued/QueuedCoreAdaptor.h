@@ -216,6 +216,10 @@ QHash<QString, QHash<QString, QString>> getStatus();
  */
 QVariantHash getTask(const long long _id);
 /**
+ * @return server status inforamtion
+ */
+QHash<QString, QHash<QString, QString>> getStatus();
+/**
  * @brief get task property
  * @param _id
  * task id

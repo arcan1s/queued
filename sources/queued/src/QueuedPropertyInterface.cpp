@@ -106,8 +106,11 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
         return QDBusVariant(response);
     } else {
         auto response = user->property(qPrintable(property));
+<<<<<<< HEAD
         if (response.type() == QVariant::DateTime)
             response = response.toDateTime().toString(Qt::ISODateWithMs);
+=======
+>>>>>>> baa20af363cb4b97cb6f7b36f833cf40f34cc61d
         return QDBusVariant(response.isValid() ? response : "");
     }
 }
