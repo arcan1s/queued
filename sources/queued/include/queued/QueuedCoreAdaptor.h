@@ -28,6 +28,7 @@
 #include <QVariant>
 
 #include "QueuedProcess.h"
+#include "QueuedStaticConfig.h"
 #include "QueuedUser.h"
 
 
@@ -184,6 +185,13 @@ bool sendUserPermissionRemove(const long long _id,
  */
 QVariant getOption(const QString &_property);
 /**
+ * @brief get option
+ * @param _property
+ * option name
+ * @return option value
+ */
+QVariant getOption(const QueuedConfig::QueuedSettings _property);
+/**
  * @brief performance report
  * @param _from
  * minimal start task time
@@ -195,6 +203,18 @@ QVariant getOption(const QString &_property);
  */
 QList<QVariantHash> getPerformance(const QDateTime &_from, const QDateTime &_to,
                                    const QString &_token);
+/**
+ * @brief server status
+ * @return server status information
+ */
+QHash<QString, QHash<QString, QString>> getStatus();
+/**
+ * @brief get all task properties
+ * @param _id
+ * task ID
+ * @return task properties
+ */
+QVariantHash getTask(const long long _id);
 /**
  * @brief get task property
  * @param _id
@@ -219,6 +239,13 @@ QVariant getTask(const long long _id, const QString &_property);
 QList<QVariantHash> getTasks(const long long _user, const QDateTime &_from,
                              const QDateTime &_to, const QString &_token);
 /**
+ * @brief get user properties
+ * @param _id
+ * user id
+ * @return user properties
+ */
+QVariantHash getUser(const long long _id);
+/**
  * @brief get user property
  * @param _id
  * user id
@@ -227,6 +254,14 @@ QList<QVariantHash> getTasks(const long long _user, const QDateTime &_from,
  * @return user property value
  */
 QVariant getUser(const long long _id, const QString &_property);
+/**
+ * @brief get user ID
+ * @param _name
+ * user name
+ * @return user ID or {0, -1} if no user found. If _name is numeric value it
+ * returns converted one
+ */
+long long getUserId(const QString &_name);
 /**
  * @brief get users list
  * @param _lastLogged
@@ -240,13 +275,6 @@ QVariant getUser(const long long _id, const QString &_property);
 QList<QVariantHash> getUsers(const QDateTime &_lastLogged,
                              const QueuedEnums::Permission _permission,
                              const QString &_token);
-/**
- * @brief get user ID
- * @param _name
- * user name
- * @return user ID or {0, -1} if no user found
- */
-long long getUserId(const QString &_name);
 // common methods
 /**
  * @brief common DBus request

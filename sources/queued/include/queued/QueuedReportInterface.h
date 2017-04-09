@@ -66,6 +66,11 @@ public slots:
     QDBusVariant Performance(const QString &from, const QString &to,
                              const QString &token);
     /**
+     * @brief server status
+     * @return server status
+     */
+    QDBusVariant Status();
+    /**
      * @brief tasks list
      * @param user
      * user ID to select

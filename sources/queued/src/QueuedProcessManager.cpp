@@ -315,29 +315,21 @@ QueuedLimits::Limits QueuedProcessManager::usedLimits()
     long long cpu = std::accumulate(
         tasks.cbegin(), tasks.cend(), 0,
         [](long long value, QueuedProcess *process) {
+            auto limit = process->nativeLimits().cpu == 0
+                             ? QueuedSystemInfo::cpuCount()
+                             : process->nativeLimits().cpu;
             return process->state() == QProcess::ProcessState::Running
-                       ? value + process->nativeLimits().cpu
-                       : value;
-        });
-    long long gpu = std::accumulate(
-        tasks.cbegin(), tasks.cend(), 0,
-        [](long long value, QueuedProcess *process) {
-            return process->state() == QProcess::ProcessState::Running
-                       ? value + process->nativeLimits().gpu
+                       ? value + limit
                        : value;
         });
     long long memory = std::accumulate(
         tasks.cbegin(), tasks.cend(), 0,
         [](long long value, QueuedProcess *process) {
+            auto limit = process->nativeLimits().memory == 0
+                             ? QueuedSystemInfo::memoryCount()
+                             : process->nativeLimits().memory;
             return process->state() == QProcess::ProcessState::Running
-                       ? value + process->nativeLimits().memory
-                       : value;
-        });
-    long long gpumemory = std::accumulate(
-        tasks.cbegin(), tasks.cend(), 0,
-        [](long long value, QueuedProcess *process) {
-            return process->state() == QProcess::ProcessState::Running
-                       ? value + process->nativeLimits().gpumemory
+                       ? value + limit
                        : value;
         });
     long long storage = std::accumulate(
@@ -348,7 +340,7 @@ QueuedLimits::Limits QueuedProcessManager::usedLimits()
                        : value;
         });
 
-    return QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage);
+    return QueuedLimits::Limits(cpu, 0, memory, 0, storage);
 }
 
 

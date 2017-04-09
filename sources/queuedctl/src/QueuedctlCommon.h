@@ -34,6 +34,7 @@ enum class QueuedctlArgument {
     PluginList,
     PluginRemove,
     Report,
+    Status,
     TaskAdd,
     TaskGet,
     TaskList,
@@ -68,6 +69,7 @@ const QHash<QString, QueuedctlArgumentInfo> QueuedctlArguments = {
     {"plugin-remove",
      {QueuedctlArgument::PluginRemove, "Removes plugin to load.", 2}},
     {"report", {QueuedctlArgument::Report, "Shows usage report.", 1}},
+    {"status", {QueuedctlArgument::Status, "Server status.", 1}},
     {"task-add", {QueuedctlArgument::TaskAdd, "Adds new task.", 2}},
     {"task-get", {QueuedctlArgument::TaskGet, "Gets task properties.", 3}},
     {"task-list", {QueuedctlArgument::TaskList, "Gets tasks list.", 1}},
@@ -82,6 +84,7 @@ const QHash<QString, QueuedctlArgumentInfo> QueuedctlArguments = {
 void checkArgs(const QStringList &_args, const int _count,
                QCommandLineParser &_parser);
 QString commandsHelp();
+QString hashHashToString(const QHash<QString, QHash<QString, QString>> &_hash);
 QString hashToString(const QVariantHash &_hash);
 QString hashListToString(const QList<QVariantHash> &_list);
 void preprocess(const QStringList &_args, QCommandLineParser &_parser);

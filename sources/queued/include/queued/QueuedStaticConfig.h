@@ -98,10 +98,12 @@ typedef struct {
  * plugin list
  * @var QueuedSettings::ServerAddress
  * queued server bind address
- * @var QueuedSettings::ServerPort
- * queued server bind port
  * @var QueuedSettings::ServerMaxConnections
  * queued server max connections
+ * @var QueuedSettings::ServerPort
+ * queued server bind port
+ * @var QueuedSettings::ServerTimeout
+ * server thread timeout
  */
 enum class QueuedSettings {
     Invalid,
@@ -115,8 +117,9 @@ enum class QueuedSettings {
     ProcessCommandLine,
     Plugins,
     ServerAddress,
+    ServerMaxConnections,
     ServerPort,
-    ServerMaxConnections
+    ServerTimeout
 };
 /**
  * @struct QueuedSettingsField
@@ -138,24 +141,26 @@ typedef QHash<QString, QueuedSettingsField> QueuedSettingsDefaultMap;
 /**
  * @brief default settings map
  */
-const QueuedSettingsDefaultMap QueuedSettingsDefaults
-    = {{"", {QueuedSettings::Invalid, QVariant()}},
-       {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000}},
-       {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\n0\n0\n0\n0"}},
-       {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
-       {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
-       {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
-       {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
-       {"DatabaseVersion",
-        {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
-       {"ProcessCommandLine",
-        {QueuedSettings::ProcessCommandLine,
-         "systemd-run\n--scope\n--unit={name}\n--uid={uid}\n--gid={gid}"
-         "\n-p\nCPUQuota={cpu}%\n-p\nMemoryHigh={memory}\n{application}"}},
-       {"Plugins", {QueuedSettings::Plugins, ""}},
-       {"ServerAddress", {QueuedSettings::ServerAddress, ""}},
-       {"ServerPort", {QueuedSettings::ServerPort, 8080}},
-       {"ServerMaxConnections", {QueuedSettings::ServerMaxConnections, 30}}};
+const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
+    {"", {QueuedSettings::Invalid, QVariant()}},
+    {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000}},
+    {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\n0\n0\n0\n0"}},
+    {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
+    {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
+    {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
+    {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
+    {"DatabaseVersion",
+     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
+    {"ProcessCommandLine",
+     {QueuedSettings::ProcessCommandLine,
+      "systemd-run\n--scope\n--unit={name}\n--uid={uid}\n--gid={gid}"
+      "\n-p\nCPUQuota={cpu}%\n-p\nMemoryHigh={memory}\n{application}"}},
+    {"Plugins", {QueuedSettings::Plugins, ""}},
+    {"ServerAddress", {QueuedSettings::ServerAddress, ""}},
+    {"ServerMaxConnections", {QueuedSettings::ServerMaxConnections, 30}},
+    {"ServerPort", {QueuedSettings::ServerPort, 8080}},
+    {"ServerTimeout", {QueuedSettings::ServerTimeout, -1}},
+};
 };
 
 #endif /* QUEUEDCONFIGURATION_H */

@@ -28,9 +28,10 @@
 
 
 QueuedTcpServerThread::QueuedTcpServerThread(int socketDescriptor,
-                                             QObject *parent)
+                                             const int timeout, QObject *parent)
     : QThread(parent)
     , m_socketDescriptor(socketDescriptor)
+    , m_timeout(timeout)
 {
     qCDebug(LOG_SERV) << __PRETTY_FUNCTION__;
 }
@@ -39,6 +40,9 @@ QueuedTcpServerThread::QueuedTcpServerThread(int socketDescriptor,
 QueuedTcpServerThread::~QueuedTcpServerThread()
 {
     qCDebug(LOG_SERV) << __PRETTY_FUNCTION__;
+
+    if (m_socket)
+        m_socket->deleteLater();
 }
 
 
@@ -133,7 +137,7 @@ QueuedTcpServerThread::QueuedTcpServerRequest QueuedTcpServerThread::getRequest(
             values = QVariantList({request.data[key]});
             break;
         }
-        values.append(key);
+        values.append(value);
         request.data[key] = values.count() == 1 ? values.first() : values;
     }
 
@@ -182,7 +186,7 @@ QueuedTcpServerThread::response(const QueuedTcpServerRequest &request) const
 
 void QueuedTcpServerThread::run()
 {
-    m_socket = new QTcpSocket(this);
+    m_socket = new QTcpSocket(nullptr);
     if (!m_socket->setSocketDescriptor(m_socketDescriptor)) {
         qCWarning(LOG_SERV) << "Socket error" << m_socket->error();
         return;
@@ -190,17 +194,8 @@ void QueuedTcpServerThread::run()
 
     connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()),
             Qt::DirectConnection);
-    connect(m_socket, SIGNAL(disconnected()), this, SLOT(disconnected()),
-            Qt::DirectConnection);
 
     exec();
-}
-
-
-void QueuedTcpServerThread::disconnected()
-{
-    m_socket->deleteLater();
-    exit(0);
 }
 
 
@@ -222,8 +217,12 @@ void QueuedTcpServerThread::readyRead()
         m_socket->write(resp);
     m_socket->flush();
 
-    m_socket->waitForBytesWritten(3000);
+    // TODO use timeouts?
+    if (m_socket->state() != QAbstractSocket::UnconnectedState)
+        m_socket->waitForBytesWritten(m_timeout);
     m_socket->disconnectFromHost();
     if (m_socket->state() != QAbstractSocket::UnconnectedState)
         m_socket->waitForDisconnected();
+
+    exit(0);
 }

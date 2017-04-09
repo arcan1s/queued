@@ -111,11 +111,10 @@ QVariant QueuedctlUser::getUser(const long long _id, const QString &_property)
 {
     qCDebug(LOG_APP) << "Get property" << _property << "from user" << _id;
 
-    auto value = QueuedCoreAdaptor::getUser(_id, _property);
     if (_property.isEmpty())
-        return qdbus_cast<QVariantHash>(value.value<QDBusArgument>());
+        return QueuedCoreAdaptor::getUser(_id);
     else
-        return value;
+        return QueuedCoreAdaptor::getUser(_id, _property);
 }
 
 
@@ -130,19 +129,6 @@ QList<QVariantHash> QueuedctlUser::getUsers(const QCommandLineParser &_parser,
               : QueuedEnums::Permission(_parser.value("access").toInt());
 
     return QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
-}
-
-
-long long QueuedctlUser::getUserId(const QString &_name)
-{
-    qCDebug(LOG_APP) << "Get user ID for" << _name;
-
-    bool status = false;
-    long long stringToLong = _name.toLongLong(&status);
-    if (status)
-        return stringToLong;
-    else
-        return QueuedCoreAdaptor::getUserId(_name);
 }
 
 

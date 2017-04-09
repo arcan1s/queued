@@ -59,81 +59,102 @@ QStringList QueuedDebug::getBuildData()
 {
     QStringList metadata;
 
-    // general information
-    metadata += "Build details";
-    metadata += QString("\tVERSION: %1").arg(VERSION);
-    metadata += QString("\tCOMMIT_SHA: %1").arg(COMMIT_SHA);
-    metadata += QString("\tBUILD_DATE: %1").arg(BUILD_DATE);
-
-    // api
-    metadata += "API";
-    metadata += QString("\tDATABASE_VERSION: %1")
-                    .arg(QueuedConfig::DATABASE_VERSION);
-    metadata += QString("\tPLUGIN_INTERFACE: %1")
-                    .arg(QueuedConfig::PLUGIN_INTERFACE);
-
-    // paths
-    metadata += "Paths";
-    metadata
-        += QString("\tBIN_INSTALL_DIR: %1").arg(QueuedConfig::BIN_INSTALL_DIR);
-    metadata += QString("\tDATA_INSTALL_DIR: %1")
-                    .arg(QueuedConfig::DATA_INSTALL_DIR);
-    metadata += QString("\tINCLUDE_INSTALL_DIR: %1")
-                    .arg(QueuedConfig::INCLUDE_INSTALL_DIR);
-    metadata
-        += QString("\tLIB_INSTALL_DIR: %1").arg(QueuedConfig::LIB_INSTALL_DIR);
-    metadata += QString("\tROOT_INSTALL_DIR: %1")
-                    .arg(QueuedConfig::ROOT_INSTALL_DIR);
-    metadata += QString("\tHOME_PATH: %1").arg(QueuedConfig::HOME_PATH);
-    metadata += QString("\tPLUGIN_PATH: %1").arg(QueuedConfig::PLUGIN_PATH);
-
-    // dbus
-    metadata += "DBus";
-    metadata += QString("\tDBUS_SERVICE: %1").arg(QueuedConfig::DBUS_SERVICE);
-    metadata += QString("\tDBUS_APPLICATION_PATH: %1")
-                    .arg(QueuedConfig::DBUS_APPLICATION_PATH);
-    metadata += QString("\tDBUS_OBJECT_PATH: %1")
-                    .arg(QueuedConfig::DBUS_OBJECT_PATH);
-    metadata += QString("\tDBUS_PROPERTY_PATH: %1")
-                    .arg(QueuedConfig::DBUS_PROPERTY_PATH);
-
-    // cmake build information
-    metadata += "Cmake properties";
-    metadata += QString("\tCMAKE_BUILD_TYPE: %1").arg(CMAKE_BUILD_TYPE);
-    metadata += QString("\tCMAKE_CXX_COMPILER: %1").arg(CMAKE_CXX_COMPILER);
-    metadata += QString("\tCMAKE_CXX_FLAGS: %1").arg(CMAKE_CXX_FLAGS);
-    metadata
-        += QString("\tCMAKE_CXX_FLAGS_DEBUG: %1").arg(CMAKE_CXX_FLAGS_DEBUG);
-    metadata += QString("\tCMAKE_CXX_FLAGS_RELEASE: %1")
-                    .arg(CMAKE_CXX_FLAGS_RELEASE);
-    metadata += QString("\tCMAKE_CXX_FLAGS_OPTIMIZATION: %1")
-                    .arg(CMAKE_CXX_FLAGS_OPTIMIZATION);
-    metadata += QString("\tCMAKE_DEFINITIONS: %1").arg(CMAKE_DEFINITIONS);
-    metadata += QString("\tCMAKE_INSTALL_PREFIX: %1").arg(CMAKE_INSTALL_PREFIX);
-    metadata += QString("\tCMAKE_MODULE_LINKER_FLAGS: %1")
-                    .arg(CMAKE_MODULE_LINKER_FLAGS);
-    metadata += QString("\tCMAKE_SHARED_LINKER_FLAGS: %1")
-                    .arg(CMAKE_SHARED_LINKER_FLAGS);
-
-    // components
-    metadata += "Components";
-    metadata += QString("\tBUILD_DEB_PACKAGE: %1").arg(BUILD_DEB_PACKAGE);
-    metadata += QString("\tBUILD_RPM_PACKAGE: %1").arg(BUILD_RPM_PACKAGE);
-    metadata
-        += QString("\tCLANGFORMAT_EXECUTABLE: %1").arg(CLANGFORMAT_EXECUTABLE);
-    metadata += QString("\tCOVERITY_COMMENT: %1").arg(COVERITY_COMMENT);
-    metadata += QString("\tCOVERITY_DIRECTORY: %1").arg(COVERITY_DIRECTORY);
-    metadata += QString("\tCOVERITY_EMAIL: %1").arg(COVERITY_EMAIL);
-    metadata += QString("\tCOVERITY_EXECUTABLE: %1").arg(COVERITY_EXECUTABLE);
-    metadata += QString("\tCOVERITY_URL: %1").arg(COVERITY_URL);
-    metadata += QString("\tCPPCHECK_EXECUTABLE: %1").arg(CPPCHECK_EXECUTABLE);
-
-    // additional properties
-    metadata += "Additional properties";
-    metadata += QString("\tPROP_DOCS: %1").arg(PROP_DOCS);
-    metadata += QString("\tPROP_FUTURE: %1").arg(PROP_FUTURE);
-    metadata += QString("\tPROP_LOAD: %1").arg(PROP_LOAD);
-    metadata += QString("\tPROP_TEST: %1").arg(PROP_TEST);
+    auto data = getBuildMetaData();
+    auto sections = data.keys();
+    sections.sort();
+    for (auto &section : sections) {
+        metadata += section;
+        auto keys = data[section].keys();
+        keys.sort();
+        for (auto &key : keys)
+            metadata += QString("\t%1: %2").arg(key).arg(data[section][key]);
+    }
 
     return metadata;
+}
+
+
+/**
+ * @fn getBuildMetaData
+ */
+QHash<QString, QHash<QString, QString>> QueuedDebug::getBuildMetaData()
+{
+    return {// general information
+            {"Build details",
+             {
+                 {"VERSION", VERSION},
+                 {"COMMIT_SHA", COMMIT_SHA},
+                 {"BUILD_DATE", BUILD_DATE},
+                 {"QT_VERSION", qVersion()},
+             }},
+            // api
+            {"API",
+             {
+                 {"DATABASE_VERSION",
+                  QString::number(QueuedConfig::DATABASE_VERSION)},
+                 {"PLUGIN_INTERFACE", QueuedConfig::PLUGIN_INTERFACE},
+                 {"WEBAPI_TOKEN_HEADER", QueuedConfig::WEBAPI_TOKEN_HEADER},
+                 {"WEBAPI_VERSIONS",
+                  std::accumulate(
+                      std::next(std::begin(QueuedConfig::WEBAPI_VERSIONS)),
+                      std::end(QueuedConfig::WEBAPI_VERSIONS),
+                      QString::number(QueuedConfig::WEBAPI_VERSIONS[0]),
+                      [](const QString str, const int version) {
+                          return QString("%1,%2").arg(str).arg(version);
+                      })},
+             }},
+            // paths
+            {"Paths",
+             {
+                 {"BIN_INSTALL_DIR", QueuedConfig::BIN_INSTALL_DIR},
+                 {"DATA_INSTALL_DIR", QueuedConfig::DATA_INSTALL_DIR},
+                 {"INCLUDE_INSTALL_DIR", QueuedConfig::INCLUDE_INSTALL_DIR},
+                 {"LIB_INSTALL_DIR", QueuedConfig::LIB_INSTALL_DIR},
+                 {"ROOT_INSTALL_DIR", QueuedConfig::ROOT_INSTALL_DIR},
+                 {"HOME_PATH", QueuedConfig::HOME_PATH},
+                 {"PLUGIN_PATH", QueuedConfig::PLUGIN_PATH},
+             }},
+            // dbus
+            {"DBus",
+             {
+                 {"DBUS_SERVICE", QueuedConfig::DBUS_SERVICE},
+                 {"DBUS_APPLICATION_PATH", QueuedConfig::DBUS_APPLICATION_PATH},
+                 {"DBUS_OBJECT_PATH", QueuedConfig::DBUS_OBJECT_PATH},
+                 {"DBUS_PROPERTY_PATH", QueuedConfig::DBUS_PROPERTY_PATH},
+             }},
+            // cmake build information
+            {"Cmake properties",
+             {
+                 {"CMAKE_BUILD_TYPE", CMAKE_BUILD_TYPE},
+                 {"CMAKE_CXX_COMPILER", CMAKE_CXX_COMPILER},
+                 {"CMAKE_CXX_FLAGS", CMAKE_CXX_FLAGS},
+                 {"CMAKE_CXX_FLAGS_DEBUG", CMAKE_CXX_FLAGS_DEBUG},
+                 {"CMAKE_CXX_FLAGS_RELEASE", CMAKE_CXX_FLAGS_RELEASE},
+                 {"CMAKE_CXX_FLAGS_OPTIMIZATION", CMAKE_CXX_FLAGS_OPTIMIZATION},
+                 {"CMAKE_DEFINITIONS", CMAKE_DEFINITIONS},
+                 {"CMAKE_INSTALL_PREFIX", CMAKE_INSTALL_PREFIX},
+                 {"CMAKE_MODULE_LINKER_FLAGS", CMAKE_MODULE_LINKER_FLAGS},
+                 {"CMAKE_SHARED_LINKER_FLAGS", CMAKE_SHARED_LINKER_FLAGS},
+             }},
+            // components
+            {"Components",
+             {
+                 {"BUILD_DEB_PACKAGE", BUILD_DEB_PACKAGE},
+                 {"BUILD_RPM_PACKAGE", BUILD_RPM_PACKAGE},
+                 {"CLANGFORMAT_EXECUTABLE", CLANGFORMAT_EXECUTABLE},
+                 {"COVERITY_COMMENT", COVERITY_COMMENT},
+                 {"COVERITY_DIRECTORY", COVERITY_DIRECTORY},
+                 {"COVERITY_EMAIL", COVERITY_EMAIL},
+                 {"COVERITY_EXECUTABLE", COVERITY_EXECUTABLE},
+                 {"COVERITY_URL", COVERITY_URL},
+                 {"CPPCHECK_EXECUTABLE", CPPCHECK_EXECUTABLE},
+             }},
+            // additional properties
+            {"Additional properties",
+             {
+                 {"PROP_DOCS", PROP_DOCS},
+                 {"PROP_FUTURE", PROP_FUTURE},
+                 {"PROP_LOAD", PROP_LOAD},
+                 {"PROP_TEST", PROP_TEST},
+             }}};
 }

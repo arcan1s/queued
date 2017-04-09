@@ -50,12 +50,22 @@ void QueuedServer::init()
 {
     deinit();
 
-    m_server = new QueuedTcpServer(this);
-    m_server->listen(
-        QHostAddress(QueuedCoreAdaptor::getOption("ServerAddress").toString()),
-        QueuedCoreAdaptor::getOption("ServerPort").toUInt());
+    m_server
+        = new QueuedTcpServer(QueuedCoreAdaptor::getOption(
+                                  QueuedConfig::QueuedSettings::ServerTimeout)
+                                  .toInt(),
+                              this);
+    QString address = QueuedCoreAdaptor::getOption(
+                          QueuedConfig::QueuedSettings::ServerAddress)
+                          .toString();
+    ushort port
+        = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::ServerPort)
+              .toUInt();
+    m_server->listen(QHostAddress(address), port);
     m_server->setMaxPendingConnections(
-        QueuedCoreAdaptor::getOption("ServerMaxConnections").toInt());
+        QueuedCoreAdaptor::getOption(
+            QueuedConfig::QueuedSettings::ServerMaxConnections)
+            .toInt());
 
     qCInfo(LOG_SERV) << "Server listen on" << m_server->serverAddress()
                      << m_server->serverPort();

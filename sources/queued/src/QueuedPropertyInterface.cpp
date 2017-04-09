@@ -56,7 +56,8 @@ QDBusVariant QueuedPropertyInterface::Option(const QString &property)
 {
     qCDebug(LOG_DBUS) << "Get property" << property;
 
-    return QDBusVariant(m_core->option(property));
+    auto response = m_core->option(property);
+    return QDBusVariant(response.isValid() ? response : "");
 }
 
 
@@ -71,14 +72,18 @@ QDBusVariant QueuedPropertyInterface::Task(const long long id,
     auto task = m_core->task(id);
     if (!task) {
         qCWarning(LOG_DBUS) << "Could not find task" << id;
-        return QDBusVariant();
+        return QDBusVariant("");
     }
 
-    if (property.isEmpty())
-        return QDBusVariant(
-            QVariant::fromValue<QVariantHash>(getProperties(task)));
-    else
-        return QDBusVariant(task->property(qPrintable(property)));
+    if (property.isEmpty()) {
+        auto response = QVariant::fromValue<QVariantHash>(getProperties(task));
+        return QDBusVariant(response);
+    } else {
+        auto response = task->property(qPrintable(property));
+        if (response.type() == QVariant::DateTime)
+            response = response.toDateTime().toString(Qt::ISODateWithMs);
+        return QDBusVariant(response.isValid() ? response : "");
+    }
 }
 
 
@@ -93,14 +98,18 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
     auto user = m_core->user(id);
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << id;
-        return QDBusVariant();
+        return QDBusVariant("");
     }
 
-    if (property.isEmpty())
-        return QDBusVariant(
-            QVariant::fromValue<QVariantHash>(getProperties(user)));
-    else
-        return QDBusVariant(user->property(qPrintable(property)));
+    if (property.isEmpty()) {
+        auto response = QVariant::fromValue<QVariantHash>(getProperties(user));
+        return QDBusVariant(response);
+    } else {
+        auto response = user->property(qPrintable(property));
+        if (response.type() == QVariant::DateTime)
+            response = response.toDateTime().toString(Qt::ISODateWithMs);
+        return QDBusVariant(response.isValid() ? response : "");
+    }
 }
 
 
@@ -138,6 +147,9 @@ QVariantHash QueuedPropertyInterface::getProperties(const QObject *_object)
         if (QString(name) == "objectName")
             continue;
         result[name] = _object->property(name);
+        if (result[name].type() == QVariant::DateTime)
+            result[name]
+                = result[name].toDateTime().toString(Qt::ISODateWithMs);
     }
 
     return result;

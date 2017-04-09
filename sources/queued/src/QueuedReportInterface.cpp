@@ -38,8 +38,16 @@ QueuedReportInterface::QueuedReportInterface(QueuedCore *parent)
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
 
+    // QList<QVariantHash>
     qRegisterMetaType<QList<QVariantHash>>("QList<QVariantHash>");
     qDBusRegisterMetaType<QList<QVariantHash>>();
+    // QHash<QString, QString>
+    qRegisterMetaType<QHash<QString, QString>>("QHash<QString, QString>");
+    qDBusRegisterMetaType<QHash<QString, QString>>();
+    // QHash<QString, QHash<QString, QString>>
+    qRegisterMetaType<QHash<QString, QHash<QString, QString>>>(
+        "QHash<QString, QHash<QString, QString>>");
+    qDBusRegisterMetaType<QHash<QString, QHash<QString, QString>>>();
 }
 
 
@@ -65,6 +73,19 @@ QDBusVariant QueuedReportInterface::Performance(const QString &from,
         QVariant::fromValue<QList<QVariantHash>>(m_core->performanceReport(
             QDateTime::fromString(from, Qt::ISODateWithMs),
             QDateTime::fromString(to, Qt::ISODateWithMs), token)));
+}
+
+
+/**
+ * @fn Status
+ */
+QDBusVariant QueuedReportInterface::Status()
+{
+    auto metadata = QueuedDebug::getBuildMetaData();
+    // append metadata here
+
+    return QDBusVariant(
+        QVariant::fromValue<QHash<QString, QHash<QString, QString>>>(metadata));
 }
 
 

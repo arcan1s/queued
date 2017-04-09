@@ -55,6 +55,27 @@ QString QueuedctlCommon::commandsHelp()
 }
 
 
+QString QueuedctlCommon::hashHashToString(
+    const QHash<QString, QHash<QString, QString>> &_hash)
+{
+    qCDebug(LOG_APP) << "Convert hash to string" << _hash;
+
+    QStringList output;
+
+    QStringList groups = _hash.keys();
+    groups.sort();
+    for (auto &group : groups) {
+        output += group;
+        QStringList keys = _hash[group].keys();
+        keys.sort();
+        for (auto &key : keys)
+            output += QString("\t%1: %2").arg(key).arg(_hash[group][key]);
+    }
+
+    return output.join('\n');
+}
+
+
 QString QueuedctlCommon::hashToString(const QVariantHash &_hash)
 {
     qCDebug(LOG_APP) << "Convert hash to string" << _hash;
@@ -135,6 +156,8 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
         break;
     case QueuedctlArgument::Report:
         QueuedctlUser::parserReport(_parser);
+        break;
+    case QueuedctlArgument::Status:
         break;
     case QueuedctlArgument::TaskAdd:
         QueuedctlTask::parserAdd(_parser);
@@ -223,7 +246,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::PermissionAdd: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QString token = QueuedctlAuth::getToken(_cache, _user);
         result.status
             = QueuedctlPermissions::addPermission(userId, args.at(2), token);
@@ -238,7 +261,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::PermissionRemove: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QString token = QueuedctlAuth::getToken(_cache, _user);
         result.status
             = QueuedctlPermissions::removePermission(userId, args.at(2), token);
@@ -282,6 +305,12 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         result.status = true;
         result.output
             = hashListToString(QueuedctlUser::getReport(_parser, token));
+        break;
+    }
+    case QueuedctlArgument::Status: {
+        auto status = QueuedCoreAdaptor::getStatus();
+        result.status = !status.isEmpty();
+        result.output = hashHashToString(status);
         break;
     }
     case QueuedctlArgument::TaskAdd: {
@@ -340,7 +369,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::UserGet: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QVariant value = QueuedctlUser::getUser(userId, args.at(2));
         result.status = value.isValid();
         result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
@@ -355,7 +384,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::UserSet: {
-        auto userId = QueuedctlUser::getUserId(args.at(1));
+        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlUser::getDefinitions(_parser, true);
         result.status = QueuedctlUser::setUser(userId, definitions, token);

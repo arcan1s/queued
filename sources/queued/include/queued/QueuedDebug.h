@@ -24,6 +24,7 @@
 #ifndef QUEUEDDEBUG_H
 #define QUEUEDDEBUG_H
 
+#include <QHash>
 #include <QLoggingCategory>
 
 
@@ -78,6 +79,10 @@ void enableDebug();
  * @brief additional method to get build details declared in version.h
  */
 QStringList getBuildData();
+/**
+ * @brief additional method to get build details declared in version.h
+ */
+QHash<QString, QHash<QString, QString>> getBuildMetaData();
 }
 
 

@@ -667,8 +667,9 @@ void QueuedCore::updateSettings(const QueuedConfig::QueuedSettings _id,
         m_processes->setProcessLine(_value.toString());
         break;
     case QueuedConfig::QueuedSettings::ServerAddress:
-    case QueuedConfig::QueuedSettings::ServerPort:
     case QueuedConfig::QueuedSettings::ServerMaxConnections:
+    case QueuedConfig::QueuedSettings::ServerPort:
+    case QueuedConfig::QueuedSettings::ServerTimeout:
         // do nothing here
         break;
     case QueuedConfig::QueuedSettings::TokenExpiration:
@@ -958,12 +959,11 @@ long long QueuedCore::addUserPrivate(const QString &_name,
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
                      << "and permissions" << _permissions;
     // add to database
-    QVariantHash properties
-        = {{"name", _name},
-           {"password", QueuedUser::hashFromPassword(_password)},
-           {"email", _email},
-           {"permissions", _permissions},
-           {"limits", _limits.toString()}};
+    QVariantHash properties = {{"name", _name},
+                               {"password", _password},
+                               {"email", _email},
+                               {"permissions", _permissions},
+                               {"limits", _limits.toString()}};
     auto id = m_database->add(QueuedDB::USERS_TABLE, properties);
     if (id == -1) {
         qCWarning(LOG_LIB) << "Could not add user" << _name;
