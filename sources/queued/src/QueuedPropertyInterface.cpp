@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Evgeniy Alekseev
+ * Copyright (c) 2017 Queued team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -15,7 +15,7 @@
 /**
  * @file QueuedPropertyInterface.cpp
  * Source code of queued library
- * @author Evgeniy Alekseev
+ * @author Queued team
  * @copyright GPLv3
  * @bug https://github.com/arcan1s/queued/issues
  */
@@ -106,11 +106,8 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
         return QDBusVariant(response);
     } else {
         auto response = user->property(qPrintable(property));
-<<<<<<< HEAD
         if (response.type() == QVariant::DateTime)
             response = response.toDateTime().toString(Qt::ISODateWithMs);
-=======
->>>>>>> baa20af363cb4b97cb6f7b36f833cf40f34cc61d
         return QDBusVariant(response.isValid() ? response : "");
     }
 }

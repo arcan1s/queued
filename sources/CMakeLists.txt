@@ -10,7 +10,7 @@ if (POLICY CMP0063)
 endif ()
 
 project(queued)
-set(PROJECT_AUTHOR "Evgeniy Alekseev")
+set(PROJECT_AUTHOR "Queued team")
 set(PROJECT_CONTACT "esalexeev@gmail.com")
 set(PROJECT_LICENSE "MIT")
 set(PROJECT_VERSION_MAJOR "0")

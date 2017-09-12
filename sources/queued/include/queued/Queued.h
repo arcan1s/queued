@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2017 Evgeniy Alekseev
+ * Copyright (c) 2017 Queued team
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -15,7 +15,7 @@
 /**
  * @file Queued.h
  * Header of Queued library
- * @author Evgeniy Alekseev
+ * @author Queued team
  * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */

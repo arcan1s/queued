@@ -1,0 +1,28 @@
+.TH queued-daemon 1  "@CURRENT_DATE@" "version @PROJECT_VERSION@"
+.SH NAME
+Daemon for starting jobs to queue of calculation
+.SH SYNOPSIS
+.B queued-daemon
+[ options ]
+.SH DESCRIPTION
+Daemon for starting jobs to queue of calculation. Daemon to start application
+.SH OPTIONS
+.IP "-c, --config <config>"
+path to configuration file, default is /etc/xdg/queued.ini
+.IP "-d, --debug"
+verbose output
+.IP "--daemon"
+start daemonize
+.IP "-v, --version"
+show version and exit
+.IP "-i, --info"
+show build information and exit
+.IP "-h, --help"
+show this help and exit
+.SH SEE ALSO
+.BR queuedctl (1)
+.BR queued-server (1)
+.SH AUTHOR
+@PROJECT_AUTHOR@ <\fI@PROJECT_CONTACT@\fR>
+.SH LICENSE
+This software is licensed under @PROJECT_LICENSE@
