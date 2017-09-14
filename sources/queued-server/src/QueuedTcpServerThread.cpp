@@ -82,7 +82,7 @@ QueuedTcpServerThread::getHeaders(const QStringList &headers)
 {
     qCDebug(LOG_SERV) << "Get headers object from" << headers;
 
-    QueuedTcpServerThread::QueuedTcpServerHeaders headersObj;
+    auto headersObj = QueuedTcpServerThread::QueuedTcpServerHeaders();
 
     // metadata
     auto protocolData = headers.first().split(' ');
@@ -96,8 +96,9 @@ QueuedTcpServerThread::getHeaders(const QStringList &headers)
         auto parsed = header.split(": ");
         if (parsed.count() < 2)
             continue;
-        headersObj.headers += {parsed.first().toUtf8().toLower(),
-                               parsed.mid(1).join(": ").toUtf8()};
+        headersObj.headers += QPair<QByteArray, QByteArray>(
+            {parsed.first().toUtf8().toLower(),
+             parsed.mid(1).join(": ").toUtf8()});
     }
 
     return headersObj;
@@ -114,7 +115,7 @@ QueuedTcpServerThread::QueuedTcpServerRequest QueuedTcpServerThread::getRequest(
     request.headers = headers;
 
     // body
-    QJsonParseError error;
+    auto error = QJsonParseError();
     auto jsonDoc = QJsonDocument::fromJson(body, &error);
     if (error.error == QJsonParseError::NoError)
         request.data = jsonDoc.object().toVariantHash();

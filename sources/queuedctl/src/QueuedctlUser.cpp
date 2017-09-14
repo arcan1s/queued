@@ -93,7 +93,7 @@ QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
 QString QueuedctlUser::getPassword()
 {
     // do not show input characters
-    struct termios tty;
+    auto tty = termios();
     ::tcgetattr(STDIN_FILENO, &tty);
     tty.c_lflag &= ~ECHO;
     tcsetattr(STDIN_FILENO, TCSANOW, &tty);

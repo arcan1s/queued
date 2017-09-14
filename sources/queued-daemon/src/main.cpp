@@ -15,19 +15,17 @@
 
 
 #include <QCommandLineParser>
-#include <QCoreApplication>
 #include <QDBusConnection>
-#include <QDBusMessage>
 
 #include <queued/Queued.h>
 
+#include <csignal>
 #include <iostream>
 
 #include "QueuedApplication.h"
 #include "version.h"
 
 extern "C" {
-#include <signal.h>
 #include <unistd.h>
 }
 

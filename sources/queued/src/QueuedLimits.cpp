@@ -52,10 +52,8 @@ bool QueuedLimits::limitCompare(const long long _first, const long long _second)
 {
     if (_first == 0)
         return false;
-    else if (_second == 0)
-        return true;
     else
-        return _first < _second;
+        return (_second == 0) || (_first < _second);
 }
 
 

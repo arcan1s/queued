@@ -30,13 +30,11 @@ class QueuedApplication : public QObject
 public:
     explicit QueuedApplication(QObject *parent, const QVariantHash &args);
     virtual ~QueuedApplication();
-    void deinit();
     void init();
 
 private:
     // backend
     void initDBus();
-    void initCore();
     // library
     QueuedCore *m_core = nullptr;
     // configuration

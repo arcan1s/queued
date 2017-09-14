@@ -27,11 +27,8 @@ bool QueuedctlPermissions::addPermission(const long long _id,
 
     auto permission = QueuedEnums::stringToPermission(_permission);
 
-    if (permission != QueuedEnums::Permission::Invalid)
-        return QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission,
-                                                        _token);
-    else
-        return false;
+    return (permission != QueuedEnums::Permission::Invalid)
+           && QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
 }
 
 
@@ -43,11 +40,9 @@ bool QueuedctlPermissions::removePermission(const long long _id,
 
     auto permission = QueuedEnums::stringToPermission(_permission);
 
-    if (permission != QueuedEnums::Permission::Invalid)
-        return QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission,
-                                                           _token);
-    else
-        return false;
+    return (permission != QueuedEnums::Permission::Invalid)
+           && QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission,
+                                                          _token);
 }
 
 

@@ -351,9 +351,9 @@ void QueuedDatabase::createSchema(const QString &_table)
                                   .arg(field.sqlDescription));
         QSqlError error = query.lastError();
         if (error.isValid())
-            qCCritical(LOG_LIB) << "Could not insert column" << column
-                                << "to table" << _table
-                                << "error:" << error.text();
+            qCCritical(LOG_LIB)
+                << "Could not insert column" << column << "to table" << _table
+                << "error:" << error.text();
     }
 }
 
@@ -370,8 +370,8 @@ void QueuedDatabase::createTable(const QString &_table)
             .arg(_table));
     QSqlError error = query.lastError();
     if (error.isValid())
-        qCCritical(LOG_LIB) << "Could not create table" << _table
-                            << "error:" << error.text();
+        qCCritical(LOG_LIB)
+            << "Could not create table" << _table << "error:" << error.text();
 }
 
 
@@ -408,7 +408,7 @@ long long QueuedDatabase::lastInsertionId(const QString &_table) const
         return -1;
     }
 
-    long long id;
+    long long id = -1;
     while (query.next())
         id = query.value(0).toLongLong();
 
@@ -430,8 +430,8 @@ QueuedDatabase::getQueryPayload(const QString &_table,
     QStringList schemaColumns = QueuedDB::DBSchema[_table].keys();
     for (auto &key : _value.keys()) {
         if (!schemaColumns.contains(key)) {
-            qCWarning(LOG_LIB) << "No key" << key << "found in schema of"
-                               << _table;
+            qCWarning(LOG_LIB)
+                << "No key" << key << "found in schema of" << _table;
             continue;
         }
         if (key == QString("_id")) {

@@ -210,7 +210,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     qCDebug(LOG_APP) << "Process command with args"
                      << "using auth" << _cache << _user;
 
-    QueuedctlResult result;
+    auto result = QueuedctlResult();
     QStringList args = _parser.positionalArguments();
     QString command = args.isEmpty() ? QString() : args.first();
 
@@ -316,10 +316,10 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::TaskAdd: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlTask::getDefinitions(_parser, false);
-        long long id = QueuedctlTask::addTask(definitions, token);
-        result.status = (id > 0);
+        long long taskId = QueuedctlTask::addTask(definitions, token);
+        result.status = (taskId > 0);
         if (result.status)
-            result.output = QString("Task %1 added").arg(id);
+            result.output = QString("Task %1 added").arg(taskId);
         else
             result.output = QString("Could not add task");
         break;
@@ -360,10 +360,10 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::UserAdd: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlUser::getDefinitions(_parser, false);
-        long long id = QueuedctlUser::addUser(definitions, token);
-        result.status = (id > 0);
+        long long userId = QueuedctlUser::addUser(definitions, token);
+        result.status = (userId > 0);
         if (result.status)
-            result.output = QString("User %1 added").arg(id);
+            result.output = QString("User %1 added").arg(userId);
         else
             result.output = QString("Could not add user");
         break;

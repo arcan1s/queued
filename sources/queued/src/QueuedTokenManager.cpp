@@ -23,9 +23,7 @@
 
 #include <queued/Queued.h>
 
-#include <QTimer>
 #include <QUuid>
-#include <queued/Queued.h>
 
 
 /**
@@ -111,8 +109,7 @@ QString QueuedTokenManager::registerToken(const QString &_user,
                                           const QDateTime &_validUntil)
 {
     // generate from uuid
-    QString token
-        = QUuid::createUuid().toString().remove(QChar('{')).remove(QChar('}'));
+    QString &token = QUuid::createUuid().toString().remove('{').remove('}');
     qCInfo(LOG_LIB) << "Registered token" << token << "valid until"
                     << _validUntil;
 

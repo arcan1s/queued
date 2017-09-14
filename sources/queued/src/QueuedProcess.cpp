@@ -26,8 +26,6 @@
 #include <QMetaProperty>
 #include <QStandardPaths>
 
-#include <queued/QueuedProcess.h>
-
 
 /**
  * @class QueuedProcess
@@ -82,9 +80,10 @@ void QueuedProcess::updateArguments()
 
     // replace limits now
     application.replace(
-        "{cpu}", QString("%1").arg(
-                     QueuedSystemInfo::cpuWeight(nativeLimits().cpu) * 100.0, 0,
-                     'f', 0));
+        "{cpu}",
+        QString("%1").arg(QueuedSystemInfo::cpuWeight(nativeLimits().cpu)
+                              * 100.0,
+                          0, 'f', 0));
     application.replace(
         "{memory}",
         QString("%1").arg(QueuedSystemInfo::memoryWeight(nativeLimits().memory)

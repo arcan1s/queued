@@ -43,7 +43,8 @@ public:
     /**
      * @brief QueuedPluginManagerInterface class destructor
      */
-    virtual ~QueuedPluginManagerInterface(){};
+    virtual ~QueuedPluginManagerInterface() = default;
+    ;
 
 signals:
     /**

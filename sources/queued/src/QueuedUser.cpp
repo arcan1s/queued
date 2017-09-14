@@ -92,12 +92,10 @@ bool QueuedUser::hasPermission(const QueuedEnums::Permission _permission)
 {
     qCDebug(LOG_LIB) << "Check permissions" << static_cast<int>(_permission);
 
-    if (static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
-            .testFlag(QueuedEnums::Permission::SuperAdmin))
-        return true;
-    else
-        return static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
-            .testFlag(_permission);
+    return static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
+               .testFlag(QueuedEnums::Permission::SuperAdmin)
+           || static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
+                  .testFlag(_permission);
 }
 
 

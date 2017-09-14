@@ -111,7 +111,6 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         else
             output = {{"code", 405}};
         break;
-        break;
     case QueuedTcpServerResponseHelper::RequestPath::User:
         if (_type == "GET")
             output = QueuedTcpServerResponseHelperUser::getUser(_arg, _data);

@@ -20,8 +20,6 @@
 
 #include <queued/Queued.h>
 
-#include "QueuedctlUser.h"
-
 extern "C" {
 #include <unistd.h>
 }

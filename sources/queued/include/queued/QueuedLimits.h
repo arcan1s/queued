@@ -84,7 +84,8 @@ struct Limits {
      * @param _stringLimits
      * limits string representation
      */
-    Limits(const QString &_stringLimits)
+    explicit Limits(const QString &_stringLimits)
+        : Limits()
     {
         QStringList limits = _stringLimits.split(QChar('\n'));
         while (limits.count() < 5)

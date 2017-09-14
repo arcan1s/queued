@@ -27,6 +27,8 @@ QueuedServer::QueuedServer(QObject *parent, const QVariantHash &args)
 {
     qCDebug(LOG_SERV) << __PRETTY_FUNCTION__;
 
+    m_server = new QueuedTcpServer(this);
+
     init();
 }
 
@@ -35,26 +37,15 @@ QueuedServer::~QueuedServer()
 {
     qCDebug(LOG_SERV) << __PRETTY_FUNCTION__;
 
-    deinit();
-}
-
-
-void QueuedServer::deinit()
-{
-    if (m_server)
-        delete m_server;
+    m_server->deleteLater();
 }
 
 
 void QueuedServer::init()
 {
-    deinit();
-
-    m_server
-        = new QueuedTcpServer(QueuedCoreAdaptor::getOption(
-                                  QueuedConfig::QueuedSettings::ServerTimeout)
-                                  .toInt(),
-                              this);
+    m_server->init(QueuedCoreAdaptor::getOption(
+                       QueuedConfig::QueuedSettings::ServerTimeout)
+                       .toInt());
     QString address = QueuedCoreAdaptor::getOption(
                           QueuedConfig::QueuedSettings::ServerAddress)
                           .toString();

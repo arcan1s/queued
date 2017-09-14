@@ -27,7 +27,6 @@
 #include <QDBusMessage>
 
 #include <queued/QueuedDatabaseSchema.h>
-#include <queued/QueuedStaticConfig.h>
 
 
 /**
@@ -233,8 +232,8 @@ bool QueuedCore::editTask(const long long _id, const QVariantHash &_taskData,
     // only admin can edit run/stopped task
     if (!task->startTime().isNull()) {
         if (!isAdmin) {
-            qCInfo(LOG_LIB) << "User" << _token
-                            << "not allowed to edit run/exited task";
+            qCInfo(LOG_LIB)
+                << "User" << _token << "not allowed to edit run/exited task";
             return false;
         }
     }
@@ -306,8 +305,8 @@ bool QueuedCore::editUserPermission(const long long _id,
     bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
     if (userAuthId != _id) {
         if (!isAdmin) {
-            qCInfo(LOG_LIB) << "User" << _token
-                            << "not allowed to edit permissions";
+            qCInfo(LOG_LIB)
+                << "User" << _token << "not allowed to edit permissions";
             return false;
         }
     }
@@ -501,8 +500,8 @@ QList<QVariantHash> QueuedCore::taskReport(const long long _user,
         effectiveUserId = userAuthId;
     } else if (userAuthId != _user) {
         if (!isAdmin) {
-            qCInfo(LOG_LIB) << "User" << _token
-                            << "not allowed to get task report";
+            qCInfo(LOG_LIB)
+                << "User" << _token << "not allowed to get task report";
             return QList<QVariantHash>();
         }
     }
@@ -575,22 +574,14 @@ void QueuedCore::deinit()
     QDBusConnection::sessionBus().unregisterService(QueuedConfig::DBUS_SERVICE);
 
     // delete objects now
-    if (m_databaseManager)
-        delete m_databaseManager;
-    if (m_reports)
-        delete m_reports;
-    if (m_plugins)
-        delete m_plugins;
-    if (m_processes)
-        delete m_processes;
-    if (m_users)
-        delete m_users;
-    if (m_database)
-        delete m_database;
-    if (m_settings)
-        delete m_settings;
-    if (m_advancedSettings)
-        delete m_advancedSettings;
+    delete m_databaseManager;
+    delete m_reports;
+    delete m_plugins;
+    delete m_processes;
+    delete m_users;
+    delete m_database;
+    delete m_settings;
+    delete m_advancedSettings;
 }
 
 
@@ -991,7 +982,7 @@ bool QueuedCore::editOptionPrivate(const QString &_key, const QVariant &_value)
     long long id = m_advancedSettings->id(_key);
     QVariantHash payload = {{"key", _key}, {"value", _value}};
 
-    bool status = false;
+    bool status;
     if (id == -1) {
         id = m_database->add(QueuedDB::SETTINGS_TABLE, payload);
         qCInfo(LOG_LIB) << "Added new key with ID" << id;
@@ -1146,7 +1137,7 @@ bool QueuedCore::editUserPermissionPrivate(
     // edit runtime permissions to get value
     auto perms = _add ? userObj->addPermission(_permission)
                       : userObj->removePermission(_permission);
-    uint permissions = static_cast<uint>(perms);
+    auto permissions = static_cast<uint>(perms);
     qCInfo(LOG_LIB) << "New user permissions" << perms << permissions;
 
     // modify in database now

@@ -40,7 +40,7 @@ public:
     /**
      * @brief QueuedPluginInterface class destructor
      */
-    virtual ~QueuedPluginInterface(){};
+    virtual ~QueuedPluginInterface() = default;
     /**
      * @brief will be emitted to map interface signals to plugin slots
      * @param _manager

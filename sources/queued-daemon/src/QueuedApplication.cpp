@@ -30,6 +30,8 @@ QueuedApplication::QueuedApplication(QObject *parent, const QVariantHash &args)
 {
     qCDebug(LOG_APP) << __PRETTY_FUNCTION__;
 
+    m_core = new QueuedCore(this);
+
     init();
     initDBus();
 }
@@ -41,30 +43,13 @@ QueuedApplication::~QueuedApplication()
 
     QDBusConnection::sessionBus().unregisterObject(
         QueuedConfig::DBUS_APPLICATION_PATH);
-    deinit();
-}
-
-
-void QueuedApplication::deinit()
-{
-    if (m_core)
-        delete m_core;
+    m_core->deleteLater();
 }
 
 
 void QueuedApplication::init()
 {
-    deinit();
-
-    initCore();
-}
-
-
-void QueuedApplication::initCore()
-{
-    m_core = new QueuedCore(this);
-    // init objects
-    m_core->init(m_configuration[QString("config")].toString());
+    m_core->init(m_configuration["config"].toString());
 }
 
 

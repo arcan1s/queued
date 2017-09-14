@@ -53,10 +53,8 @@ bool QueuedAdvancedSettings::checkDatabaseVersion() const
 {
     QString key = internalId(QueuedConfig::QueuedSettings::DatabaseVersion);
 
-    if (m_values.contains(key.toLower()))
-        return get(key).toInt() == QueuedConfig::DATABASE_VERSION;
-    else
-        return false;
+    return m_values.contains(key.toLower())
+           && (get(key).toInt() == QueuedConfig::DATABASE_VERSION);
 }
 
 

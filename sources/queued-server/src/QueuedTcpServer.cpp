@@ -21,9 +21,8 @@
 #include "QueuedTcpServerThread.h"
 
 
-QueuedTcpServer::QueuedTcpServer(const int timeout, QObject *parent)
+QueuedTcpServer::QueuedTcpServer(QObject *parent)
     : QTcpServer(parent)
-    , m_timeout(timeout)
 {
     qCDebug(LOG_SERV) << __PRETTY_FUNCTION__;
 }
@@ -32,26 +31,18 @@ QueuedTcpServer::QueuedTcpServer(const int timeout, QObject *parent)
 QueuedTcpServer::~QueuedTcpServer()
 {
     qCDebug(LOG_SERV) << __PRETTY_FUNCTION__;
-
-    deinit();
 }
 
 
-void QueuedTcpServer::deinit()
+void QueuedTcpServer::init(const int timeout)
 {
-}
-
-
-void QueuedTcpServer::init()
-{
-    deinit();
+    m_timeout = timeout;
 }
 
 
 void QueuedTcpServer::incomingConnection(qintptr socketDescriptor)
 {
-    QueuedTcpServerThread *thread
-        = new QueuedTcpServerThread(socketDescriptor, m_timeout, this);
+    auto thread = new QueuedTcpServerThread(socketDescriptor, m_timeout, this);
     connect(thread, SIGNAL(finished()), thread, SLOT(deleteLater()));
     thread->start();
 }

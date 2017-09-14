@@ -30,7 +30,6 @@ class QueuedServer : public QObject
 public:
     explicit QueuedServer(QObject *parent, const QVariantHash &args);
     virtual ~QueuedServer();
-    void deinit();
     void init();
 
 private:

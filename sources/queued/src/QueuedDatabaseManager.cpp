@@ -23,8 +23,6 @@
 
 #include <queued/Queued.h>
 
-#include <QDateTime>
-
 
 /**
  * @class QueuedDatabaseManager

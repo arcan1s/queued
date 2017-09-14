@@ -42,7 +42,7 @@ QueuedTcpServerResponseHelperTask::getDefinitions(const QVariantHash &_data)
 {
     qCDebug(LOG_SERV) << "Get definitions from" << _data;
 
-    QueuedProcess::QueuedProcessDefinitions defs;
+    auto defs = QueuedProcess::QueuedProcessDefinitions();
     auto args = _data["arguments"].toList();
     for (auto &arg : args)
         defs.arguments.append(arg.toString());
@@ -94,7 +94,7 @@ QueuedTcpServerResponseHelperTask::getTasks(const QVariantHash &_data,
 {
     qCDebug(LOG_SERV) << "Get tasks" << _data;
 
-    long long user = _data.value("userId").toLongLong();
+    long long userId = _data.value("userId").toLongLong();
     QDateTime start
         = QDateTime::fromString(_data["start"].toString(), Qt::ISODateWithMs);
     QDateTime stop
@@ -103,7 +103,7 @@ QueuedTcpServerResponseHelperTask::getTasks(const QVariantHash &_data,
     QVariantHash output = {{"code", 200}};
     // some conversion magic
     QVariantList outputReport;
-    auto report = QueuedCoreAdaptor::getTasks(user, start, stop, _token);
+    auto report = QueuedCoreAdaptor::getTasks(userId, start, stop, _token);
     for (auto &user : report)
         outputReport.append(user);
     output["report"] = outputReport;

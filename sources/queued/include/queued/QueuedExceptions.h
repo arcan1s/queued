@@ -38,12 +38,18 @@ public:
      * @param message
      * exception message
      */
-    QueuedException(const QString &message)
-        : m_message(message){};
+    explicit QueuedException(QString message)
+        : QException()
+    {
+        m_message = std::move(message);
+    };
     /**
      * @brief clone QueuedException
      */
-    QueuedException *clone() const { return new QueuedException(*this); };
+    QueuedException *clone() const override
+    {
+        return new QueuedException(*this);
+    };
     /**
      * @brief message of this exception
      * @return message for logging, etc
@@ -52,7 +58,7 @@ public:
     /**
      * @brief raise QueuedException
      */
-    void raise() const { throw * this; }
+    void raise() const override { throw * this; }
 
 private:
     /**
@@ -73,7 +79,7 @@ public:
      * @param message
      * exception message
      */
-    QueuedConfigurationException(const QString &message)
+    explicit QueuedConfigurationException(const QString &message)
         : QueuedException(message){};
 };
 
@@ -89,7 +95,7 @@ public:
      * @param message
      * exception message
      */
-    QueuedDatabaseException(const QString &message)
+    explicit QueuedDatabaseException(const QString &message)
         : QueuedException(message){};
 };
 
@@ -105,7 +111,7 @@ public:
      * @param message
      * exception message
      */
-    QueuedDBusException(const QString &message)
+    explicit QueuedDBusException(const QString &message)
         : QueuedException(message){};
 };
 

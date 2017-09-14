@@ -102,7 +102,7 @@ QueuedProcess *QueuedProcessManager::add(
     if (processes().contains(_index))
         return process(_index);
 
-    QueuedProcess *process = new QueuedProcess(this, _definitions, _index);
+    auto *process = new QueuedProcess(this, _definitions, _index);
     process->setProcessLine(processLine());
     m_processes[_index] = process;
     // connect to signal

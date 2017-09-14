@@ -15,7 +15,6 @@
 
 
 #include <QCommandLineParser>
-#include <QCoreApplication>
 
 #include <queued/Queued.h>
 
