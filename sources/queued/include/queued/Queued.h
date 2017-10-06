@@ -25,6 +25,7 @@
 #define QUEUED_H
 
 #include "QueuedAdvancedSettings.h"
+#include "QueuedControlGroupsAdaptor.h"
 #include "QueuedCore.h"
 #include "QueuedCoreAdaptor.h"
 #include "QueuedCoreInterface.h"

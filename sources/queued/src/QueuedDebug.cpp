@@ -48,7 +48,7 @@ void QueuedDebug::applyLogFormat()
  */
 void QueuedDebug::enableDebug()
 {
-    QLoggingCategory::setFilterRules(QString("org.queued.*=true"));
+    QLoggingCategory::setFilterRules("org.queued.*=true");
 }
 
 

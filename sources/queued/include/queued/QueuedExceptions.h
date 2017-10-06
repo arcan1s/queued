@@ -58,7 +58,7 @@ public:
     /**
      * @brief raise QueuedException
      */
-    void raise() const override { throw * this; }
+    void raise() const override { throw *this; }
 
 private:
     /**

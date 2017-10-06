@@ -69,21 +69,20 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
 
     QueuedProcess::QueuedProcessDefinitions defs;
     // parameters
-    defs.command = _properties[QString("command")].toString();
-    defs.arguments = _properties[QString("commandArguments")].toString().split(
-        QChar('\n'));
-    defs.workingDirectory = _properties[QString("workDirectory")].toString();
-    defs.nice = _properties[QString("nice")].toUInt();
-    defs.limits = _properties[QString("limits")].toString();
+    defs.command = _properties["command"].toString();
+    defs.arguments = _properties["commandArguments"].toString().split('\n');
+    defs.workingDirectory = _properties["workDirectory"].toString();
+    defs.nice = _properties["nice"].toUInt();
+    defs.limits = _properties["limits"].toString();
     // user data
-    defs.uid = _properties[QString("uid")].toUInt();
-    defs.gid = _properties[QString("gid")].toUInt();
-    defs.user = _properties[QString("user")].toLongLong();
+    defs.uid = _properties["uid"].toUInt();
+    defs.gid = _properties["gid"].toUInt();
+    defs.user = _properties["user"].toLongLong();
     // metadata
-    defs.startTime = QDateTime::fromString(
-        _properties[QString("startTime")].toString(), Qt::ISODateWithMs);
-    defs.endTime = QDateTime::fromString(
-        _properties[QString("endTime")].toString(), Qt::ISODateWithMs);
+    defs.startTime = QDateTime::fromString(_properties["startTime"].toString(),
+                                           Qt::ISODateWithMs);
+    defs.endTime = QDateTime::fromString(_properties["endTime"].toString(),
+                                         Qt::ISODateWithMs);
 
     return add(defs, _index);
 }
@@ -107,8 +106,9 @@ QueuedProcess *QueuedProcessManager::add(
     m_processes[_index] = process;
     // connect to signal
     m_connections[_index] = connect(
-        process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
-                     &QProcess::finished),
+        process,
+        static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
+            &QProcess::finished),
         [=](const int exitCode, const QProcess::ExitStatus exitStatus) {
             return taskFinished(exitCode, exitStatus, _index);
         });
@@ -127,7 +127,7 @@ void QueuedProcessManager::loadProcesses(const QList<QVariantHash> &_processes)
     qCDebug(LOG_LIB) << "Add tasks from" << _processes;
 
     for (auto &processData : _processes)
-        add(processData, processData[QString("_id")].toLongLong());
+        add(processData, processData["_id"].toLongLong());
 }
 
 
@@ -235,6 +235,7 @@ void QueuedProcessManager::start(const long long _index)
 
     QDateTime start = QDateTime::currentDateTimeUtc();
     pr->start();
+    // emit start time
     pr->setStartTime(start);
     emit(taskStartTimeReceived(_index, start));
 }

@@ -39,29 +39,29 @@ namespace QueuedDB
  */
 const char SETTINGS_TABLE[] = "settings";
 /**
-* @brief tasks table name
-*/
+ * @brief tasks table name
+ */
 const char TASKS_TABLE[] = "tasks";
 /**
-* @brief tokens table name
-*/
+ * @brief tokens table name
+ */
 const char TOKENS_TABLE[] = "tokens";
 /**
-* @brief users table name
-*/
+ * @brief users table name
+ */
 const char USERS_TABLE[] = "users";
 /**
-* @struct QueuedDBField
-* @brief describes database column
-* @var QueuedDBField::name
-* column name
-* @var QueuedDBField::sqlDescription
-* description to create column
-* @var QueuedDBField::type
-* Qt type of column for cast
-* @var QueuedDBField::adminField
-* is admin permissions required to edit or not
-*/
+ * @struct QueuedDBField
+ * @brief describes database column
+ * @var QueuedDBField::name
+ * column name
+ * @var QueuedDBField::sqlDescription
+ * description to create column
+ * @var QueuedDBField::type
+ * Qt type of column for cast
+ * @var QueuedDBField::adminField
+ * is admin permissions required to edit or not
+ */
 typedef struct {
     QString name;
     QString sqlDescription;

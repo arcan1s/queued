@@ -47,9 +47,7 @@ QString QueuedctlAuth::getToken(const QString &_cache, const QString &_user)
 }
 
 
-void QueuedctlAuth::parser(QCommandLineParser &_parser)
-{
-}
+void QueuedctlAuth::parser(QCommandLineParser &_parser) {}
 
 
 void QueuedctlAuth::setToken(const QString &_token, const QString &_user,

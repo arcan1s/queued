@@ -30,14 +30,12 @@
 long long QueuedLimits::convertMemory(QString _value, bool *_status)
 {
     long long intValue;
-    if (_value.endsWith(QString("K")))
-        intValue = _value.remove(QString("K")).toLongLong(_status) * 1024;
-    else if (_value.endsWith(QString("M")))
-        intValue
-            = _value.remove(QString("M")).toLongLong(_status) * 1024 * 1024;
-    else if (_value.endsWith(QString("G")))
-        intValue = _value.remove(QString("G")).toLongLong(_status) * 1024 * 1024
-                   * 1024;
+    if (_value.endsWith("K"))
+        intValue = _value.remove("K").toLongLong(_status) * 1024;
+    else if (_value.endsWith("M"))
+        intValue = _value.remove("M").toLongLong(_status) * 1024 * 1024;
+    else if (_value.endsWith("G"))
+        intValue = _value.remove("G").toLongLong(_status) * 1024 * 1024 * 1024;
     else
         intValue = _value.toInt(_status);
 

@@ -80,8 +80,8 @@ QueuedConfig::QueuedDBSetup QueuedSettings::db() const
  */
 QString QueuedSettings::defaultPath()
 {
-    QString fileName = QStandardPaths::locate(QStandardPaths::ConfigLocation,
-                                              QString("queued.ini"));
+    QString fileName
+        = QStandardPaths::locate(QStandardPaths::ConfigLocation, "queued.ini");
     qCInfo(LOG_LIB) << "Found configuration file" << fileName;
 
     return fileName;

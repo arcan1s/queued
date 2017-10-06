@@ -602,12 +602,13 @@ void QueuedCore::init(const QString &_configuration)
     initProcesses();
 
     // settings update notifier
-    m_connections += connect(
-        m_advancedSettings,
-        SIGNAL(valueUpdated(const QueuedConfig::QueuedSettings, const QString &,
-                            const QVariant &)),
-        this, SLOT(updateSettings(const QueuedConfig::QueuedSettings,
-                                  const QString &, const QVariant &)));
+    m_connections
+        += connect(m_advancedSettings,
+                   SIGNAL(valueUpdated(const QueuedConfig::QueuedSettings,
+                                       const QString &, const QVariant &)),
+                   this,
+                   SLOT(updateSettings(const QueuedConfig::QueuedSettings,
+                                       const QString &, const QVariant &)));
 
     // dbus session
     initDBus();
@@ -671,7 +672,7 @@ void QueuedCore::updateSettings(const QueuedConfig::QueuedSettings _id,
 
 
 /**
-* @fn updateTaskTime
+ * @fn updateTaskTime
  */
 void QueuedCore::updateTaskTime(const long long _id,
                                 const QDateTime &_startTime,
@@ -682,12 +683,12 @@ void QueuedCore::updateTaskTime(const long long _id,
 
     QVariantHash record;
     if (_startTime.isValid()) {
-        record[QString("startTime")] = _startTime.toString(Qt::ISODateWithMs);
+        record["startTime"] = _startTime.toString(Qt::ISODateWithMs);
         if (m_plugins)
             emit(m_plugins->interface()->onStartTask(_id));
     }
     if (_endTime.isValid()) {
-        record[QString("endTime")] = _endTime.toString(Qt::ISODateWithMs);
+        record["endTime"] = _endTime.toString(Qt::ISODateWithMs);
         if (m_plugins)
             emit(m_plugins->interface()->onStopTask(_id));
     }
@@ -807,8 +808,8 @@ void QueuedCore::initProcesses()
               .toString();
 
     m_processes = new QueuedProcessManager(this, processLine, onExitAction);
-    auto dbProcesses = m_database->get(QueuedDB::TASKS_TABLE,
-                                       QString("WHERE endTime IS NULL"));
+    auto dbProcesses
+        = m_database->get(QueuedDB::TASKS_TABLE, "WHERE endTime IS NULL");
     m_processes->loadProcesses(dbProcesses);
 
     m_connections
@@ -837,7 +838,7 @@ void QueuedCore::initSettings(const QString &_configuration)
     bool status = m_database->open(dbSetup.hostname, dbSetup.port,
                                    dbSetup.username, dbSetup.password);
     if (!status) {
-        QString message = QString("Could not open database");
+        QString message = "Could not open database";
         qCCritical(LOG_LIB) << message;
         throw QueuedDatabaseException(message);
     }

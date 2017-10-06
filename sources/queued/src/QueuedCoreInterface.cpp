@@ -135,19 +135,19 @@ bool QueuedCoreInterface::TaskEdit(
     // build payload
     QVariantHash data;
     if (!command.isEmpty())
-        data[QString("command")] = command;
+        data["command"] = command;
     if (!arguments.isEmpty())
-        data[QString("arguments")] = arguments;
+        data["arguments"] = arguments;
     if (!directory.isEmpty())
-        data[QString("directory")] = directory;
+        data["directory"] = directory;
     if (nice > 0)
-        data[QString("nice")] = nice;
+        data["nice"] = nice;
     if (uid > 0)
-        data[QString("uid")] = uid;
+        data["uid"] = uid;
     if (gid > 0)
-        data[QString("gid")] = gid;
+        data["gid"] = gid;
     if (user > 0)
-        data[QString("user")] = user;
+        data["user"] = user;
     // append limits now
     auto limits = task->nativeLimits();
     if (cpu > -1)
@@ -160,7 +160,7 @@ bool QueuedCoreInterface::TaskEdit(
         limits.gpumemory = gpumemory;
     if (storage > -1)
         limits.storage = storage;
-    data[QString("limits")] = limits.toString();
+    data["limits"] = limits.toString();
 
     return m_core->editTask(id, data, token);
 }
@@ -240,11 +240,11 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
     // build payload
     QVariantHash data;
     if (!name.isEmpty())
-        data[QString("name")] = name;
+        data["name"] = name;
     if (!password.isEmpty())
-        data[QString("password")] = password;
+        data["password"] = password;
     if (!email.isEmpty())
-        data[QString("email")] = email;
+        data["email"] = email;
     // append limits now
     auto limits = user->nativeLimits();
     if (cpu > -1)
@@ -257,7 +257,7 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
         limits.gpumemory = gpumemory;
     if (storage > -1)
         limits.storage = storage;
-    data[QString("limits")] = limits.toString();
+    data["limits"] = limits.toString();
 
     return m_core->editUser(id, data, token);
 }

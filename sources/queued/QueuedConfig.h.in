@@ -41,7 +41,7 @@ namespace QueuedConfig
  */
 const char DBUS_SERVICE[] = DBUS_SERVICE_NAME;
 /**
- * @brief DBus object path for applicaiton
+ * @brief DBus object path for application
  */
 const char DBUS_APPLICATION_PATH[] = "/application";
 /**
@@ -102,6 +102,12 @@ const char WEBAPI_TOKEN_HEADER[] = "x-queued-token";
  * @brief supported web server API versions
  */
 const int WEBAPI_VERSIONS[] = {1};
+
+// cgroups configuration
+/**
+ * @brief path to root directory of cgroups
+ */
+const char CG_FS_PATH[] = "/sys/fs/cgroup";
 
 // plugin interfaces
 /**

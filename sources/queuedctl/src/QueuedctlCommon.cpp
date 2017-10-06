@@ -122,7 +122,7 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
 {
     qCDebug(LOG_APP) << "Preprocess command" << _args;
 
-    QString command = _args.isEmpty() ? QString() : _args.first();
+    QString command = _args.isEmpty() ? "" : _args.first();
     // HACK: workaround to show valid help message
     auto id = QueuedctlArguments.contains(command)
                   ? QueuedctlArguments[command].id
@@ -212,7 +212,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
 
     auto result = QueuedctlResult();
     QStringList args = _parser.positionalArguments();
-    QString command = args.isEmpty() ? QString() : args.first();
+    QString command = args.isEmpty() ? "" : args.first();
 
     auto id = QueuedctlArguments.contains(command)
                   ? QueuedctlArguments[command].id
@@ -321,7 +321,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         if (result.status)
             result.output = QString("Task %1 added").arg(taskId);
         else
-            result.output = QString("Could not add task");
+            result.output = "Could not add task";
         break;
     }
     case QueuedctlArgument::TaskGet: {
@@ -365,7 +365,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         if (result.status)
             result.output = QString("User %1 added").arg(userId);
         else
-            result.output = QString("Could not add user");
+            result.output = "Could not add user";
         break;
     }
     case QueuedctlArgument::UserGet: {

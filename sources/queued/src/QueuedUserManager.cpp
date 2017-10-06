@@ -60,11 +60,11 @@ QueuedUser *QueuedUserManager::add(const QVariantHash &_properties,
     qCDebug(LOG_LIB) << "Add user" << _properties << "with ID" << _id;
 
     QueuedUser::QueuedUserDefinitions defs;
-    defs.name = _properties[QString("name")].toString();
-    defs.email = _properties[QString("email")].toString();
-    defs.password = _properties[QString("password")].toString();
-    defs.permissions = _properties[QString("permissions")].toUInt();
-    defs.limits = _properties[QString("limits")].toString();
+    defs.name = _properties["name"].toString();
+    defs.email = _properties["email"].toString();
+    defs.password = _properties["password"].toString();
+    defs.permissions = _properties["permissions"].toUInt();
+    defs.limits = _properties["limits"].toString();
 
     return add(defs, _id);
 }
@@ -116,13 +116,13 @@ QString QueuedUserManager::authorize(const QString &_user,
     auto userObj = user(_user, false);
     if (!userObj) {
         qCInfo(LOG_LIB) << "No user found" << _user;
-        return QString();
+        return "";
     }
 
     bool status = userObj->isPasswordValid(_password);
     if (!status) {
         qCInfo(LOG_LIB) << "User password invalid for" << _user;
-        return QString();
+        return "";
     }
 
     auto time = QDateTime::currentDateTimeUtc();
@@ -208,7 +208,7 @@ void QueuedUserManager::loadUsers(const QList<QVariantHash> &_users)
 
     // load now
     for (auto &userData : _users)
-        add(userData, userData[QString("_id")].toLongLong());
+        add(userData, userData["_id"].toLongLong());
 }
 
 

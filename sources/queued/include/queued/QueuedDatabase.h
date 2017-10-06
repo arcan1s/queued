@@ -74,7 +74,7 @@ public:
      * @return list of records from table
      */
     QList<QVariantHash> get(const QString &_table,
-                            const QString &_condition = QString());
+                            const QString &_condition = "");
     /**
      * @brief get record from table with given id
      * @param _table

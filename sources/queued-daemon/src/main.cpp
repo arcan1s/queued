@@ -100,7 +100,7 @@ int main(int argc, char *argv[])
     }
 
     // check if exists
-    if (existingSessionOperation(QString("Active"))) {
+    if (existingSessionOperation("Active")) {
         qCWarning(LOG_APP) << "Another session is active";
         return 1;
     }

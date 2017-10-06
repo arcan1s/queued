@@ -117,7 +117,7 @@ QString QueuedAdvancedSettings::internalId(const QString &_key)
         return internal;
     }
 
-    return QString();
+    return "";
 }
 
 
@@ -135,7 +135,7 @@ QueuedAdvancedSettings::internalId(const QueuedConfig::QueuedSettings _key)
         return internal;
     }
 
-    return QString();
+    return "";
 }
 
 
@@ -160,8 +160,8 @@ void QueuedAdvancedSettings::set(const QList<QVariantHash> &_values)
     qCDebug(LOG_LIB) << "Set values from" << _values;
 
     for (auto &pair : _values) {
-        QString key = pair[QString("key")].toString().toLower();
-        m_ids[key] = pair[QString("_id")].toLongLong();
-        set(key, pair[QString("value")]);
+        QString key = pair["key"].toString().toLower();
+        m_ids[key] = pair["_id"].toLongLong();
+        set(key, pair["value"]);
     }
 }

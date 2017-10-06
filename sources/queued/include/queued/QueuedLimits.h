@@ -87,9 +87,9 @@ struct Limits {
     explicit Limits(const QString &_stringLimits)
         : Limits()
     {
-        QStringList limits = _stringLimits.split(QChar('\n'));
+        QStringList limits = _stringLimits.split('\n');
         while (limits.count() < 5)
-            limits.append(QString("0"));
+            limits.append("0");
 
         cpu = limits.at(0).toLongLong();
         gpu = limits.at(1).toLongLong();

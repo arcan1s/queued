@@ -261,7 +261,7 @@ bool QueuedCoreAdaptor::sendUserEdit(
 
 
 /**
- * sendUserPermissionAdd
+ * @fn sendUserPermissionAdd
  */
 bool QueuedCoreAdaptor::sendUserPermissionAdd(
     const long long _id, const QueuedEnums::Permission _permission,
@@ -280,7 +280,7 @@ bool QueuedCoreAdaptor::sendUserPermissionAdd(
 
 
 /**
- * sendUserPermissionRemove
+ * @fn sendUserPermissionRemove
  */
 bool QueuedCoreAdaptor::sendUserPermissionRemove(
     const long long _id, const QueuedEnums::Permission _permission,

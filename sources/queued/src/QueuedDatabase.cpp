@@ -201,11 +201,10 @@ long long QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
 
     auto payload = getQueryPayload(_table, _value);
     // build query
-    QSqlQuery query
-        = m_database.exec(QString("INSERT INTO %1 (%2) VALUES (%3)")
-                              .arg(_table)
-                              .arg(payload.first.join(QChar(',')))
-                              .arg(payload.second.join(QChar(','))));
+    QSqlQuery query = m_database.exec(QString("INSERT INTO %1 (%2) VALUES (%3)")
+                                          .arg(_table)
+                                          .arg(payload.first.join(','))
+                                          .arg(payload.second.join(',')));
     QSqlError error = query.lastError();
     if (error.isValid()) {
         qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
@@ -235,7 +234,7 @@ bool QueuedDatabase::modify(const QString &_table, const long long _id,
     // build query
     QSqlQuery query = m_database.exec(QString("UPDATE %1 SET %2 WHERE _id=%3")
                                           .arg(_table)
-                                          .arg(stringPayload.join(QChar(',')))
+                                          .arg(stringPayload.join(','))
                                           .arg(_id));
     QSqlError error = query.lastError();
     if (error.isValid()) {
@@ -434,7 +433,7 @@ QueuedDatabase::getQueryPayload(const QString &_table,
                 << "No key" << key << "found in schema of" << _table;
             continue;
         }
-        if (key == QString("_id")) {
+        if (key == "_id") {
             qCWarning(LOG_LIB) << "Modifying record ID is not allowed";
             continue;
         }

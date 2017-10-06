@@ -52,9 +52,8 @@ QVariantHash QueuedTcpServerResponseHelperPermissions::removePermission(
     if (permission == QueuedEnums::Permission::Invalid)
         return {{"code", 400}, {"message", "Invalid permission"}};
 
-    return {
-        {"code",
-         QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission, _token)
-             ? 200
-             : 400}};
+    return {{"code", QueuedCoreAdaptor::sendUserPermissionRemove(
+                         _id, permission, _token)
+                         ? 200
+                         : 400}};
 }
