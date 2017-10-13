@@ -83,7 +83,7 @@ public:
      * @brief path to plugin location
      * @return full path to plugin location
      */
-    QStringList pluginLocations() const;
+    static QStringList pluginLocations();
     /**
      * @brief unload plugin
      * @param _name

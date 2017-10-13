@@ -58,15 +58,10 @@ public:
 
     /**
      * @brief QueuedProcessManager class constructor
-     * @param parent
+     * @param _parent
      * pointer to parent item
-     * @param processLine
-     * command line pattern
-     * @param onExit
-     * default action on exit
      */
-    explicit QueuedProcessManager(QObject *parent, const QString &processLine,
-                                  const QueuedEnums::ExitAction onExit);
+    explicit QueuedProcessManager(QObject *_parent);
     /**
      * @brief QueuedProcessManager class destructor
      */

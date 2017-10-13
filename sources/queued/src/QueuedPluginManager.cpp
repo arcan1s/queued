@@ -99,6 +99,14 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
 {
     qCDebug(LOG_PL) << "Load plugin" << _name << "with settings" << _settings;
 
+    // check if it was loaded already then call QueuedPluginInterface::init()
+    if (m_plugins.contains(_name)) {
+        m_plugins[_name]->init(_settings);
+        m_plugins[_name]->setToken(m_token);
+        return true;
+    }
+
+    // normal load
     QString libraryName = QString("lib%2.so").arg(_name);
     // init plugin settings with valid keys
     QVariantHash pluginSettings;
@@ -138,7 +146,7 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
 /**
  * @fn pluginLocations
  */
-QStringList QueuedPluginManager::pluginLocations() const
+QStringList QueuedPluginManager::pluginLocations()
 {
     QStringList locations = QStandardPaths::standardLocations(
         QStandardPaths::GenericDataLocation);

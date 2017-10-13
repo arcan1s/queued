@@ -33,9 +33,9 @@
 /**
  * @fn QueuedSettings
  */
-QueuedSettings::QueuedSettings(QObject *parent, const QString path)
-    : QObject(parent)
-    , m_path(path)
+QueuedSettings::QueuedSettings(QObject *_parent, const QString _path)
+    : QObject(_parent)
+    , m_path(_path)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
@@ -43,8 +43,6 @@ QueuedSettings::QueuedSettings(QObject *parent, const QString path)
         "QueuedConfig::QueuedAdminSetup");
     qRegisterMetaType<QueuedConfig::QueuedDBSetup>(
         "QueuedConfig::QueuedDBSetup");
-
-    readConfiguration();
 }
 
 

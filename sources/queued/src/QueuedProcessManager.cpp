@@ -31,17 +31,12 @@ extern "C" {
 /**
  * @fn QueuedProcessManager
  */
-QueuedProcessManager::QueuedProcessManager(QObject *parent,
-                                           const QString &processLine,
-                                           const QueuedEnums::ExitAction onExit)
-    : QObject(parent)
+QueuedProcessManager::QueuedProcessManager(QObject *_parent)
+    : QObject(_parent)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
     qRegisterMetaType<QueuedEnums::ExitAction>("QueuedEnums::ExitAction");
-
-    setExitAction(onExit);
-    setProcessLine(processLine);
 }
 
 

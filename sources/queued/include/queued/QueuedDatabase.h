@@ -58,6 +58,10 @@ public:
      */
     void checkDatabase();
     /**
+     * @brief close database connection
+     */
+    void close();
+    /**
      * @brief check and create queued administrator if missing
      * @param _user
      * administrator username

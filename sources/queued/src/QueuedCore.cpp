@@ -35,8 +35,8 @@
 /**
  * @fn QueuedCore
  */
-QueuedCore::QueuedCore(QObject *parent)
-    : QObject(parent)
+QueuedCore::QueuedCore(QObject *_parent)
+    : QObject(_parent)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 }
@@ -565,23 +565,13 @@ void QueuedCore::deinit()
     m_connections.clear();
 
     // dbus cleanup
-    QDBusConnection::sessionBus().unregisterObject(
+    QDBusConnection::systemBus().unregisterObject(
         QueuedConfig::DBUS_OBJECT_PATH);
-    QDBusConnection::sessionBus().unregisterObject(
+    QDBusConnection::systemBus().unregisterObject(
         QueuedConfig::DBUS_PROPERTY_PATH);
-    QDBusConnection::sessionBus().unregisterObject(
+    QDBusConnection::systemBus().unregisterObject(
         QueuedConfig::DBUS_REPORTS_PATH);
-    QDBusConnection::sessionBus().unregisterService(QueuedConfig::DBUS_SERVICE);
-
-    // delete objects now
-    delete m_databaseManager;
-    delete m_reports;
-    delete m_plugins;
-    delete m_processes;
-    delete m_users;
-    delete m_database;
-    delete m_settings;
-    delete m_advancedSettings;
+    QDBusConnection::systemBus().unregisterService(QueuedConfig::DBUS_SERVICE);
 }
 
 
@@ -787,7 +777,7 @@ void QueuedCore::initPlugins()
               .split('\n');
     QString token = m_users->authorize(m_settings->admin().name);
 
-    m_plugins = new QueuedPluginManager(this, token);
+    m_plugins = initObject(m_plugins, token);
     for (auto &plugin : pluginList)
         m_plugins->loadPlugin(plugin, pluginSettings(plugin));
 }
@@ -807,7 +797,9 @@ void QueuedCore::initProcesses()
               ->get(QueuedConfig::QueuedSettings::ProcessCommandLine)
               .toString();
 
-    m_processes = new QueuedProcessManager(this, processLine, onExitAction);
+    m_processes = initObject(m_processes);
+    m_processes->setProcessLine(processLine);
+    m_processes->setExitAction(onExitAction);
     auto dbProcesses
         = m_database->get(QueuedDB::TASKS_TABLE, "WHERE endTime IS NULL");
     m_processes->loadProcesses(dbProcesses);
@@ -831,10 +823,12 @@ void QueuedCore::initProcesses()
 void QueuedCore::initSettings(const QString &_configuration)
 {
     // read configuration first
-    m_settings = new QueuedSettings(this, _configuration);
+    m_settings = initObject(m_settings, _configuration);
+    m_settings->readConfiguration();
     // init database now
     auto dbSetup = m_settings->db();
-    m_database = new QueuedDatabase(this, dbSetup.path, dbSetup.driver);
+    m_database = initObject(m_database,  dbSetup.path, dbSetup.driver);
+    m_database->close();
     bool status = m_database->open(dbSetup.hostname, dbSetup.port,
                                    dbSetup.username, dbSetup.password);
     if (!status) {
@@ -848,7 +842,7 @@ void QueuedCore::initSettings(const QString &_configuration)
     m_database->createAdministrator(dbAdmin.name, dbAdmin.password);
 
     // and load advanced settings
-    m_advancedSettings = new QueuedAdvancedSettings(this);
+    m_advancedSettings = initObject(m_advancedSettings);
     m_advancedSettings->set(m_database->get(QueuedDB::SETTINGS_TABLE));
     if (!m_advancedSettings->checkDatabaseVersion()) {
         qCInfo(LOG_LIB) << "Bump database version to"
@@ -859,9 +853,9 @@ void QueuedCore::initSettings(const QString &_configuration)
     }
 
     // report manager
-    m_reports = new QueuedReportManager(this, m_database);
+    m_reports = initObject(m_reports, m_database);
     // database manager
-    m_databaseManager = new QueuedDatabaseManager(this, m_database);
+    m_databaseManager = initObject(m_databaseManager, m_database);
 }
 
 
@@ -875,7 +869,7 @@ void QueuedCore::initUsers()
         = m_advancedSettings->get(QueuedConfig::QueuedSettings::TokenExpiration)
               .toLongLong();
 
-    m_users = new QueuedUserManager(this);
+    m_users = initObject(m_users);
     m_users->setTokenExpiration(expiry);
     QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
     auto dbTokens = m_database->get(

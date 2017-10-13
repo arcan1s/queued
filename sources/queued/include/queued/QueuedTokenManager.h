@@ -66,7 +66,7 @@ public:
      * @brief check if token is valid
      * @param _token
      * token ID
-     * @return token user if token is valid otherwise return false
+     * @return token user if token is valid otherwise return empty string
      */
     QString isTokenValid(const QString &_token) const;
     /**

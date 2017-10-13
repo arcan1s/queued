@@ -53,9 +53,10 @@ class QueuedCore : public QObject
 public:
     /**
      * @brief QueuedCore class constructor
-     * @param parent         pointer to parent item
+     * @param _parent
+     * pointer to parent item
      */
-    explicit QueuedCore(QObject *parent);
+    explicit QueuedCore(QObject *_parent);
     /**
      * @brief QueuedCore class destructor
      */
@@ -382,6 +383,21 @@ private:
      * @throw QueuedDBusException
      */
     void initDBus();
+    /**
+     * @brief method allows to init class if it was not created
+     * @tparam T
+     * class name
+     * @tparam Args
+     * class constructor arguments
+     * @param _dest
+     * pointer to destination
+     * @param _args
+     * class constructor arguments
+     */
+    template<class T, typename... Args> T *initObject(T *_dest, Args... _args)
+    {
+        return _dest ? _dest : new T(this, _args...);
+    };
     /**
      * @brief init plugins
      */

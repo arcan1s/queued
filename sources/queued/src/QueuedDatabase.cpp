@@ -52,7 +52,7 @@ QueuedDatabase::~QueuedDatabase()
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
-    m_database.close();
+    close();
 }
 
 
@@ -70,6 +70,15 @@ void QueuedDatabase::checkDatabase()
         // update schema
         createSchema(table);
     }
+}
+
+
+/**
+ * @fn close
+ */
+void QueuedDatabase::close()
+{
+    m_database.close();
 }
 
 
