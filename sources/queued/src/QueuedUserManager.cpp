@@ -16,7 +16,7 @@
  * @file QueuedUserManager.cpp
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
@@ -119,7 +119,7 @@ QString QueuedUserManager::authorize(const QString &_user,
         return "";
     }
 
-    bool status = userObj->isPasswordValid(_password);
+    bool status = userObj->isPasswordValid(_password, salt());
     if (!status) {
         qCInfo(LOG_LIB) << "User password invalid for" << _user;
         return "";
@@ -243,12 +243,30 @@ QueuedUser *QueuedUserManager::user(const QString &_name, const bool _isToken)
 }
 
 
+/**
+ * @salt
+ */
+QString QueuedUserManager::salt() const
+{
+    return m_salt;
+}
+
+
 /*
  * @fn tokenExpiration
  */
 long long QueuedUserManager::tokenExpiration() const
 {
     return m_tokenExpiration;
+}
+
+
+/**
+ * @fn setSalt
+ */
+void QueuedUserManager::setSalt(const QString &_salt)
+{
+    m_salt = _salt;
 }
 
 

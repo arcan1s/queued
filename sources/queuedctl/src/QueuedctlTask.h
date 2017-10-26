@@ -21,26 +21,33 @@
 
 #include <queued/QueuedProcess.h>
 
+#include "QueuedctlCommon.h"
+
 
 namespace QueuedctlTask
 {
-long long addTask(const QueuedProcess::QueuedProcessDefinitions &_definitions,
-                  const QString &_token);
+QueuedctlCommon::QueuedctlResult
+addTask(const QueuedProcess::QueuedProcessDefinitions &_definitions,
+        const QString &_token);
 QueuedProcess::QueuedProcessDefinitions
 getDefinitions(const QCommandLineParser &_parser, const bool _expandAll);
-QVariant getTask(const long long _id, const QString &_property);
-QList<QVariantHash> getTasks(const QCommandLineParser &_parser,
-                             const QString &_token);
+QueuedctlCommon::QueuedctlResult getTask(const long long _id,
+                                         const QString &_property);
+QueuedctlCommon::QueuedctlResult getTasks(const QCommandLineParser &_parser,
+                                          const QString &_token);
 void parserAdd(QCommandLineParser &_parser);
 void parserGet(QCommandLineParser &_parser);
 void parserList(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
 void parserStart(QCommandLineParser &_parser);
-bool setTask(const long long _id,
-             const QueuedProcess::QueuedProcessDefinitions &_definitions,
-             const QString &_token);
-bool startTask(const long long _id, const QString &_token);
-bool stopTask(const long long _id, const QString &_token);
+QueuedctlCommon::QueuedctlResult
+setTask(const long long _id,
+        const QueuedProcess::QueuedProcessDefinitions &_definitions,
+        const QString &_token);
+QueuedctlCommon::QueuedctlResult startTask(const long long _id,
+                                           const QString &_token);
+QueuedctlCommon::QueuedctlResult stopTask(const long long _id,
+                                          const QString &_token);
 };
 
 

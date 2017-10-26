@@ -25,19 +25,40 @@ QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(
     qCDebug(LOG_SERV) << "Add user" << _user << "with data" << _data;
 
     // try define if user exists first
-    auto userId = QueuedCoreAdaptor::getUserId(_user);
+    auto userIdRes = QueuedCoreAdaptor::getUserId(_user);
+    long long userId = -1;
+    Result::match(userIdRes, [&userId](const long long val) { userId = val; },
+                  [&userId](const QueuedError &) {});
 
     auto defs = getDefinitions(_data);
     defs.name = _user;
+
+    QVariantHash output;
     if (userId > 0) {
         // edit existing user
-        bool status = QueuedCoreAdaptor::sendUserEdit(userId, defs, _token);
-        return {{"code", status ? 200 : 400}};
+        auto res = QueuedCoreAdaptor::sendUserEdit(userId, defs, _token);
+        Result::match(
+            res,
+            [&output](const bool val) {
+                output = {{"code", val ? 200 : 500}};
+            },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
     } else {
         // add new user
-        auto id = QueuedCoreAdaptor::sendUserAdd(defs, _token);
-        return {{"code", id > 0 ? 200 : 400}, {"id", id}};
+        auto res = QueuedCoreAdaptor::sendUserAdd(defs, _token);
+        Result::match(
+            res,
+            [&output](const long long val) {
+                output = {{"code", val ? 200 : 500}, {"id", val}};
+            },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
     }
+
+    return output;
 }
 
 
@@ -48,7 +69,10 @@ QueuedTcpServerResponseHelperUser::getDefinitions(const QVariantHash &_data)
 
     QueuedUser::QueuedUserDefinitions defs;
     defs.email = _data["email"].toString();
-    defs.password = QueuedUser::hashFromPassword(_data["password"].toString());
+    auto res = QueuedCoreAdaptor::sendPasswordHash(_data["password"].toString());
+    Result::match(
+            res, [&defs](const QString &val) { defs.password = val; },
+            [](const QueuedError &) {});
     defs.permissions = _data["permissions"].toUInt();
     // limits
     QueuedLimits::Limits limits;
@@ -77,10 +101,17 @@ QueuedTcpServerResponseHelperUser::getReport(const QVariantHash &_data,
     QVariantHash output = {{"code", 200}};
     // some conversion magic
     QVariantList outputReport;
-    auto report = QueuedCoreAdaptor::getPerformance(start, stop, _token);
-    for (auto &user : report)
-        outputReport.append(user);
-    output["report"] = outputReport;
+    auto res = QueuedCoreAdaptor::getPerformance(start, stop, _token);
+    Result::match(
+        res,
+        [&output, &outputReport](const QList<QVariantHash> &val) {
+            for (auto &user : val)
+                outputReport += user;
+            output = {{"code", 200}, {"report", outputReport}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
 
     return output;
 }
@@ -92,15 +123,35 @@ QueuedTcpServerResponseHelperUser::getUser(const QString &_user,
 {
     qCDebug(LOG_SERV) << "Get user data for" << _user << _data;
 
-    auto userId = QueuedCoreAdaptor::getUserId(_user);
+    auto userIdRes = QueuedCoreAdaptor::getUserId(_user);
+    long long userId = -1;
+    Result::match(userIdRes, [&userId](const long long val) { userId = val; },
+                  [](const QueuedError &) {});
+    if (userId == -1)
+        return {{"code", 500}};
+
     auto property = _data["property"].toString();
 
     QVariantHash output = {{"code", 200}};
-    if (property.isEmpty())
-        output["properties"] = QueuedCoreAdaptor::getUser(userId);
-    else
-        output["properties"] = QVariantHash(
-            {{property, QueuedCoreAdaptor::getUser(userId, property)}});
+    if (property.isEmpty()) {
+        auto res = QueuedCoreAdaptor::getUser(userId);
+        Result::match(
+            res,
+            [&output](const QVariantHash &val) { output["properties"] = val; },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
+    } else {
+        auto res = QueuedCoreAdaptor::getUser(userId, property);
+        Result::match(
+            res,
+            [&output, &property](const QVariant &val) {
+                output["properties"] = {{property, val}};
+            },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
+    }
 
     return output;
 }
@@ -120,10 +171,17 @@ QueuedTcpServerResponseHelperUser::getUsers(const QVariantHash &_data,
     QVariantHash output = {{"code", 200}};
     // some conversion magic
     QVariantList outputReport;
-    auto report = QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
-    for (auto &user : report)
-        outputReport.append(user);
-    output["report"] = outputReport;
+    auto res = QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
+    Result::match(
+        res,
+        [&output, &outputReport](const QList<QVariantHash> &val) {
+            for (auto &user : val)
+                outputReport += user;
+            output = {{"code", 200}, {"report", outputReport}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
 
     return output;
 }

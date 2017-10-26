@@ -35,12 +35,11 @@ QueuedApplication *instance = nullptr;
 
 bool existingSessionOperation(const QString &operation)
 {
-    QVariantList arguments = QueuedCoreAdaptor::sendRequest(
+    auto res = QueuedCoreAdaptor::sendRequest<bool>(
         QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_APPLICATION_PATH,
         QueuedConfig::DBUS_SERVICE, operation, QVariantList());
 
-    return (!arguments.isEmpty() && arguments.at(0).type() == QVariant::Bool
-            && arguments[0].toBool());
+    return ((res.type() == Result::Content::Value) && res.get());
 }
 
 

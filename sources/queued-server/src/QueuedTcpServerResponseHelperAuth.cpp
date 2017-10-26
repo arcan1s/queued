@@ -25,9 +25,17 @@ QVariantHash QueuedTcpServerResponseHelperAuth::auth(const QVariantHash &_data)
 
     QVariantHash output;
     if (_data.contains("user") && _data.contains("password")) {
-        output["token"] = QueuedCoreAdaptor::auth(_data["user"].toString(),
-                                                  _data["password"].toString());
-        output["code"] = output["token"].toString().isEmpty() ? 401 : 200;
+        auto res = QueuedCoreAdaptor::auth(_data["user"].toString(),
+                                           _data["password"].toString());
+
+        Result::match(
+            res,
+            [&output](const QString &val) {
+                output = {{"code", 200}, {"token", val}};
+            },
+            [&output](const QueuedError &err) {
+                output = {{"code", 401}, {"message", err.message().c_str()}};
+            });
     } else {
         output = {{"code", 400}, {"message", "No required fields found"}};
     }
@@ -40,5 +48,11 @@ bool QueuedTcpServerResponseHelperAuth::tryAuth(const QString &_token)
 {
     qCDebug(LOG_APP) << "Try auth with" << _token;
 
-    return QueuedCoreAdaptor::auth(_token);
+    auto res = QueuedCoreAdaptor::auth(_token);
+
+    bool ret = true;
+    Result::match(res, [&ret](const bool val) { ret = val; },
+                  [&ret](const QueuedError &err) { ret = false; });
+
+    return ret;
 }

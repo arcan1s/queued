@@ -23,11 +23,25 @@
 #include "QueuedctlUser.h"
 
 
-QString QueuedctlAuth::auth(const QString &_user)
+QueuedctlCommon::QueuedctlResult QueuedctlAuth::auth(const QString &_user,
+                                                     const QString &_cache)
 {
     qCDebug(LOG_APP) << "Auth as user" << _user;
 
-    return QueuedCoreAdaptor::auth(_user, QueuedctlUser::getPassword());
+    QueuedctlCommon::QueuedctlResult output;
+
+    auto res = QueuedCoreAdaptor::auth(_user, QueuedctlUser::getPassword());
+    Result::match(res,
+                  [&output, &_user, &_cache](const QString &val) {
+                      setToken(val, _user, _cache);
+                      output.status = true;
+                  },
+                  [&output](const QueuedError &err) {
+                      output.status = false;
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
@@ -40,8 +54,7 @@ QString QueuedctlAuth::getToken(const QString &_cache, const QString &_user)
     if (tryAuth(tokenId)) {
         return tokenId;
     } else {
-        tokenId = auth(_user);
-        setToken(tokenId, _user, _cache);
+        auth(_user, _cache);
         return getToken(_cache, _user);
     }
 }
@@ -83,5 +96,7 @@ bool QueuedctlAuth::tryAuth(const QString &_token)
 {
     qCDebug(LOG_APP) << "Try auth with" << _token;
 
-    return QueuedCoreAdaptor::auth(_token);
+    auto res = QueuedCoreAdaptor::auth(_token);
+
+    return ((res.type() == Result::Content::Value) && res.get());
 }

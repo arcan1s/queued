@@ -19,12 +19,15 @@
 
 #include <QCommandLineParser>
 
+#include "QueuedctlCommon.h"
+
 
 namespace QueuedctlOption
 {
-bool editOption(const QString &_option, const QVariant &_value,
-                const QString &_token);
-QVariant getOption(const QString &_option);
+QueuedctlCommon::QueuedctlResult editOption(const QString &_option,
+                                            const QVariant &_value,
+                                            const QString &_token);
+QueuedctlCommon::QueuedctlResult getOption(const QString &_option);
 void parserGet(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
 };

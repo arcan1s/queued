@@ -56,7 +56,7 @@ enum class Permission {
 };
 Q_DECLARE_FLAGS(Permissions, Permission)
 Q_DECLARE_OPERATORS_FOR_FLAGS(Permissions)
-const QHash<QString, Permission> PermissionMap = {
+static const QHash<QString, Permission> PermissionMap = {
     {"superadmin", Permission::SuperAdmin},
     {"admin", Permission::Admin},
     {"job", Permission::Job},
@@ -71,7 +71,7 @@ const QHash<QString, Permission> PermissionMap = {
 inline Permission stringToPermission(const QString &_permission)
 {
     return PermissionMap.contains(_permission.toLower())
-               ? PermissionMap[_permission.toLower()]
+               ? PermissionMap.value(_permission.toLower())
                : Permission::Invalid;
 };
 /**
@@ -83,6 +83,23 @@ inline Permission stringToPermission(const QString &_permission)
  * send SIGKILL on exit
  */
 enum class ExitAction { Terminate = 1 << 1, Kill = 1 << 2 };
+/**
+ * @enum ReturnStatus
+ * @brief DBus response status
+ * @var ReturnStatus::OK
+ * no errors in report
+ * @var ReturnStatus::Error
+ * generic error occurs
+ * @var ReturnStatus::InsufficientPermissions
+ * insufficient user permissions
+ */
+enum class ReturnStatus {
+    Error = 1 << 1,
+    InvalidArgument = 1 << 2,
+    InsufficientPermissions = 1 << 3,
+    InvalidToken = 1 << 4,
+    InvalidPassword = 1 << 5
+};
 };
 
 

@@ -15,10 +15,12 @@
 
 
 #include "QueuedctlUser.h"
+#include "QueuedctlCommon.h"
 
 #include <queued/Queued.h>
 
 #include <iostream>
+#include <queued/QueuedUser.h>
 
 extern "C" {
 #include <termios.h>
@@ -26,18 +28,31 @@ extern "C" {
 }
 
 
-long long
+QueuedctlCommon::QueuedctlResult
 QueuedctlUser::addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
                        const QString &_token)
 {
     qCDebug(LOG_APP) << "Add user" << _definitions.name;
 
-    return QueuedCoreAdaptor::sendUserAdd(_definitions, _token);
+    auto res = QueuedCoreAdaptor::sendUserAdd(_definitions, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res,
+                  [&output](const long long val) {
+                      output.status = (val > 0);
+                      output.output = QString::number(val);
+                  },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
-QList<QVariantHash> QueuedctlUser::getReport(const QCommandLineParser &_parser,
-                                             const QString &_token)
+QueuedctlCommon::QueuedctlResult
+QueuedctlUser::getReport(const QCommandLineParser &_parser,
+                         const QString &_token)
 {
     qCDebug(LOG_APP) << "Get usage report";
 
@@ -46,7 +61,19 @@ QList<QVariantHash> QueuedctlUser::getReport(const QCommandLineParser &_parser,
     QDateTime start
         = QDateTime::fromString(_parser.value("start"), Qt::ISODateWithMs);
 
-    return QueuedCoreAdaptor::getPerformance(start, stop, _token);
+    auto res = QueuedCoreAdaptor::getPerformance(start, stop, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res,
+                  [&output](const QList<QVariantHash> &val) {
+                      output.status = true;
+                      output.output = QueuedctlCommon::hashListToString(val);
+                  },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
@@ -59,15 +86,16 @@ QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
 
     QueuedUser::QueuedUserDefinitions definitions;
 
-    definitions.email = _parser.value("email");
+    // define password first
     definitions.password = _parser.isSet("stdin-password")
-                               ? getPassword()
-                               : _parser.value("password");
-    // transform to hash
-    definitions.password
-        = definitions.password.isEmpty()
-              ? ""
-              : QueuedUser::hashFromPassword(definitions.password);
+                           ? getPassword()
+                           : _parser.value("password");
+    auto res = QueuedCoreAdaptor::sendPasswordHash(definitions.password);
+    Result::match(
+        res, [&definitions](const QString &val) { definitions.password = val; },
+        [](const QueuedError &) {});
+
+    definitions.email = _parser.value("email");
     // limits now
     QueuedLimits::Limits limits(
         _parser.value("limit-cpu").toLongLong(),
@@ -107,19 +135,42 @@ QString QueuedctlUser::getPassword()
 }
 
 
-QVariant QueuedctlUser::getUser(const long long _id, const QString &_property)
+QueuedctlCommon::QueuedctlResult
+QueuedctlUser::getUser(const long long _id, const QString &_property)
 {
     qCDebug(LOG_APP) << "Get property" << _property << "from user" << _id;
 
-    if (_property.isEmpty())
-        return QueuedCoreAdaptor::getUser(_id);
-    else
-        return QueuedCoreAdaptor::getUser(_id, _property);
+    QueuedctlCommon::QueuedctlResult output;
+
+    if (_property.isEmpty()) {
+        auto res = QueuedCoreAdaptor::getUser(_id);
+        Result::match(res,
+                      [&output](const QVariantHash &val) {
+                          output.status = true;
+                          output.output = QueuedctlCommon::hashToString(val);
+                      },
+                      [&output](const QueuedError &err) {
+                          output.output = err.message().c_str();
+                      });
+    } else {
+        auto res = QueuedCoreAdaptor::getUser(_id, _property);
+        Result::match(res,
+                      [&output](const QVariant &val) {
+                          output.status = val.isValid();
+                          output.output = val.toString();
+                      },
+                      [&output](const QueuedError &err) {
+                          output.output = err.message().c_str();
+                      });
+    }
+
+    return output;
 }
 
 
-QList<QVariantHash> QueuedctlUser::getUsers(const QCommandLineParser &_parser,
-                                            const QString &_token)
+QueuedctlCommon::QueuedctlResult
+QueuedctlUser::getUsers(const QCommandLineParser &_parser,
+                        const QString &_token)
 {
     QDateTime lastLogin = QDateTime::fromString(_parser.value("last-logged"),
                                                 Qt::ISODateWithMs);
@@ -128,7 +179,19 @@ QList<QVariantHash> QueuedctlUser::getUsers(const QCommandLineParser &_parser,
               ? QueuedEnums::Permission::Invalid
               : QueuedEnums::Permission(_parser.value("access").toInt());
 
-    return QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
+    auto res = QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res,
+                  [&output](const QList<QVariantHash> &val) {
+                      output.status = true;
+                      output.output = QueuedctlCommon::hashListToString(val);
+                  },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
@@ -253,11 +316,20 @@ void QueuedctlUser::parserSet(QCommandLineParser &_parser)
 }
 
 
-bool QueuedctlUser::setUser(
-    const long long _id, const QueuedUser::QueuedUserDefinitions &_definitions,
-    const QString &_token)
+QueuedctlCommon::QueuedctlResult
+QueuedctlUser::setUser(const long long _id,
+                       const QueuedUser::QueuedUserDefinitions &_definitions,
+                       const QString &_token)
 {
     qCDebug(LOG_APP) << "Edit user" << _id;
 
-    return QueuedCoreAdaptor::sendUserEdit(_id, _definitions, _token);
+    auto res = QueuedCoreAdaptor::sendUserEdit(_id, _definitions, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res, [&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }

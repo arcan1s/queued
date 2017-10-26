@@ -25,16 +25,38 @@ QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
 {
     qCDebug(LOG_SERV) << "Add plugin" << _name;
 
-    return {
-        {"code", QueuedCoreAdaptor::sendPluginAdd(_name, _token) ? 200 : 400}};
+    auto res = QueuedCoreAdaptor::sendPluginAdd(_name, _token);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const bool) {
+            output = {{"code", 200}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
 }
 
 
 QVariantHash QueuedTcpServerResponseHelperPlugins::listPlugins()
 {
-    return {{"code", 200},
-            {"plugins", QueuedCoreAdaptor::getOption(
-                            QueuedConfig::QueuedSettings::Plugins)}};
+    auto res
+        = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const QVariant &val) {
+            output = {{"code", 200}, {"plugins", val.toStringList()}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
 }
 
 
@@ -44,6 +66,17 @@ QueuedTcpServerResponseHelperPlugins::removePlugin(const QString &_name,
 {
     qCDebug(LOG_SERV) << "Remove plugin" << _name;
 
-    return {{"code",
-             QueuedCoreAdaptor::sendPluginRemove(_name, _token) ? 200 : 400}};
+    auto res = QueuedCoreAdaptor::sendPluginRemove(_name, _token);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const bool) {
+            output = {{"code", 200}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
 }

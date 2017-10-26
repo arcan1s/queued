@@ -16,7 +16,7 @@
  * @file QueuedSettings.cpp
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
@@ -25,6 +25,7 @@
 
 #include <QSettings>
 #include <QStandardPaths>
+#include <queued/QueuedStaticConfig.h>
 
 
 /**
@@ -121,6 +122,7 @@ void QueuedSettings::readConfiguration()
     settings.beginGroup("Administrator");
     m_cfgAdmin.name = settings.value("Username", "root").toString();
     m_cfgAdmin.password = settings.value("Password").toString();
+    m_cfgAdmin.salt = settings.value("Salt").toString();
     settings.endGroup();
 
     // database related settings

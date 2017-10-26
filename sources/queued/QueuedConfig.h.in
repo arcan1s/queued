@@ -16,7 +16,7 @@
  * @file QueuedConfig.h
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
@@ -39,75 +39,75 @@ namespace QueuedConfig
 /**
  * @brief DBus service name for library and application
  */
-const char DBUS_SERVICE[] = DBUS_SERVICE_NAME;
+static const char DBUS_SERVICE[] = DBUS_SERVICE_NAME;
 /**
  * @brief DBus object path for application
  */
-const char DBUS_APPLICATION_PATH[] = "/application";
+static const char DBUS_APPLICATION_PATH[] = "/application";
 /**
  * @brief DBus object path for library
  */
-const char DBUS_OBJECT_PATH[] = "/queued";
+static const char DBUS_OBJECT_PATH[] = "/queued";
 /**
  * @brief DBus properties path for properties library
  */
-const char DBUS_PROPERTY_PATH[] = "/property";
+static const char DBUS_PROPERTY_PATH[] = "/property";
 /**
  * @brief DBus properties path for reports library
  */
-const char DBUS_REPORTS_PATH[] = "/report";
+static const char DBUS_REPORTS_PATH[] = "/report";
 
 // path configuration
 // common paths
 /**
  * @brief installation directory for executables
  */
-const char BIN_INSTALL_DIR[] = "@BIN_INSTALL_DIR@";
+static const char BIN_INSTALL_DIR[] = "@BIN_INSTALL_DIR@";
 /**
  * @brief installation directory for data
  */
-const char DATA_INSTALL_DIR[] = "@DATA_INSTALL_DIR@";
+static const char DATA_INSTALL_DIR[] = "@DATA_INSTALL_DIR@";
 /**
  * @brief installation directory for headers
  */
-const char INCLUDE_INSTALL_DIR[] = "@INCLUDE_INSTALL_DIR@";
+static const char INCLUDE_INSTALL_DIR[] = "@INCLUDE_INSTALL_DIR@";
 /**
  * @brief installation directory for libraries
  */
-const char LIB_INSTALL_DIR[] = "@LIB_INSTALL_DIR@";
+static const char LIB_INSTALL_DIR[] = "@LIB_INSTALL_DIR@";
 /**
  * @brief the same as CMAKE_INSTALL_PREFIX
  */
-const char ROOT_INSTALL_DIR[] = "@CMAKE_INSTALL_PREFIX@";
+static const char ROOT_INSTALL_DIR[] = "@CMAKE_INSTALL_PREFIX@";
 // application specific
 /**
  * @brief path to queued home directory
  */
-const char HOME_PATH[] = "queued";
+static const char HOME_PATH[] = "queued";
 /**
  * @brief path to plugins inside @ref HOME_PATH
  */
-const char PLUGIN_PATH[] = "plugins";
+static const char PLUGIN_PATH[] = "plugins";
 
 // internal configuration
 /**
  * @brief version of internal storage
  */
-const int DATABASE_VERSION = 1;
+static const int DATABASE_VERSION = 1;
 /**
  * @brief header name for token
  */
-const char WEBAPI_TOKEN_HEADER[] = "x-queued-token";
+static const char WEBAPI_TOKEN_HEADER[] = "x-queued-token";
 /**
  * @brief supported web server API versions
  */
-const int WEBAPI_VERSIONS[] = {1};
+static const int WEBAPI_VERSIONS[] = {1};
 
 // cgroups configuration
 /**
  * @brief path to root directory of cgroups
  */
-const char CG_FS_PATH[] = "/sys/fs/cgroup";
+static const char CG_FS_PATH[] = "/sys/fs/cgroup";
 
 // plugin interfaces
 /**
@@ -119,7 +119,7 @@ const char CG_FS_PATH[] = "/sys/fs/cgroup";
 /**
  * @brief plugin interface name
  */
-const char PLUGIN_INTERFACE[] = PLUGIN_INTERFACE_NAME;
+static const char PLUGIN_INTERFACE[] = PLUGIN_INTERFACE_NAME;
 }
 
 

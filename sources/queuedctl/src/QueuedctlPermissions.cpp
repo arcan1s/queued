@@ -15,34 +15,54 @@
 
 
 #include "QueuedctlPermissions.h"
+#include "QueuedctlCommon.h"
 
 #include <queued/Queued.h>
 
 
-bool QueuedctlPermissions::addPermission(const long long _id,
-                                         const QString &_permission,
-                                         const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPermissions::addPermission(
+    const long long _id, const QString &_permission, const QString &_token)
 {
     qCDebug(LOG_APP) << "Add permission" << _permission << "to" << _id;
 
     auto permission = QueuedEnums::stringToPermission(_permission);
+    QueuedctlCommon::QueuedctlResult output;
 
-    return (permission != QueuedEnums::Permission::Invalid)
-           && QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
+    if (permission == QueuedEnums::Permission::Invalid) {
+        output.output = "Invalid permission";
+    } else {
+        auto res
+            = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
+        Result::match(res, [&output](const bool val) { output.status = val; },
+                      [&output](const QueuedError &err) {
+                          output.output = err.message().c_str();
+                      });
+    }
+
+    return output;
 }
 
 
-bool QueuedctlPermissions::removePermission(const long long _id,
-                                            const QString &_permission,
-                                            const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPermissions::removePermission(
+    const long long _id, const QString &_permission, const QString &_token)
 {
     qCDebug(LOG_APP) << "Remove permission" << _permission << "to" << _id;
 
     auto permission = QueuedEnums::stringToPermission(_permission);
+    QueuedctlCommon::QueuedctlResult output;
 
-    return (permission != QueuedEnums::Permission::Invalid)
-           && QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission,
-                                                          _token);
+    if (permission == QueuedEnums::Permission::Invalid) {
+        output.output = "Invalid permission";
+    } else {
+        auto res = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission,
+                                                               _token);
+        Result::match(res, [&output](const bool val) { output.status = val; },
+                      [&output](const QueuedError &err) {
+                          output.output = err.message().c_str();
+                      });
+    }
+
+    return output;
 }
 
 

@@ -43,6 +43,7 @@
 #include "QueuedPropertyInterface.h"
 #include "QueuedReportInterface.h"
 #include "QueuedReportManager.h"
+#include "QueuedResult.h"
 #include "QueuedSettings.h"
 #include "QueuedStaticConfig.h"
 #include "QueuedSystemInfo.h"

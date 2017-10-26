@@ -15,6 +15,7 @@
 
 
 #include "QueuedctlTask.h"
+#include "QueuedctlCommon.h"
 
 #include <QDir>
 
@@ -25,13 +26,25 @@ extern "C" {
 }
 
 
-long long QueuedctlTask::addTask(
+QueuedctlCommon::QueuedctlResult QueuedctlTask::addTask(
     const QueuedProcess::QueuedProcessDefinitions &_definitions,
     const QString &_token)
 {
     qCDebug(LOG_APP) << "Add task" << _definitions.command;
 
-    return QueuedCoreAdaptor::sendTaskAdd(_definitions, _token);
+    auto res = QueuedCoreAdaptor::sendTaskAdd(_definitions, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res,
+                  [&output](const long long val) {
+                      output.status = (val > 0);
+                      output.output = QString::number(val);
+                  },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
@@ -52,10 +65,15 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
                   });
 
     definitions.nice = _parser.value("nice").toUInt();
-    definitions.user
-        = _parser.value("task-user").isEmpty()
-              ? 0
-              : QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
+    if (_parser.value("task-user").isEmpty()) {
+        definitions.user = 0;
+    } else {
+        auto res = QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
+        Result::match(
+            res,
+            [&definitions](const long long val) { definitions.user = val; },
+            [&definitions](const QueuedError &) { definitions.user = 0; });
+    }
     definitions.workingDirectory
         = QFileInfo(_parser.value("directory")).absoluteFilePath();
     // limits now
@@ -87,30 +105,67 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
 }
 
 
-QVariant QueuedctlTask::getTask(const long long _id, const QString &_property)
+QueuedctlCommon::QueuedctlResult
+QueuedctlTask::getTask(const long long _id, const QString &_property)
 {
     qCDebug(LOG_APP) << "Get property" << _property << "from task" << _id;
 
-    if (_property.isEmpty())
-        return QueuedCoreAdaptor::getTask(_id);
-    else
-        return QueuedCoreAdaptor::getTask(_id, _property);
+    QueuedctlCommon::QueuedctlResult output;
+
+    if (_property.isEmpty()) {
+        auto res = QueuedCoreAdaptor::getTask(_id);
+        Result::match(res,
+                      [&output](const QVariantHash &val) {
+                          output.status = true;
+                          output.output = QueuedctlCommon::hashToString(val);
+                      },
+                      [&output](const QueuedError &err) {
+                          output.output = err.message().c_str();
+                      });
+    } else {
+        auto res = QueuedCoreAdaptor::getTask(_id, _property);
+        Result::match(res,
+                      [&output](const QVariant &val) {
+                          output.status = val.isValid();
+                          output.output = val.toString();
+                      },
+                      [&output](const QueuedError &err) {
+                          output.output = err.message().c_str();
+                      });
+    }
+
+    return output;
 }
 
 
-QList<QVariantHash> QueuedctlTask::getTasks(const QCommandLineParser &_parser,
-                                            const QString &_token)
+QueuedctlCommon::QueuedctlResult
+QueuedctlTask::getTasks(const QCommandLineParser &_parser,
+                        const QString &_token)
 {
-    long long user
-        = _parser.value("task-user").isEmpty()
-              ? -1
-              : QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
+    long long userId = -1;
+    if (!_parser.value("task-user").isEmpty()) {
+        auto res = QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
+        Result::match(res, [&userId](const long long val) { userId = val; },
+                      [&userId](const QueuedError &) {});
+    }
     QDateTime stop
         = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
     QDateTime start
         = QDateTime::fromString(_parser.value("start"), Qt::ISODateWithMs);
 
-    return QueuedCoreAdaptor::getTasks(user, start, stop, _token);
+    QueuedctlCommon::QueuedctlResult output;
+
+    auto res = QueuedCoreAdaptor::getTasks(userId, start, stop, _token);
+    Result::match(res,
+                  [&output](const QList<QVariantHash> &val) {
+                      output.status = true;
+                      output.output = QueuedctlCommon::hashListToString(val);
+                  },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
@@ -245,28 +300,54 @@ void QueuedctlTask::parserStart(QCommandLineParser &_parser)
 }
 
 
-bool QueuedctlTask::setTask(
+QueuedctlCommon::QueuedctlResult QueuedctlTask::setTask(
     const long long _id,
     const QueuedProcess::QueuedProcessDefinitions &_definitions,
     const QString &_token)
 {
     qCDebug(LOG_APP) << "Edit task" << _id;
 
-    return QueuedCoreAdaptor::sendTaskEdit(_id, _definitions, _token);
+    auto res = QueuedCoreAdaptor::sendTaskEdit(_id, _definitions, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res, [&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
-bool QueuedctlTask::startTask(const long long _id, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlTask::startTask(const long long _id,
+                                                          const QString &_token)
 {
     qCDebug(LOG_APP) << "Start task" << _id;
 
-    return QueuedCoreAdaptor::sendTaskStart(_id, _token);
+    auto res = QueuedCoreAdaptor::sendTaskStart(_id, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res, [&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
-bool QueuedctlTask::stopTask(const long long _id, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlTask::stopTask(const long long _id,
+                                                         const QString &_token)
 {
     qCDebug(LOG_APP) << "Stop task" << _id;
 
-    return QueuedCoreAdaptor::sendTaskStop(_id, _token);
+    auto res = QueuedCoreAdaptor::sendTaskStart(_id, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res, [&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }

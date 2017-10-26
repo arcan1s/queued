@@ -21,27 +21,32 @@
 
 #include <queued/QueuedUser.h>
 
+#include "QueuedctlCommon.h"
+
 
 namespace QueuedctlUser
 {
-long long addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
-                  const QString &_token);
-QList<QVariantHash> getReport(const QCommandLineParser &_parser,
-                              const QString &_token);
+QueuedctlCommon::QueuedctlResult
+addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
+        const QString &_token);
+QueuedctlCommon::QueuedctlResult getReport(const QCommandLineParser &_parser,
+                                           const QString &_token);
 QueuedUser::QueuedUserDefinitions
 getDefinitions(const QCommandLineParser &_parser, const bool _expandAll);
 QString getPassword();
-QVariant getUser(const long long _id, const QString &_property);
-QList<QVariantHash> getUsers(const QCommandLineParser &_parser,
-                             const QString &_token);
+QueuedctlCommon::QueuedctlResult getUser(const long long _id,
+                                         const QString &_property);
+QueuedctlCommon::QueuedctlResult getUsers(const QCommandLineParser &_parser,
+                                          const QString &_token);
 void parserAdd(QCommandLineParser &_parser);
 void parserGet(QCommandLineParser &_parser);
 void parserList(QCommandLineParser &_parser);
 void parserReport(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
-bool setUser(const long long _id,
-             const QueuedUser::QueuedUserDefinitions &_definitions,
-             const QString &_token);
+QueuedctlCommon::QueuedctlResult
+setUser(const long long _id,
+        const QueuedUser::QueuedUserDefinitions &_definitions,
+        const QString &_token);
 };
 
 

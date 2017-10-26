@@ -19,13 +19,17 @@
 
 #include <QCommandLineParser>
 
+#include "QueuedctlCommon.h"
+
 
 namespace QueuedctlPermissions
 {
-bool addPermission(const long long _id, const QString &_permission,
-                   const QString &_token);
-bool removePermission(const long long _id, const QString &_permission,
-                      const QString &_token);
+QueuedctlCommon::QueuedctlResult addPermission(const long long _id,
+                                               const QString &_permission,
+                                               const QString &_token);
+QueuedctlCommon::QueuedctlResult removePermission(const long long _id,
+                                                  const QString &_permission,
+                                                  const QString &_token);
 void parser(QCommandLineParser &_parser);
 };
 

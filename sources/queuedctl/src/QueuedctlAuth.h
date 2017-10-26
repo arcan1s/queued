@@ -19,10 +19,13 @@
 
 #include <QCommandLineParser>
 
+#include "QueuedctlCommon.h"
+
 
 namespace QueuedctlAuth
 {
-QString auth(const QString &_user);
+QueuedctlCommon::QueuedctlResult auth(const QString &_user,
+                                      const QString &_cache);
 QString getToken(const QString &_cache, const QString &_user);
 void parser(QCommandLineParser &_parser);
 void setToken(const QString &_token, const QString &_user,

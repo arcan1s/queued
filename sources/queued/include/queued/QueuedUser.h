@@ -98,9 +98,12 @@ public:
      * @brief generates SHA512 hash from given password
      * @param _password
      * password as string
+     * @param _salt
+     * password salt if any
      * @return SHA512 of password
      */
-    static QString hashFromPassword(const QString &_password);
+    static QString hashFromPassword(const QString &_password,
+                                    const QString &_salt);
     /**
      * @brief test user permissions
      * @param _permission
@@ -117,9 +120,11 @@ public:
      * @brief check if password is valid
      * @param _password
      * password as string
+     * @param _salt
+     * password salt if any
      * @return true if password matches stored hash
      */
-    bool isPasswordValid(const QString &_password) const;
+    bool isPasswordValid(const QString &_password, const QString &_salt) const;
     /**
      * @brief remove permissions from user
      * @param _permission

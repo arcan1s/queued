@@ -16,7 +16,7 @@
  * @file QueuedUser.cpp
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
@@ -77,9 +77,10 @@ QueuedUser::addPermission(const QueuedEnums::Permission _permission)
 /**
  * @fn hashFromPassword
  */
-QString QueuedUser::hashFromPassword(const QString &_password)
+QString QueuedUser::hashFromPassword(const QString &_password,
+                                     const QString &_salt)
 {
-    return QCryptographicHash::hash(_password.toUtf8(),
+    return QCryptographicHash::hash(_salt.toUtf8() + _password.toUtf8(),
                                     QCryptographicHash::Sha512)
         .toHex();
 }
@@ -120,9 +121,11 @@ QPair<uint, uint> QueuedUser::ids()
 /**
  * @fn isPasswordValid
  */
-bool QueuedUser::isPasswordValid(const QString &_password) const
+bool QueuedUser::isPasswordValid(const QString &_password,
+                                 const QString &_salt) const
 {
-    return (m_definitions.password.toUtf8() == hashFromPassword(_password));
+    return (m_definitions.password.toUtf8()
+            == hashFromPassword(_password, _salt));
 }
 
 

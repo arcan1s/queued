@@ -221,173 +221,147 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
 
     switch (id) {
     case QueuedctlArgument::Auth: {
-        QString token = QueuedctlAuth::auth(_user);
-        result.status = !token.isEmpty();
-        if (result.status)
-            QueuedctlAuth::setToken(token, _user, _cache);
+        result = QueuedctlAuth::auth(_user, _cache);
         break;
     }
     case QueuedctlArgument::OptionGet: {
-        QVariant value = QueuedctlOption::getOption(args.at(1));
-        result.status = value.isValid();
-        result.output = value.toString();
+        result = QueuedctlOption::getOption(args.at(1));
         break;
     }
     case QueuedctlArgument::OptionSet: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status
-            = QueuedctlOption::editOption(args.at(1), args.at(2), token);
-        if (result.status)
-            result.output
-                = QString("Option %1 set to %2").arg(args.at(1), args.at(2));
-        else
-            result.output = QString("Could not set option %1 to %2")
-                                .arg(args.at(1), args.at(2));
+        result = QueuedctlOption::editOption(args.at(1), args.at(2), token);
         break;
     }
     case QueuedctlArgument::PermissionAdd: {
-        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        long long userId = -1;
+        Result::match(userIdRes,
+                      [&userId](const long long val) { userId = val; },
+                      [&result](const QueuedError &err) {
+                          result.output = err.message().c_str();
+                      });
+        if (userId == -1)
+            break;
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status
-            = QueuedctlPermissions::addPermission(userId, args.at(2), token);
-        if (result.status)
-            result.output = QString("Add permission %2 to user %1")
-                                .arg(args.at(1))
-                                .arg(args.at(2));
-        else
-            result.output = QString("Could not add permission %2 to user %1")
-                                .arg(args.at(1))
-                                .arg(args.at(2));
+        result = QueuedctlPermissions::addPermission(userId, args.at(2), token);
         break;
     }
     case QueuedctlArgument::PermissionRemove: {
-        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        long long userId = -1;
+        Result::match(userIdRes,
+                      [&userId](const long long val) { userId = val; },
+                      [&result](const QueuedError &err) {
+                          result.output = err.message().c_str();
+                      });
+        if (userId == -1)
+            break;
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status
+        result
             = QueuedctlPermissions::removePermission(userId, args.at(2), token);
-        if (result.status)
-            result.output = QString("Remove permission %2 from user %1")
-                                .arg(args.at(1))
-                                .arg(args.at(2));
-        else
-            result.output
-                = QString("Could not remove permission %2 from user %1")
-                      .arg(args.at(1))
-                      .arg(args.at(2));
         break;
     }
     case QueuedctlArgument::PluginAdd: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status = QueuedctlPlugins::addPlugin(args.at(1), token);
-        if (result.status)
-            result.output = QString("Add plugin %1").arg(args.at(1));
-        else
-            result.output = QString("Could not add plugin %1").arg(args.at(1));
+        result = QueuedctlPlugins::addPlugin(args.at(1), token);
         break;
     }
     case QueuedctlArgument::PluginList: {
-        result.status = true;
-        result.output = QueuedctlPlugins::listPlugins().join('\n');
+        result = QueuedctlPlugins::listPlugins();
         break;
     }
     case QueuedctlArgument::PluginRemove: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status = QueuedctlPlugins::removePlugin(args.at(1), token);
-        if (result.status)
-            result.output = QString("Remove plugin %1").arg(args.at(1));
-        else
-            result.output
-                = QString("Could not remove plugin %1").arg(args.at(1));
+        result = QueuedctlPlugins::removePlugin(args.at(1), token);
         break;
     }
     case QueuedctlArgument::Report: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status = true;
-        result.output
-            = hashListToString(QueuedctlUser::getReport(_parser, token));
+        result = QueuedctlUser::getReport(_parser, token);
         break;
     }
     case QueuedctlArgument::Status: {
-        auto status = QueuedCoreAdaptor::getStatus();
-        result.status = !status.isEmpty();
-        result.output = hashHashToString(status);
+        auto res = QueuedCoreAdaptor::getStatus();
+        Result::match(res,
+                      [&result](const QueuedStatusMap &val) {
+                          result.status = true;
+                          result.output = hashHashToString(val);
+                      },
+                      [&result](const QueuedError &err) {
+                          result.output = err.message().c_str();
+                      });
         break;
     }
     case QueuedctlArgument::TaskAdd: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlTask::getDefinitions(_parser, false);
-        long long taskId = QueuedctlTask::addTask(definitions, token);
-        result.status = (taskId > 0);
-        if (result.status)
-            result.output = QString("Task %1 added").arg(taskId);
-        else
-            result.output = "Could not add task";
+        result = QueuedctlTask::addTask(definitions, token);
         break;
     }
     case QueuedctlArgument::TaskGet: {
-        QVariant value
-            = QueuedctlTask::getTask(args.at(1).toLongLong(), args.at(2));
-        result.status = value.isValid();
-        result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
-                                             : value.toString();
+        result = QueuedctlTask::getTask(args.at(1).toLongLong(), args.at(2));
         break;
     }
     case QueuedctlArgument::TaskList: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status = true;
-        result.output
-            = hashListToString(QueuedctlTask::getTasks(_parser, token));
+        result = QueuedctlTask::getTasks(_parser, token);
         break;
     }
     case QueuedctlArgument::TaskSet: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlTask::getDefinitions(_parser, true);
-        result.status = QueuedctlTask::setTask(args.at(1).toLongLong(),
-                                               definitions, token);
+        result = QueuedctlTask::setTask(args.at(1).toLongLong(), definitions,
+                                        token);
         break;
     }
     case QueuedctlArgument::TaskStart: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status
-            = QueuedctlTask::startTask(args.at(1).toLongLong(), token);
+        result = QueuedctlTask::startTask(args.at(1).toLongLong(), token);
         break;
     }
     case QueuedctlArgument::TaskStop: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status = QueuedctlTask::stopTask(args.at(1).toLongLong(), token);
+        result = QueuedctlTask::stopTask(args.at(1).toLongLong(), token);
         break;
     }
     case QueuedctlArgument::UserAdd: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlUser::getDefinitions(_parser, false);
-        long long userId = QueuedctlUser::addUser(definitions, token);
-        result.status = (userId > 0);
-        if (result.status)
-            result.output = QString("User %1 added").arg(userId);
-        else
-            result.output = "Could not add user";
+        result = QueuedctlUser::addUser(definitions, token);
         break;
     }
     case QueuedctlArgument::UserGet: {
-        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
-        QVariant value = QueuedctlUser::getUser(userId, args.at(2));
-        result.status = value.isValid();
-        result.output = args.at(2).isEmpty() ? hashToString(value.toHash())
-                                             : value.toString();
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        long long userId = -1;
+        Result::match(userIdRes,
+                      [&userId](const long long val) { userId = val; },
+                      [&result](const QueuedError &err) {
+                          result.output = err.message().c_str();
+                      });
+        if (userId == -1)
+            break;
+        result = QueuedctlUser::getUser(userId, args.at(2));
         break;
     }
     case QueuedctlArgument::UserList: {
         QString token = QueuedctlAuth::getToken(_cache, _user);
-        result.status = true;
-        result.output
-            = hashListToString(QueuedctlUser::getUsers(_parser, token));
+        result = QueuedctlUser::getUsers(_parser, token);
         break;
     }
     case QueuedctlArgument::UserSet: {
-        auto userId = QueuedCoreAdaptor::getUserId(args.at(1));
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        long long userId = -1;
+        Result::match(userIdRes,
+                      [&userId](const long long val) { userId = val; },
+                      [&result](const QueuedError &err) {
+                          result.output = err.message().c_str();
+                      });
+        if (userId == -1)
+            break;
         QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlUser::getDefinitions(_parser, true);
-        result.status = QueuedctlUser::setUser(userId, definitions, token);
+        result = QueuedctlUser::setUser(userId, definitions, token);
         break;
     }
     case QueuedctlArgument::Invalid: {

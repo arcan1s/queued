@@ -16,104 +16,105 @@
  * @file QueuedCoreAdaptor.cpp
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
 
 #include <queued/Queued.h>
 
-#include <QDBusConnection>
-#include <QDBusMessage>
-
 
 /**
  * @fn auth
  */
-bool QueuedCoreAdaptor::auth(const QString &_token)
+QueuedResult<bool> QueuedCoreAdaptor::auth(const QString &_token)
 {
     QVariantList args = {_token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "TryAuth", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "TryAuth", args);
 }
 
 
 /**
  * @fn auth
  */
-QString QueuedCoreAdaptor::auth(const QString &_name, const QString &_password)
+QueuedResult<QString> QueuedCoreAdaptor::auth(const QString &_name,
+                                              const QString &_password)
 {
     qCDebug(LOG_DBUS) << "Auth user" << _name;
 
     QVariantList args = {_name, _password};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "Auth", args)
-        .first()
-        .toString();
+    return sendRequest<QString>(QueuedConfig::DBUS_SERVICE,
+                                QueuedConfig::DBUS_OBJECT_PATH,
+                                QueuedConfig::DBUS_SERVICE, "Auth", args);
 }
 
 
 /**
  * @fn sendOptionEdit
  */
-bool QueuedCoreAdaptor::sendOptionEdit(const QString &_key,
-                                       const QVariant &_value,
-                                       const QString &_token)
+QueuedResult<bool> QueuedCoreAdaptor::sendOptionEdit(const QString &_key,
+                                                     const QVariant &_value,
+                                                     const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Edit option" << _key << "to" << _value;
 
     QVariantList args
         = {_key, QVariant::fromValue(QDBusVariant(_value)), _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "OptionEdit", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "OptionEdit", args);
+}
+
+
+/**
+ * @fn sendPasswordHash
+ */
+QueuedResult<QString>
+QueuedCoreAdaptor::sendPasswordHash(const QString &_password)
+{
+    QVariantList args = {_password};
+    return sendRequest<QString>(QueuedConfig::DBUS_SERVICE,
+                                QueuedConfig::DBUS_OBJECT_PATH,
+                                QueuedConfig::DBUS_SERVICE, "Auth", args);
 }
 
 
 /**
  * @fn sendPluginAdd
  */
-bool QueuedCoreAdaptor::sendPluginAdd(const QString &_plugin,
-                                      const QString &_token)
+QueuedResult<bool> QueuedCoreAdaptor::sendPluginAdd(const QString &_plugin,
+                                                    const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Add plugin" << _plugin;
 
     QVariantList args = {_plugin, _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "PluginAdd", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "PluginAdd", args);
 }
 
 
 /**
  * @fn sendPluginRemove
  */
-bool QueuedCoreAdaptor::sendPluginRemove(const QString &_plugin,
-                                         const QString &_token)
+QueuedResult<bool> QueuedCoreAdaptor::sendPluginRemove(const QString &_plugin,
+                                                       const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Remove plugin" << _plugin;
 
     QVariantList args = {_plugin, _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "PluginRemove", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "PluginRemove", args);
 }
 
 
 /**
  * @fn sendTaskAdd
  */
-long long QueuedCoreAdaptor::sendTaskAdd(
+QueuedResult<long long> QueuedCoreAdaptor::sendTaskAdd(
     const QueuedProcess::QueuedProcessDefinitions &_definitions,
     const QString &_token)
 {
@@ -130,18 +131,16 @@ long long QueuedCoreAdaptor::sendTaskAdd(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "TaskAdd", args)
-        .first()
-        .toLongLong();
+    return sendRequest<long long>(QueuedConfig::DBUS_SERVICE,
+                                  QueuedConfig::DBUS_OBJECT_PATH,
+                                  QueuedConfig::DBUS_SERVICE, "TaskAdd", args);
 }
 
 
 /**
  * @fn sendTaskEdit
  */
-bool QueuedCoreAdaptor::sendTaskEdit(
+QueuedResult<bool> QueuedCoreAdaptor::sendTaskEdit(
     const long long _id,
     const QueuedProcess::QueuedProcessDefinitions &_definitions,
     const QString &_token)
@@ -163,51 +162,46 @@ bool QueuedCoreAdaptor::sendTaskEdit(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "TaskEdit", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "TaskEdit", args);
 }
 
 
 /**
  * @fn sendTaskStart
  */
-bool QueuedCoreAdaptor::sendTaskStart(const long long _id,
-                                      const QString &_token)
+QueuedResult<bool> QueuedCoreAdaptor::sendTaskStart(const long long _id,
+                                                    const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Start task" << _id;
 
     QVariantList args = {_id, _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "TaskStart", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "TaskStart", args);
 }
 
 
 /**
  * @fn sendTaskStop
  */
-bool QueuedCoreAdaptor::sendTaskStop(const long long _id, const QString &_token)
+QueuedResult<bool> QueuedCoreAdaptor::sendTaskStop(const long long _id,
+                                                   const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Stop task" << _id;
 
     QVariantList args = {_id, _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "TaskStop", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "TaskStop", args);
 }
 
 
 /**
  * @fn sendUserAdd
  */
-long long QueuedCoreAdaptor::sendUserAdd(
+QueuedResult<long long> QueuedCoreAdaptor::sendUserAdd(
     const QueuedUser::QueuedUserDefinitions &_definitions,
     const QString &_token)
 {
@@ -224,18 +218,16 @@ long long QueuedCoreAdaptor::sendUserAdd(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "UserAdd", args)
-        .first()
-        .toLongLong();
+    return sendRequest<long long>(QueuedConfig::DBUS_SERVICE,
+                                  QueuedConfig::DBUS_OBJECT_PATH,
+                                  QueuedConfig::DBUS_SERVICE, "UserAdd", args);
 }
 
 
 /**
  * @fn sendUserEdit
  */
-bool QueuedCoreAdaptor::sendUserEdit(
+QueuedResult<bool> QueuedCoreAdaptor::sendUserEdit(
     const long long _id, const QueuedUser::QueuedUserDefinitions &_definitions,
     const QString &_token)
 {
@@ -252,18 +244,16 @@ bool QueuedCoreAdaptor::sendUserEdit(
                          limits.gpumemory,
                          limits.storage,
                          _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "UserEdit", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(QueuedConfig::DBUS_SERVICE,
+                             QueuedConfig::DBUS_OBJECT_PATH,
+                             QueuedConfig::DBUS_SERVICE, "UserEdit", args);
 }
 
 
 /**
  * @fn sendUserPermissionAdd
  */
-bool QueuedCoreAdaptor::sendUserPermissionAdd(
+QueuedResult<bool> QueuedCoreAdaptor::sendUserPermissionAdd(
     const long long _id, const QueuedEnums::Permission _permission,
     const QString &_token)
 {
@@ -271,18 +261,16 @@ bool QueuedCoreAdaptor::sendUserPermissionAdd(
                       << "to" << _id;
 
     QVariantList args = {_id, static_cast<uint>(_permission), _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "UserPermissionAdd", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_OBJECT_PATH,
+        QueuedConfig::DBUS_SERVICE, "UserPermissionAdd", args);
 }
 
 
 /**
  * @fn sendUserPermissionRemove
  */
-bool QueuedCoreAdaptor::sendUserPermissionRemove(
+QueuedResult<bool> QueuedCoreAdaptor::sendUserPermissionRemove(
     const long long _id, const QueuedEnums::Permission _permission,
     const QString &_token)
 {
@@ -290,33 +278,30 @@ bool QueuedCoreAdaptor::sendUserPermissionRemove(
                       << "from" << _id;
 
     QVariantList args = {_id, static_cast<uint>(_permission), _token};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_OBJECT_PATH,
-                       QueuedConfig::DBUS_SERVICE, "UserPermissionRemove", args)
-        .first()
-        .toBool();
+    return sendRequest<bool>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_OBJECT_PATH,
+        QueuedConfig::DBUS_SERVICE, "UserPermissionRemove", args);
 }
 
 
 /**
  * @fn getOption
  */
-QVariant QueuedCoreAdaptor::getOption(const QString &_property)
+QueuedResult<QVariant> QueuedCoreAdaptor::getOption(const QString &_property)
 {
     qCDebug(LOG_DBUS) << "Get option" << _property;
 
     QVariantList args = {_property};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_PROPERTY_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "Option", args)
-                            .first());
+    return sendRequest<QVariant>(QueuedConfig::DBUS_SERVICE,
+                                 QueuedConfig::DBUS_PROPERTY_PATH,
+                                 QueuedConfig::DBUS_SERVICE, "Option", args);
 }
 
 
 /**
  * @fn getOption
  */
-QVariant
+QueuedResult<QVariant>
 QueuedCoreAdaptor::getOption(const QueuedConfig::QueuedSettings _property)
 {
     qCDebug(LOG_DBUS) << "Get option" << static_cast<int>(_property);
@@ -328,110 +313,122 @@ QueuedCoreAdaptor::getOption(const QueuedConfig::QueuedSettings _property)
 /**
  * @fn getPerformance
  */
-QList<QVariantHash> QueuedCoreAdaptor::getPerformance(const QDateTime &_from,
-                                                      const QDateTime &_to,
-                                                      const QString &_token)
+QueuedResult<QList<QVariantHash>>
+QueuedCoreAdaptor::getPerformance(const QDateTime &_from, const QDateTime &_to,
+                                  const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get performance report for" << _from << _to;
 
     QVariantList args = {_from.toString(Qt::ISODateWithMs),
                          _to.toString(Qt::ISODateWithMs), _token};
-    return qdbus_cast<QList<QVariantHash>>(toNativeType(
-        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
-                    QueuedConfig::DBUS_SERVICE, "Performance", args)
-            .first()));
+    return sendRequest<QList<QVariantHash>>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+        QueuedConfig::DBUS_SERVICE, "Performance", args);
 }
 
 
 /**
  * @fn getStatus
  */
-QHash<QString, QHash<QString, QString>> QueuedCoreAdaptor::getStatus()
+QueuedResult<QueuedStatusMap> QueuedCoreAdaptor::getStatus()
 {
-    return qdbus_cast<QHash<QString, QHash<QString, QString>>>(toNativeType(
-        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
-                    QueuedConfig::DBUS_SERVICE, "Status", {})
-            .first()));
+    return sendRequest<QueuedStatusMap>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+        QueuedConfig::DBUS_SERVICE, "Status", {});
 }
 
 
 /**
  * @fn getTask
  */
-QVariantHash QueuedCoreAdaptor::getTask(const long long _id)
+QueuedResult<QVariantHash> QueuedCoreAdaptor::getTask(const long long _id)
 {
     qCDebug(LOG_DBUS) << "Get task properties" << _id;
 
-    return qdbus_cast<QVariantHash>(getTask(_id, ""));
+    auto res = getTask(_id, "");
+
+    QueuedResult<QVariantHash> output;
+    Result::match(res,
+                  [&output](const QVariant &val) {
+                      output = toResult<QVariantHash>(val);
+                  },
+                  [&output](const QueuedError &err) { output = err; });
+
+    return output;
 }
 
 
 /**
  * @fn getTask
  */
-QVariant QueuedCoreAdaptor::getTask(const long long _id,
-                                    const QString &_property)
+QueuedResult<QVariant> QueuedCoreAdaptor::getTask(const long long _id,
+                                                  const QString &_property)
 {
     qCDebug(LOG_DBUS) << "Get task property" << _id << _property;
 
     QVariantList args = {_id, _property};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_PROPERTY_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "Task", args)
-                            .first());
+    return sendRequest<QVariant>(QueuedConfig::DBUS_SERVICE,
+                                 QueuedConfig::DBUS_PROPERTY_PATH,
+                                 QueuedConfig::DBUS_SERVICE, "Task", args);
 }
 
 
 /**
  * @fn getTasks
  */
-QList<QVariantHash> QueuedCoreAdaptor::getTasks(const long long _user,
-                                                const QDateTime &_from,
-                                                const QDateTime &_to,
-                                                const QString &_token)
+QueuedResult<QList<QVariantHash>>
+QueuedCoreAdaptor::getTasks(const long long _user, const QDateTime &_from,
+                            const QDateTime &_to, const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get tasks list for" << _user << _from << _to;
 
     QVariantList args = {_user, _from.toString(Qt::ISODateWithMs),
                          _to.toString(Qt::ISODateWithMs), _token};
-    return qdbus_cast<QList<QVariantHash>>(toNativeType(
-        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
-                    QueuedConfig::DBUS_SERVICE, "Tasks", args)
-            .first()));
+    return sendRequest<QList<QVariantHash>>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+        QueuedConfig::DBUS_SERVICE, "Tasks", args);
 }
 
 
 /**
  * @fn getUser
  */
-QVariantHash QueuedCoreAdaptor::getUser(const long long _id)
+QueuedResult<QVariantHash> QueuedCoreAdaptor::getUser(const long long _id)
 {
     qCDebug(LOG_DBUS) << "Get user property" << _id;
 
-    return qdbus_cast<QVariantHash>(getUser(_id, ""));
+    auto res = getUser(_id, "");
+
+    QueuedResult<QVariantHash> output;
+    Result::match(res,
+                  [&output](const QVariant &val) {
+                      output = toResult<QVariantHash>(val);
+                  },
+                  [&output](const QueuedError &err) { output = err; });
+
+    return output;
 }
 
 
 /**
  * @fn getUser
  */
-QVariant QueuedCoreAdaptor::getUser(const long long _id,
-                                    const QString &_property)
+QueuedResult<QVariant> QueuedCoreAdaptor::getUser(const long long _id,
+                                                  const QString &_property)
 {
     qCDebug(LOG_DBUS) << "Get user property" << _id << _property;
 
     QVariantList args = {_id, _property};
-    return toNativeType(sendRequest(QueuedConfig::DBUS_SERVICE,
-                                    QueuedConfig::DBUS_PROPERTY_PATH,
-                                    QueuedConfig::DBUS_SERVICE, "User", args)
-                            .first());
+    return sendRequest<QVariant>(QueuedConfig::DBUS_SERVICE,
+                                 QueuedConfig::DBUS_PROPERTY_PATH,
+                                 QueuedConfig::DBUS_SERVICE, "User", args);
 }
 
 
 /**
  * @fn getUserId
  */
-long long QueuedCoreAdaptor::getUserId(const QString &_name)
+QueuedResult<long long> QueuedCoreAdaptor::getUserId(const QString &_name)
 {
     qCDebug(LOG_DBUS) << "Get user ID for" << _name;
 
@@ -441,18 +438,16 @@ long long QueuedCoreAdaptor::getUserId(const QString &_name)
         return stringToLong;
 
     QVariantList args = {_name};
-    return sendRequest(QueuedConfig::DBUS_SERVICE,
-                       QueuedConfig::DBUS_PROPERTY_PATH,
-                       QueuedConfig::DBUS_SERVICE, "UserIdByName", args)
-        .first()
-        .toLongLong();
+    return sendRequest<long long>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_PROPERTY_PATH,
+        QueuedConfig::DBUS_SERVICE, "UserIdByName", args);
 }
 
 
 /**
  * @fn getUsers
  */
-QList<QVariantHash>
+QueuedResult<QList<QVariantHash>>
 QueuedCoreAdaptor::getUsers(const QDateTime &_lastLogged,
                             const QueuedEnums::Permission _permission,
                             const QString &_token)
@@ -462,47 +457,7 @@ QueuedCoreAdaptor::getUsers(const QDateTime &_lastLogged,
 
     QVariantList args = {_lastLogged.toString(Qt::ISODateWithMs),
                          static_cast<uint>(_permission), _token};
-    return qdbus_cast<QList<QVariantHash>>(toNativeType(
-        sendRequest(QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
-                    QueuedConfig::DBUS_SERVICE, "Users", args)
-            .first()));
-}
-
-
-/**
- * @fn sendRequest
- */
-QVariantList QueuedCoreAdaptor::sendRequest(const QString &_service,
-                                            const QString &_path,
-                                            const QString &_interface,
-                                            const QString &_cmd,
-                                            const QVariantList &_args)
-{
-    qCDebug(LOG_DBUS) << "Send request to service" << _service << "by interface"
-                      << _interface << "to" << _path << "command" << _cmd
-                      << "with args" << _args;
-
-    QDBusConnection bus = QDBusConnection::systemBus();
-    QDBusMessage request
-        = QDBusMessage::createMethodCall(_service, _path, _interface, _cmd);
-    if (!_args.isEmpty())
-        request.setArguments(_args);
-
-    QDBusMessage response = bus.call(request, QDBus::BlockWithGui);
-    QVariantList arguments = response.arguments();
-
-    QString error = response.errorMessage();
-    if (!error.isEmpty())
-        qCWarning(LOG_DBUS) << "Error message" << error;
-
-    return arguments;
-}
-
-
-/**
- * @fn toNativeType
- */
-QVariant QueuedCoreAdaptor::toNativeType(const QVariant &_data)
-{
-    return _data.value<QDBusVariant>().variant();
+    return sendRequest<QList<QVariantHash>>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_REPORTS_PATH,
+        QueuedConfig::DBUS_SERVICE, "Users", args);
 }

@@ -28,6 +28,7 @@
 
 #include "QueuedEnums.h"
 #include "QueuedLimits.h"
+#include "QueuedResult.h"
 #include "QueuedStaticConfig.h"
 
 
@@ -69,7 +70,7 @@ public:
      * user auth token
      * @return true on successfully addition
      */
-    bool addPlugin(const QString &_plugin, const QString &_token);
+    QueuedResult<bool> addPlugin(const QString &_plugin, const QString &_token);
     /**
      * @brief add new task
      * @param _command
@@ -86,10 +87,10 @@ public:
      * user auth token
      * @return task ID or -1 if no task added
      */
-    long long addTask(const QString &_command, const QStringList &_arguments,
-                      const QString &_workingDirectory, const long long _userId,
-                      const QueuedLimits::Limits &_limits,
-                      const QString &_token);
+    QueuedResult<long long>
+    addTask(const QString &_command, const QStringList &_arguments,
+            const QString &_workingDirectory, const long long _userId,
+            const QueuedLimits::Limits &_limits, const QString &_token);
     /**
      * @brief add new user
      * @param _name
@@ -106,17 +107,18 @@ public:
      * user auth token
      * @return user ID or -1 if no user created
      */
-    long long addUser(const QString &_name, const QString &_email,
-                      const QString &_password, const uint _permissions,
-                      const QueuedLimits::Limits &_limits,
-                      const QString &_token);
+    QueuedResult<long long> addUser(const QString &_name, const QString &_email,
+                                    const QString &_password,
+                                    const uint _permissions,
+                                    const QueuedLimits::Limits &_limits,
+                                    const QString &_token);
     /**
      * @brief try to authorize by given token
      * @param _token
      * token ID
      * @return true if token is valid
      */
-    bool authorization(const QString &_token);
+    QueuedResult<bool> authorization(const QString &_token);
     /**
      * @brief authorize and create new token for user
      * @param _name
@@ -125,7 +127,8 @@ public:
      * user password
      * @return token. It will be empty if authorization error occurs
      */
-    QString authorization(const QString &_name, const QString &_password);
+    QueuedResult<QString> authorization(const QString &_name,
+                                        const QString &_password);
     /**
      * @brief edit advanced settings
      * @param _key
@@ -136,8 +139,8 @@ public:
      * user auth token
      * @return true on successful option edition
      */
-    bool editOption(const QString &_key, const QVariant &_value,
-                    const QString &_token);
+    QueuedResult<bool> editOption(const QString &_key, const QVariant &_value,
+                                  const QString &_token);
     /**
      * @brief edit task
      * @param _id
@@ -150,8 +153,9 @@ public:
      * fields will be ignored. No need to pass all properties here
      * @return true on successful task edition
      */
-    bool editTask(const long long _id, const QVariantHash &_taskData,
-                  const QString &_token);
+    QueuedResult<bool> editTask(const long long _id,
+                                const QVariantHash &_taskData,
+                                const QString &_token);
     /**
      * @brief edit user
      * @param _id
@@ -164,8 +168,9 @@ public:
      * fields will be ignored. No need to pass all properties here
      * @return true on successful user edition
      */
-    bool editUser(const long long _id, const QVariantHash &_userData,
-                  const QString &_token);
+    QueuedResult<bool> editUser(const long long _id,
+                                const QVariantHash &_userData,
+                                const QString &_token);
     /**
      * @brief edit user permissions
      * @param _id
@@ -178,16 +183,24 @@ public:
      * user auth token
      * @return true on successful user permission edition
      */
-    bool editUserPermission(const long long _id,
-                            const QueuedEnums::Permission &_permission,
-                            const bool _add, const QString &_token);
+    QueuedResult<bool>
+    editUserPermission(const long long _id,
+                       const QueuedEnums::Permission &_permission,
+                       const bool _add, const QString &_token);
+    /**
+     * @brief hash password
+     * @param _password
+     * user password as plain text
+     * @return hashed password with applied salt
+     */
+    QueuedResult<QString> hashFromPassword(const QString &_password);
     /**
      * @brief get value from advanced settings
      * @param _key
      * key string
      * @return option value or empty QVariant
      */
-    QVariant option(const QString &_key);
+    QueuedResult<QVariant> option(const QString &_key);
     /**
      * @brief usage report
      * @param _from
@@ -198,9 +211,9 @@ public:
      * user auth token
      * @return performance table
      */
-    QList<QVariantHash> performanceReport(const QDateTime &_from,
-                                          const QDateTime &_to,
-                                          const QString &_token) const;
+    QueuedResult<QList<QVariantHash>>
+    performanceReport(const QDateTime &_from, const QDateTime &_to,
+                      const QString &_token) const;
     /**
      * @brief get plugin settings
      * @param _plugin
@@ -216,7 +229,8 @@ public:
      * user auth token
      * @return true on successful plugin removal
      */
-    bool removePlugin(const QString &_plugin, const QString &_token);
+    QueuedResult<bool> removePlugin(const QString &_plugin,
+                                    const QString &_token);
     /**
      * @brief force start task
      * @param _id
@@ -225,7 +239,7 @@ public:
      * user auth token
      * @return true on successful task start
      */
-    bool startTask(const long long _id, const QString &_token);
+    QueuedResult<bool> startTask(const long long _id, const QString &_token);
     /**
      * @brief force stop task
      * @param _id
@@ -234,7 +248,7 @@ public:
      * user auth token
      * @return true on successful task stop
      */
-    bool stopTask(const long long _id, const QString &_token);
+    QueuedResult<bool> stopTask(const long long _id, const QString &_token);
     /**
      * @brief get task by ID
      * @param _id
@@ -254,9 +268,10 @@ public:
      * user auth token
      * @return list of tasks in database format
      */
-    QList<QVariantHash> taskReport(const long long _user,
-                                   const QDateTime &_from, const QDateTime &_to,
-                                   const QString &_token) const;
+    QueuedResult<QList<QVariantHash>> taskReport(const long long _user,
+                                                 const QDateTime &_from,
+                                                 const QDateTime &_to,
+                                                 const QString &_token) const;
     /**
      * @brief get user by ID
      * @param _id
@@ -281,9 +296,10 @@ public:
      * user auth token
      * @return list of users in database format
      */
-    QList<QVariantHash> userReport(const QDateTime &_lastLogged,
-                                   const QueuedEnums::Permission _permission,
-                                   const QString &_token) const;
+    QueuedResult<QList<QVariantHash>>
+    userReport(const QDateTime &_lastLogged,
+               const QueuedEnums::Permission _permission,
+               const QString &_token) const;
     // control methods
     /**
      * @brief deinit subclasses
@@ -394,7 +410,7 @@ private:
      * @param _args
      * class constructor arguments
      */
-    template<class T, typename... Args> T *initObject(T *_dest, Args... _args)
+    template <class T, typename... Args> T *initObject(T *_dest, Args... _args)
     {
         return _dest ? _dest : new T(this, _args...);
     };
@@ -432,11 +448,11 @@ private:
      * task defined limits
      * @return task ID or -1 if no task added
      */
-    long long addTaskPrivate(const QString &_command,
-                             const QStringList &_arguments,
-                             const QString &_workingDirectory,
-                             const long long _userId,
-                             const QueuedLimits::Limits &_limits);
+    QueuedResult<long long> addTaskPrivate(const QString &_command,
+                                           const QStringList &_arguments,
+                                           const QString &_workingDirectory,
+                                           const long long _userId,
+                                           const QueuedLimits::Limits &_limits);
     /**
      * @brief add new user
      * @param _name
@@ -451,9 +467,11 @@ private:
      * user limits
      * @return user ID or -1 if no user found
      */
-    long long addUserPrivate(const QString &_name, const QString &_email,
-                             const QString &_password, const uint _permissions,
-                             const QueuedLimits::Limits &_limits);
+    QueuedResult<long long> addUserPrivate(const QString &_name,
+                                           const QString &_email,
+                                           const QString &_password,
+                                           const uint _permissions,
+                                           const QueuedLimits::Limits &_limits);
     /**
      * @brief edit advanced settings
      * @param _key
@@ -462,7 +480,8 @@ private:
      * advanced settings value
      * @return true on successful option edition
      */
-    bool editOptionPrivate(const QString &_key, const QVariant &_value);
+    QueuedResult<bool> editOptionPrivate(const QString &_key,
+                                         const QVariant &_value);
     /**
      * @brief edit plugin list
      * @param _plugin
@@ -471,7 +490,8 @@ private:
      * true if it requires add plugin
      * @return true on successful action
      */
-    bool editPluginPrivate(const QString &_plugin, const bool _add);
+    QueuedResult<bool> editPluginPrivate(const QString &_plugin,
+                                         const bool _add);
     /**
      * @brief edit task
      * @param _id
@@ -482,7 +502,8 @@ private:
      * fields will be ignored. No need to pass all properties here
      * @return true on successful task edition
      */
-    bool editTaskPrivate(const long long _id, const QVariantHash &_taskData);
+    QueuedResult<bool> editTaskPrivate(const long long _id,
+                                       const QVariantHash &_taskData);
     /**
      * @brief edit user
      * @param _id
@@ -493,7 +514,8 @@ private:
      * fields will be ignored. No need to pass all properties here
      * @return true on successful user edition
      */
-    bool editUserPrivate(const long long _id, const QVariantHash &_userData);
+    QueuedResult<bool> editUserPrivate(const long long _id,
+                                       const QVariantHash &_userData);
     /**
      * @brief edit user permissions
      * @param _id
@@ -504,9 +526,10 @@ private:
      * indicates whether it should be added or removed
      * @return true on successful user permission edition
      */
-    bool editUserPermissionPrivate(const long long _id,
-                                   const QueuedEnums::Permission &_permission,
-                                   const bool _add);
+    QueuedResult<bool>
+    editUserPermissionPrivate(const long long _id,
+                              const QueuedEnums::Permission &_permission,
+                              const bool _add);
 };
 
 

@@ -16,13 +16,14 @@
  * @file QueuedPropertyInterface.cpp
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
 
 #include <queued/Queued.h>
 
+#include <QDBusMetaType>
 #include <QMetaProperty>
 
 
@@ -37,6 +38,9 @@ QueuedPropertyInterface::QueuedPropertyInterface(QueuedCore *parent)
     , m_core(parent)
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
+
+    qRegisterMetaType<QueuedResult<QVariant>>("QueuedResult<QVariant>");
+    qDBusRegisterMetaType<QueuedResult<QVariant>>();
 }
 
 
@@ -56,8 +60,7 @@ QDBusVariant QueuedPropertyInterface::Option(const QString &property)
 {
     qCDebug(LOG_DBUS) << "Get property" << property;
 
-    auto response = m_core->option(property);
-    return QDBusVariant(response.isValid() ? response : "");
+    return QueuedCoreAdaptor::toDBusVariant(m_core->option(property));
 }
 
 
@@ -72,17 +75,21 @@ QDBusVariant QueuedPropertyInterface::Task(const long long id,
     auto task = m_core->task(id);
     if (!task) {
         qCWarning(LOG_DBUS) << "Could not find task" << id;
-        return QDBusVariant("");
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(
+            QueuedError("Task does not exist",
+                        QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
     if (property.isEmpty()) {
         auto response = QVariant::fromValue<QVariantHash>(getProperties(task));
-        return QDBusVariant(response);
+        return QueuedCoreAdaptor::toDBusVariant(
+            QueuedResult<QVariant>(response));
     } else {
         auto response = task->property(qPrintable(property));
         if (response.type() == QVariant::DateTime)
             response = response.toDateTime().toString(Qt::ISODateWithMs);
-        return QDBusVariant(response.isValid() ? response : "");
+        return QueuedCoreAdaptor::toDBusVariant(
+            QueuedResult<QVariant>(response));
     }
 }
 
@@ -98,17 +105,21 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
     auto user = m_core->user(id);
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << id;
-        return QDBusVariant("");
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(
+            QueuedError("User does not exist",
+                        QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
     if (property.isEmpty()) {
         auto response = QVariant::fromValue<QVariantHash>(getProperties(user));
-        return QDBusVariant(response);
+        return QueuedCoreAdaptor::toDBusVariant(
+            QueuedResult<QVariant>(response));
     } else {
         auto response = user->property(qPrintable(property));
         if (response.type() == QVariant::DateTime)
             response = response.toDateTime().toString(Qt::ISODateWithMs);
-        return QDBusVariant(response.isValid() ? response : "");
+        return QueuedCoreAdaptor::toDBusVariant(
+            QueuedResult<QVariant>(response));
     }
 }
 
@@ -116,17 +127,20 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
 /**
  * @fn UserIdByName
  */
-qlonglong QueuedPropertyInterface::UserIdByName(const QString &name)
+QDBusVariant QueuedPropertyInterface::UserIdByName(const QString &name)
 {
     qCDebug(LOG_DBUS) << "Look for user ID" << name;
 
     auto user = m_core->user(name);
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << name;
-        return -1;
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<long long>(
+            QueuedError("User does not exist",
+                        QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
-    return user->index();
+    return QueuedCoreAdaptor::toDBusVariant(
+        QueuedResult<long long>(user->index()));
 }
 
 

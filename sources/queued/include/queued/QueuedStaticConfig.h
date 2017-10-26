@@ -44,10 +44,13 @@ namespace QueuedConfig
  * administrator user name
  * @var QueuedAdminSetup::password
  * administrator user password
+ * @var QueuedAdminSetup::salt
+ * user passwords salt
  */
 typedef struct {
     QString name;
     QString password;
+    QString salt;
 } QueuedAdminSetup;
 /**
  * @struct QueuedDBSetup
@@ -80,6 +83,8 @@ typedef struct {
  * unknown key
  * @var QueuedSettings::DatabaseInterval
  * database actions interval in msecs
+ * @var QueuedSettings::DatabaseVersion
+ * internal field to control current database version
  * @var QueuedSettings::DefaultLimits
  * default limits value
  * @var QueuedSettings::KeepTasks
@@ -88,14 +93,10 @@ typedef struct {
  * keep users last logged in msecs
  * @var QueuedSettings::OnExitAction
  * on queued exit action enum
- * @var QueuedSettings::TokenExpiration
- * token expiration value in days
- * @var QueuedSettings::DatabaseVersion
- * internal field to control current database version
- * @var QueuedSettings::ProcessCommandLine
- * control process command line
  * @var QueuedSettings::Plugins
  * plugin list
+ * @var QueuedSettings::ProcessCommandLine
+ * control process command line
  * @var QueuedSettings::ServerAddress
  * queued server bind address
  * @var QueuedSettings::ServerMaxConnections
@@ -104,22 +105,24 @@ typedef struct {
  * queued server bind port
  * @var QueuedSettings::ServerTimeout
  * server thread timeout
+ * @var QueuedSettings::TokenExpiration
+ * token expiration value in days
  */
 enum class QueuedSettings {
     Invalid,
     DatabaseInterval,
+    DatabaseVersion,
     DefaultLimits,
     KeepTasks,
     KeepUsers,
     OnExitAction,
-    TokenExpiration,
-    DatabaseVersion,
-    ProcessCommandLine,
     Plugins,
+    ProcessCommandLine,
     ServerAddress,
     ServerMaxConnections,
     ServerPort,
-    ServerTimeout
+    ServerTimeout,
+    TokenExpiration
 };
 /**
  * @struct QueuedSettingsField
@@ -141,25 +144,25 @@ typedef QHash<QString, QueuedSettingsField> QueuedSettingsDefaultMap;
 /**
  * @brief default settings map
  */
-const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
+static const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
     {"", {QueuedSettings::Invalid, QVariant()}},
     {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000}},
+    {"DatabaseVersion",
+     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
     {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\n0\n0\n0\n0"}},
     {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
     {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
     {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
-    {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
-    {"DatabaseVersion",
-     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
+    {"Plugins", {QueuedSettings::Plugins, ""}},
     {"ProcessCommandLine",
      {QueuedSettings::ProcessCommandLine,
       "systemd-run\n--scope\n--unit={name}\n--uid={uid}\n--gid={gid}"
       "\n-p\nCPUQuota={cpu}%\n-p\nMemoryHigh={memory}\n{application}"}},
-    {"Plugins", {QueuedSettings::Plugins, ""}},
     {"ServerAddress", {QueuedSettings::ServerAddress, ""}},
     {"ServerMaxConnections", {QueuedSettings::ServerMaxConnections, 30}},
     {"ServerPort", {QueuedSettings::ServerPort, 8080}},
     {"ServerTimeout", {QueuedSettings::ServerTimeout, -1}},
+    {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
 };
 };
 

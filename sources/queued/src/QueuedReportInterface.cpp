@@ -16,7 +16,7 @@
  * @file QueuedReportInterface.cpp
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
@@ -38,16 +38,16 @@ QueuedReportInterface::QueuedReportInterface(QueuedCore *parent)
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
 
-    // QList<QVariantHash>
-    qRegisterMetaType<QList<QVariantHash>>("QList<QVariantHash>");
-    qDBusRegisterMetaType<QList<QVariantHash>>();
-    // QHash<QString, QString>
     qRegisterMetaType<QHash<QString, QString>>("QHash<QString, QString>");
     qDBusRegisterMetaType<QHash<QString, QString>>();
-    // QHash<QString, QHash<QString, QString>>
-    qRegisterMetaType<QHash<QString, QHash<QString, QString>>>(
-        "QHash<QString, QHash<QString, QString>>");
-    qDBusRegisterMetaType<QHash<QString, QHash<QString, QString>>>();
+
+    qRegisterMetaType<QueuedResult<QList<QVariantHash>>>(
+        "QueuedResult<QList<QVariantHash>>");
+    qDBusRegisterMetaType<QueuedResult<QList<QVariantHash>>>();
+
+    qRegisterMetaType<QueuedResult<QueuedStatusMap>>(
+        "QueuedResult<QueuedStatusMap>");
+    qDBusRegisterMetaType<QueuedResult<QueuedStatusMap>>();
 }
 
 
@@ -69,10 +69,9 @@ QDBusVariant QueuedReportInterface::Performance(const QString &from,
 {
     qCDebug(LOG_DBUS) << "Performance report for" << from << to;
 
-    return QDBusVariant(
-        QVariant::fromValue<QList<QVariantHash>>(m_core->performanceReport(
-            QDateTime::fromString(from, Qt::ISODateWithMs),
-            QDateTime::fromString(to, Qt::ISODateWithMs), token)));
+    return QueuedCoreAdaptor::toDBusVariant(m_core->performanceReport(
+        QDateTime::fromString(from, Qt::ISODateWithMs),
+        QDateTime::fromString(to, Qt::ISODateWithMs), token));
 }
 
 
@@ -81,11 +80,11 @@ QDBusVariant QueuedReportInterface::Performance(const QString &from,
  */
 QDBusVariant QueuedReportInterface::Status()
 {
-    auto metadata = QueuedDebug::getBuildMetaData();
+    QueuedResult<QueuedStatusMap> metadata = QueuedDebug::getBuildMetaData();
     // append metadata here
 
     return QDBusVariant(
-        QVariant::fromValue<QHash<QString, QHash<QString, QString>>>(metadata));
+        QVariant::fromValue<QueuedResult<QueuedStatusMap>>(metadata));
 }
 
 
@@ -99,10 +98,9 @@ QDBusVariant QueuedReportInterface::Tasks(const qlonglong user,
 {
     qCDebug(LOG_DBUS) << "Search for tasks" << user << from << to;
 
-    return QDBusVariant(QVariant::fromValue<QList<QVariantHash>>(
-        m_core->taskReport(user, QDateTime::fromString(from, Qt::ISODateWithMs),
-                           QDateTime::fromString(to, Qt::ISODateWithMs),
-                           token)));
+    return QueuedCoreAdaptor::toDBusVariant(m_core->taskReport(
+        user, QDateTime::fromString(from, Qt::ISODateWithMs),
+        QDateTime::fromString(to, Qt::ISODateWithMs), token));
 }
 
 
@@ -115,9 +113,9 @@ QDBusVariant QueuedReportInterface::Users(const QString &lastLogged,
 {
     qCDebug(LOG_DBUS) << "Search for users" << lastLogged << permission;
 
-    return QDBusVariant(QVariant::fromValue<QList<QVariantHash>>(
+    return QueuedCoreAdaptor::toDBusVariant(
         m_core->userReport(QDateTime::fromString(lastLogged, Qt::ISODateWithMs),
                            permission < 1 ? QueuedEnums::Permission::Invalid
                                           : QueuedEnums::Permission(permission),
-                           token)));
+                           token));
 }

@@ -19,12 +19,16 @@
 
 #include <QCommandLineParser>
 
+#include "QueuedctlCommon.h"
+
 
 namespace QueuedctlPlugins
 {
-bool addPlugin(const QString &_plugin, const QString &_token);
-QStringList listPlugins();
-bool removePlugin(const QString &_plugin, const QString &_token);
+QueuedctlCommon::QueuedctlResult addPlugin(const QString &_plugin,
+                                           const QString &_token);
+QueuedctlCommon::QueuedctlResult listPlugins();
+QueuedctlCommon::QueuedctlResult removePlugin(const QString &_plugin,
+                                              const QString &_token);
 void parser(QCommandLineParser &_parser);
 };
 

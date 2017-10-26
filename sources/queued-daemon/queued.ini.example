@@ -1,6 +1,7 @@
 [Administrator]
 Username = root
-Password = 0dd3e512642c97ca3f747f9a76e374fbda73f9292823c0313be9d78add7cdd8f72235af0c553dd26797e78e1854edee0ae002f8aba074b066dfce1af114e32f8
+Password = 9bc0798aa9d5de1f41e56ea4654cf86694dae080912d7df83cf293e7c7beb1b62e2811ed88bb24553a50d53f5cf85458928d25aea19aca5dc42fb316ba9c0e2c
+Salt = suzMBxyKxtyQtu7c4vVfbQTB
 
 [Database]
 Driver = QSQLITE

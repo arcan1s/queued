@@ -18,6 +18,7 @@
 #define QUEUEDAPPLICATIONINTERFACE_H
 
 #include <QDBusAbstractAdaptor>
+#include <QDBusVariant>
 
 #include "QueuedConfig.h"
 
@@ -34,8 +35,8 @@ public:
     virtual ~QueuedApplicationInterface();
 
 public slots:
-    bool Active() const;
-    QStringList UIDs() const;
+    QDBusVariant Active() const;
+    QDBusVariant UIDs() const;
 
 private:
     QueuedApplication *m_application = nullptr;

@@ -86,7 +86,7 @@ public slots:
      * user name
      * @return user ID or -1 if no user found
      */
-    qlonglong UserIdByName(const QString &name);
+    QDBusVariant UserIdByName(const QString &name);
 
 private:
     /**

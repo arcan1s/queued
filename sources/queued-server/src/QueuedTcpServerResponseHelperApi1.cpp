@@ -139,7 +139,10 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getStatus()
 {
     QVariantHash output = {{"code", 200}};
 
-    auto data = QueuedCoreAdaptor::getStatus();
+    auto res = QueuedCoreAdaptor::getStatus();
+    if (res.type() != Result::Content::Value)
+        return {};
+    auto data = res.get();
     auto sections = data.keys();
     sections.sort();
     for (auto &section : sections) {

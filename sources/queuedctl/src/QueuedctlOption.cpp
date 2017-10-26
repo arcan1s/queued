@@ -15,24 +15,45 @@
 
 
 #include "QueuedctlOption.h"
+#include "QueuedctlCommon.h"
 
 #include <queued/Queued.h>
 
 
-bool QueuedctlOption::editOption(const QString &_option, const QVariant &_value,
-                                 const QString &_token)
+QueuedctlCommon::QueuedctlResult
+QueuedctlOption::editOption(const QString &_option, const QVariant &_value,
+                            const QString &_token)
 {
     qCDebug(LOG_APP) << "Edit option" << _option << "to" << _value;
 
-    return QueuedCoreAdaptor::sendOptionEdit(_option, _value, _token);
+    QueuedctlCommon::QueuedctlResult output;
+    auto res = QueuedCoreAdaptor::sendOptionEdit(_option, _value, _token);
+    Result::match(res, [&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
-QVariant QueuedctlOption::getOption(const QString &_option)
+QueuedctlCommon::QueuedctlResult
+QueuedctlOption::getOption(const QString &_option)
 {
     qCDebug(LOG_APP) << "Get option" << _option;
 
-    return QueuedCoreAdaptor::getOption(_option);
+    QueuedctlCommon::QueuedctlResult output;
+    auto res = QueuedCoreAdaptor::getOption(_option);
+    Result::match(res,
+                  [&output](const QVariant &val) {
+                      output.status = val.isValid();
+                      output.output = val.toString();
+                  },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 

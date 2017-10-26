@@ -16,12 +16,14 @@
  * @file QueuedCoreInterface.cpp
  * Source code of queued library
  * @author Queued team
- * @copyright GPLv3
+ * @copyright MIT
  * @bug https://github.com/arcan1s/queued/issues
  */
 
 
 #include <queued/Queued.h>
+
+#include <QDBusMetaType>
 
 
 /**
@@ -35,6 +37,15 @@ QueuedCoreInterface::QueuedCoreInterface(QueuedCore *parent)
     , m_core(parent)
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
+
+    qRegisterMetaType<QueuedResult<bool>>("QueuedResult<bool>");
+    qDBusRegisterMetaType<QueuedResult<bool>>();
+
+    qRegisterMetaType<QueuedResult<long long>>("QueuedResult<long long>");
+    qDBusRegisterMetaType<QueuedResult<long long>>();
+
+    qRegisterMetaType<QueuedResult<QString>>("QueuedResult<QString>");
+    qDBusRegisterMetaType<QueuedResult<QString>>();
 }
 
 
@@ -50,54 +61,68 @@ QueuedCoreInterface::~QueuedCoreInterface()
 /**
  * @fn Auth
  */
-QString QueuedCoreInterface::Auth(const QString &name, const QString &password)
+QDBusVariant QueuedCoreInterface::Auth(const QString &name,
+                                       const QString &password)
 {
     qCDebug(LOG_DBUS) << "Authorize user" << name;
 
-    return m_core->authorization(name, password);
+    return QueuedCoreAdaptor::toDBusVariant(
+        m_core->authorization(name, password));
 }
 
 
 /**
  * @fn OptionEdit
  */
-bool QueuedCoreInterface::OptionEdit(const QString &key,
-                                     const QDBusVariant &value,
-                                     const QString &token)
+QDBusVariant QueuedCoreInterface::OptionEdit(const QString &key,
+                                             const QDBusVariant &value,
+                                             const QString &token)
 {
     qCDebug(LOG_DBUS) << "Edit option" << key << value.variant();
 
-    return m_core->editOption(key, value.variant(), token);
+    return QueuedCoreAdaptor::toDBusVariant(
+        m_core->editOption(key, value.variant(), token));
+}
+
+
+/**
+ * @fn PasswordHash
+ */
+QDBusVariant QueuedCoreInterface::PasswordHash(const QString &password)
+{
+    return QueuedCoreAdaptor::toDBusVariant(m_core->hashFromPassword(password));
 }
 
 
 /**
  * @fn PluginAdd
  */
-bool QueuedCoreInterface::PluginAdd(const QString &plugin, const QString &token)
+QDBusVariant QueuedCoreInterface::PluginAdd(const QString &plugin,
+                                            const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add plugin" << plugin;
 
-    return m_core->addPlugin(plugin, token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->addPlugin(plugin, token));
 }
 
 
 /**
  * @fn PluginRemove
  */
-bool QueuedCoreInterface::PluginRemove(const QString &plugin,
-                                       const QString &token)
+QDBusVariant QueuedCoreInterface::PluginRemove(const QString &plugin,
+                                               const QString &token)
 {
     qCDebug(LOG_DBUS) << "Remove plugin" << plugin;
 
-    return m_core->removePlugin(plugin, token);
+    return QueuedCoreAdaptor::toDBusVariant(
+        m_core->removePlugin(plugin, token));
 }
 
 
 /**
  * @fn TaskAdd
  */
-qlonglong QueuedCoreInterface::TaskAdd(
+QDBusVariant QueuedCoreInterface::TaskAdd(
     const QString &command, const QStringList &arguments,
     const QString &workingDirectory, const qlonglong user, const qlonglong cpu,
     const qlonglong gpu, const qlonglong memory, const qlonglong gpumemory,
@@ -106,16 +131,16 @@ qlonglong QueuedCoreInterface::TaskAdd(
     qCDebug(LOG_DBUS) << "Add new task with parameters" << command << arguments
                       << workingDirectory << "from user" << user;
 
-    return m_core->addTask(
+    return QueuedCoreAdaptor::toDBusVariant(m_core->addTask(
         command, arguments, workingDirectory, user,
-        QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token);
+        QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token));
 }
 
 
 /**
  * @fn TaskEdit
  */
-bool QueuedCoreInterface::TaskEdit(
+QDBusVariant QueuedCoreInterface::TaskEdit(
     const qlonglong id, const QString &command, const QStringList &arguments,
     const QString &directory, const uint nice, const uint uid, const uint gid,
     const qlonglong user, const qlonglong cpu, const qlonglong gpu,
@@ -129,7 +154,9 @@ bool QueuedCoreInterface::TaskEdit(
     auto task = m_core->task(id);
     if (!task) {
         qCWarning(LOG_DBUS) << "Could not find task" << id;
-        return false;
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<bool>(
+            QueuedError("Task does not exist",
+                        QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
     // build payload
@@ -162,45 +189,47 @@ bool QueuedCoreInterface::TaskEdit(
         limits.storage = storage;
     data["limits"] = limits.toString();
 
-    return m_core->editTask(id, data, token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->editTask(id, data, token));
 }
 
 
 /**
  * @fn TaskStart
  */
-bool QueuedCoreInterface::TaskStart(const qlonglong id, const QString &token)
+QDBusVariant QueuedCoreInterface::TaskStart(const qlonglong id,
+                                            const QString &token)
 {
     qCDebug(LOG_DBUS) << "Force start task" << id;
 
-    return m_core->startTask(id, token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->startTask(id, token));
 }
 
 
 /**
  * @fn TaskStop
  */
-bool QueuedCoreInterface::TaskStop(const qlonglong id, const QString &token)
+QDBusVariant QueuedCoreInterface::TaskStop(const qlonglong id,
+                                           const QString &token)
 {
     qCDebug(LOG_DBUS) << "Force stop task" << id;
 
-    return m_core->stopTask(id, token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->stopTask(id, token));
 }
 
 
 /**
  * @fn TryAuth
  */
-bool QueuedCoreInterface::TryAuth(const QString &token)
+QDBusVariant QueuedCoreInterface::TryAuth(const QString &token)
 {
-    return m_core->authorization(token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->authorization(token));
 }
 
 
 /**
  * @fn UserAdd
  */
-qlonglong
+QDBusVariant
 QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
                              const QString &password, const uint permissions,
                              const qlonglong cpu, const qlonglong gpu,
@@ -210,22 +239,21 @@ QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
     qCDebug(LOG_DBUS) << "Add new user with paramaters" << name << email
                       << permissions;
 
-    return m_core->addUser(
+    return QueuedCoreAdaptor::toDBusVariant(m_core->addUser(
         name, email, password, permissions,
-        QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token);
+        QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token));
 }
 
 
 /**
  * @fn UserEdit
  */
-bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
-                                   const QString &password,
-                                   const QString &email, const qlonglong cpu,
-                                   const qlonglong gpu, const qlonglong memory,
-                                   const qlonglong gpumemory,
-                                   const qlonglong storage,
-                                   const QString &token)
+QDBusVariant
+QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
+                              const QString &password, const QString &email,
+                              const qlonglong cpu, const qlonglong gpu,
+                              const qlonglong memory, const qlonglong gpumemory,
+                              const qlonglong storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Edit user" << id << name << email << cpu << gpu
                       << memory << gpumemory << storage;
@@ -234,7 +262,9 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
     auto user = m_core->user(id);
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << id;
-        return false;
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<bool>(
+            QueuedError("User does not exist",
+                        QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
     // build payload
@@ -259,33 +289,33 @@ bool QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
         limits.storage = storage;
     data["limits"] = limits.toString();
 
-    return m_core->editUser(id, data, token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->editUser(id, data, token));
 }
 
 
 /**
  * @fn UserPermissionAdd
  */
-bool QueuedCoreInterface::UserPermissionAdd(const qlonglong id,
-                                            const uint permission,
-                                            const QString &token)
+QDBusVariant QueuedCoreInterface::UserPermissionAdd(const qlonglong id,
+                                                    const uint permission,
+                                                    const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add permission" << permission << "to user" << id;
 
-    return m_core->editUserPermission(
-        id, static_cast<QueuedEnums::Permission>(permission), true, token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->editUserPermission(
+        id, static_cast<QueuedEnums::Permission>(permission), true, token));
 }
 
 
 /**
  * @fn UserPermissionRemove
  */
-bool QueuedCoreInterface::UserPermissionRemove(const qlonglong id,
-                                               const uint permission,
-                                               const QString &token)
+QDBusVariant QueuedCoreInterface::UserPermissionRemove(const qlonglong id,
+                                                       const uint permission,
+                                                       const QString &token)
 {
     qCDebug(LOG_DBUS) << "Remove permission" << permission << "from user" << id;
 
-    return m_core->editUserPermission(
-        id, static_cast<QueuedEnums::Permission>(permission), false, token);
+    return QueuedCoreAdaptor::toDBusVariant(m_core->editUserPermission(
+        id, static_cast<QueuedEnums::Permission>(permission), false, token));
 }

@@ -5,3 +5,4 @@ install (FILES "QueuedConfig.cmake" DESTINATION "${LIB_INSTALL_DIR}/cmake/Queued
 install (FILES "QueuedLibraries.cmake" DESTINATION "${LIB_INSTALL_DIR}/cmake/Queued")
 install (FILES "QueuedMacros.cmake" DESTINATION "${LIB_INSTALL_DIR}/cmake/Queued")
 install (FILES "${CMAKE_CURRENT_BINARY_DIR}/QueuedPaths.cmake" DESTINATION "${LIB_INSTALL_DIR}/cmake/Queued")
+install (FILES "${PROJECT_TRDPARTY_DIR}/result/result.hpp" DESTINATION "${INCLUDE_INSTALL_DIR}/${SUBPROJECT}/result")

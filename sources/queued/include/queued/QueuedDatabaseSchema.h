@@ -37,19 +37,19 @@ namespace QueuedDB
 /**
  * @brief settings table name
  */
-const char SETTINGS_TABLE[] = "settings";
+static const char SETTINGS_TABLE[] = "settings";
 /**
  * @brief tasks table name
  */
-const char TASKS_TABLE[] = "tasks";
+static const char TASKS_TABLE[] = "tasks";
 /**
  * @brief tokens table name
  */
-const char TOKENS_TABLE[] = "tokens";
+static const char TOKENS_TABLE[] = "tokens";
 /**
  * @brief users table name
  */
-const char USERS_TABLE[] = "users";
+static const char USERS_TABLE[] = "users";
 /**
  * @struct QueuedDBField
  * @brief describes database column
@@ -76,7 +76,7 @@ typedef QHash<QString, QHash<QString, QueuedDBField>> QueuedDBSchema;
 /**
  * @brief database schema
  */
-const QueuedDBSchema DBSchema = {
+static const QueuedDBSchema DBSchema = {
     {SETTINGS_TABLE,
      {{"_id",
        {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong,

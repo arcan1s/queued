@@ -24,7 +24,18 @@ QueuedTcpServerResponseHelperOption::getOption(const QString &_option)
 {
     qCDebug(LOG_SERV) << "Get option" << _option;
 
-    return {{"code", 200}, {"value", QueuedCoreAdaptor::getOption(_option)}};
+    auto res = QueuedCoreAdaptor::getOption(_option);
+
+    QVariantHash output;
+    Result::match(res,
+                  [&output](const QVariant &val) {
+                      output = {{"code", 200}, {"token", val}};
+                  },
+                  [&output](const QueuedError &) {
+                      output = {{"code", 404}, {"message", "Option not found"}};
+                  });
+
+    return output;
 }
 
 
@@ -36,8 +47,18 @@ QVariantHash QueuedTcpServerResponseHelperOption::setOption(
     if (!_value.contains("value"))
         return {{"code", 400}, {"message", "No required fields found"}};
 
-    return {{"code",
-             QueuedCoreAdaptor::sendOptionEdit(_option, _value["value"], _token)
-                 ? 200
-                 : 400}};
+    auto res
+        = QueuedCoreAdaptor::sendOptionEdit(_option, _value["value"], _token);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const QVariant &) {
+            output = {{"code", 200}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
 }

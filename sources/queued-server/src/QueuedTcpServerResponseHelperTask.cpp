@@ -25,15 +25,33 @@ QVariantHash QueuedTcpServerResponseHelperTask::addOrEditTask(
     qCDebug(LOG_SERV) << "Add or edit task" << _id << "with data" << _data;
 
     auto defs = getDefinitions(_data);
+
+    QVariantHash output;
     if (_id > 0) {
         // edit existing task
-        bool status = QueuedCoreAdaptor::sendTaskEdit(_id, defs, _token);
-        return {{"code", status ? 200 : 400}};
+        auto res = QueuedCoreAdaptor::sendTaskEdit(_id, defs, _token);
+        Result::match(
+            res,
+            [&output](const bool val) {
+                output = {{"code", val ? 200 : 500}};
+            },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
     } else {
         // add new task
-        auto id = QueuedCoreAdaptor::sendTaskAdd(defs, _token);
-        return {{"code", id > 0 ? 200 : 400}, {"id", id}};
+        auto res = QueuedCoreAdaptor::sendTaskAdd(defs, _token);
+        Result::match(
+            res,
+            [&output](const long long val) {
+                output = {{"code", val ? 200 : 500}, {"id", val}};
+            },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
     }
+
+    return output;
 }
 
 
@@ -78,11 +96,25 @@ QueuedTcpServerResponseHelperTask::getTask(const long long _id,
     auto property = _data["property"].toString();
 
     QVariantHash output = {{"code", 200}};
-    if (property.isEmpty())
-        output["properties"] = QueuedCoreAdaptor::getTask(_id);
-    else
-        output["properties"] = QVariantHash(
-            {{property, QueuedCoreAdaptor::getTask(_id, property)}});
+    if (property.isEmpty()) {
+        auto res = QueuedCoreAdaptor::getTask(_id);
+        Result::match(
+            res,
+            [&output](const QVariantHash &val) { output["properties"] = val; },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
+    } else {
+        auto res = QueuedCoreAdaptor::getTask(_id, property);
+        Result::match(
+            res,
+            [&output, &property](const QVariant &val) {
+                output["properties"] = {{property, val}};
+            },
+            [&output](const QueuedError &err) {
+                output = {{"code", 500}, {"message", err.message().c_str()}};
+            });
+    }
 
     return output;
 }
@@ -100,13 +132,20 @@ QueuedTcpServerResponseHelperTask::getTasks(const QVariantHash &_data,
     QDateTime stop
         = QDateTime::fromString(_data["stop"].toString(), Qt::ISODateWithMs);
 
-    QVariantHash output = {{"code", 200}};
+    QVariantHash output;
     // some conversion magic
     QVariantList outputReport;
-    auto report = QueuedCoreAdaptor::getTasks(userId, start, stop, _token);
-    for (auto &user : report)
-        outputReport.append(user);
-    output["report"] = outputReport;
+    auto res = QueuedCoreAdaptor::getTasks(userId, start, stop, _token);
+    Result::match(
+        res,
+        [&output, &outputReport](const QList<QVariantHash> &val) {
+            for (auto &user : val)
+                outputReport += user;
+            output = {{"code", 200}, {"report", outputReport}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
 
     return output;
 }
@@ -118,15 +157,63 @@ QueuedTcpServerResponseHelperTask::startOrStopTask(const long long _id,
 {
     qCDebug(LOG_SERV) << "Change task state" << _id;
 
-    QVariantHash task = QueuedCoreAdaptor::getTask(_id);
-    if (task.isEmpty())
-        return {{"code", 400}, {"message", "No task found"}};
+    auto res = QueuedCoreAdaptor::getTask(_id);
 
-    if (task["startTime"].toString().isEmpty()
-        || !task["endTime"].toString().isEmpty())
-        return {{"code",
-                 QueuedCoreAdaptor::sendTaskStart(_id, _token) ? 200 : 400}};
-    else
-        return {
-            {"code", QueuedCoreAdaptor::sendTaskStop(_id, _token) ? 200 : 400}};
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output, &_id, &_token](const QVariantHash &val) {
+            if (val["startTime"].toString().isEmpty()
+                || !val["endTime"].toString().isEmpty())
+                output = startTask(_id, _token);
+            else
+                output = stopTask(_id, _token);
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 400}, {"message", err.message().c_str()}};
+        });
+
+    return output;
+}
+
+
+QVariantHash QueuedTcpServerResponseHelperTask::startTask(const long long _id,
+                                                          const QString &_token)
+{
+    qCDebug(LOG_SERV) << "Start task" << _id;
+
+    auto res = QueuedCoreAdaptor::sendTaskStart(_id, _token);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const bool val) {
+            output = {{"code", val ? 200 : 500}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
+}
+
+
+QVariantHash QueuedTcpServerResponseHelperTask::stopTask(const long long _id,
+                                                         const QString &_token)
+{
+    qCDebug(LOG_SERV) << "Stop task" << _id;
+
+    auto res = QueuedCoreAdaptor::sendTaskStop(_id, _token);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const bool val) {
+            output = {{"code", val ? 200 : 500}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
 }

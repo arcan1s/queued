@@ -32,10 +32,20 @@ QVariantHash QueuedTcpServerResponseHelperPermissions::addPermission(
     if (permission == QueuedEnums::Permission::Invalid)
         return {{"code", 400}, {"message", "Invalid permission"}};
 
-    return {{"code",
-             QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token)
-                 ? 200
-                 : 400}};
+    auto res
+        = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const QVariant &) {
+            output = {{"code", 200}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
 }
 
 
@@ -52,8 +62,18 @@ QVariantHash QueuedTcpServerResponseHelperPermissions::removePermission(
     if (permission == QueuedEnums::Permission::Invalid)
         return {{"code", 400}, {"message", "Invalid permission"}};
 
-    return {{"code", QueuedCoreAdaptor::sendUserPermissionRemove(
-                         _id, permission, _token)
-                         ? 200
-                         : 400}};
+    auto res
+        = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission, _token);
+
+    QVariantHash output;
+    Result::match(
+        res,
+        [&output](const QVariant &) {
+            output = {{"code", 200}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
 }

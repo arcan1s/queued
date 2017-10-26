@@ -39,6 +39,7 @@ class QueuedTokenManager;
 class QueuedUserManager : public QObject
 {
     Q_OBJECT
+    Q_PROPERTY(QString salt READ salt WRITE setSalt)
     Q_PROPERTY(
         long long tokenExpiration READ tokenExpiration WRITE setTokenExpiration)
 
@@ -145,10 +146,21 @@ public:
     QueuedUser *user(const QString &_name, const bool _isToken);
     // properties
     /**
+     * @brief password salt if any
+     * @return password salt if any or empty string
+     */
+    QString salt() const;
+    /**
      * @brief token expiration
      * @return token expiration in days
      */
     long long tokenExpiration() const;
+    /**
+     * @brief set password salt
+     * @param _salt
+     * new password salt
+     */
+    void setSalt(const QString &_salt);
     /**
      * @brief set token expiration
      * @param _expiry
@@ -167,6 +179,10 @@ signals:
     void userLoggedIn(const long long _id, const QDateTime &_time);
 
 private:
+    /**
+     * @brief password salt
+     */
+    QString m_salt;
     /**
      * @brief token expiration in days
      */

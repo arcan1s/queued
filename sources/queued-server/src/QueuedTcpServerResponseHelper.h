@@ -42,7 +42,7 @@ typedef struct {
     QString type;
     bool valid;
 } Request;
-const QHash<int, QByteArray> HTTPCodeMap
+static const QHash<int, QByteArray> HTTPCodeMap
     = {{100, "Continue"},
        {101, "Switching Protocols"},
        {200, "OK"},

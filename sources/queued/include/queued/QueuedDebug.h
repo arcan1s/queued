@@ -62,11 +62,12 @@ namespace QueuedDebug
 /**
  * @brief default log format
  */
-const char LOG_FORMAT[] = "[%{time "
-                          "process}][%{if-debug}DD%{endif}%{if-info}II%{endif}%"
-                          "{if-warning}WW%{endif}%{if-critical}CC%{endif}%{if-"
-                          "fatal}FF%{endif}][%{category}][%{function}] "
-                          "%{message}";
+static const char LOG_FORMAT[]
+    = "[%{time "
+      "process}][%{if-debug}DD%{endif}%{if-info}II%{endif}%"
+      "{if-warning}WW%{endif}%{if-critical}CC%{endif}%{if-"
+      "fatal}FF%{endif}][%{category}][%{function}] "
+      "%{message}";
 /**
  * @brief method to apply log format
  */

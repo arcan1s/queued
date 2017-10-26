@@ -15,32 +15,61 @@
 
 
 #include "QueuedctlPlugins.h"
+#include "QueuedctlCommon.h"
 
 #include <queued/Queued.h>
 
 
-bool QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
+QueuedctlCommon::QueuedctlResult
+QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
 {
     qCDebug(LOG_APP) << "Add plugin" << _plugin;
 
-    return QueuedCoreAdaptor::sendPluginAdd(_plugin, _token);
+    auto res = QueuedCoreAdaptor::sendPluginAdd(_plugin, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res, [&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
-QStringList QueuedctlPlugins::listPlugins()
+QueuedctlCommon::QueuedctlResult QueuedctlPlugins::listPlugins()
 {
-    return QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins)
-        .toString()
-        .split('\n');
+    auto res
+        = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res,
+                  [&output](const QVariant &val) {
+                      output.status = val.isValid();
+                      output.output = val.toString();
+                  },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 
-bool QueuedctlPlugins::removePlugin(const QString &_plugin,
-                                    const QString &_token)
+QueuedctlCommon::QueuedctlResult
+QueuedctlPlugins::removePlugin(const QString &_plugin, const QString &_token)
 {
     qCDebug(LOG_APP) << "Remove plugin" << _plugin;
 
-    return QueuedCoreAdaptor::sendPluginRemove(_plugin, _token);
+    auto res = QueuedCoreAdaptor::sendPluginRemove(_plugin, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    Result::match(res, [&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
+
+    return output;
 }
 
 

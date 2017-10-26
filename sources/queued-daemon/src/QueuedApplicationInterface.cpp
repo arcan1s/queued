@@ -17,6 +17,7 @@
 #include "QueuedApplicationInterface.h"
 
 #include <QCoreApplication>
+#include <QDBusMetaType>
 
 #include <queued/Queued.h>
 
@@ -33,6 +34,9 @@ QueuedApplicationInterface::QueuedApplicationInterface(
     , m_application(parent)
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
+
+    qRegisterMetaType<QueuedResult<QStringList>>("QueuedResult<QStringList>");
+    qDBusRegisterMetaType<QueuedResult<QStringList>>();
 }
 
 
@@ -42,17 +46,17 @@ QueuedApplicationInterface::~QueuedApplicationInterface()
 }
 
 
-bool QueuedApplicationInterface::Active() const
+QDBusVariant QueuedApplicationInterface::Active() const
 {
-    return true;
+    return QueuedCoreAdaptor::toDBusVariant(QueuedResult<bool>(true));
 }
 
 
-QStringList QueuedApplicationInterface::UIDs() const
+QDBusVariant QueuedApplicationInterface::UIDs() const
 {
     QStringList uids;
     uids.append(QString::number(::getuid()));
     uids.append(QString::number(::geteuid()));
 
-    return uids;
+    return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QStringList>(uids));
 }
