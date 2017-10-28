@@ -36,10 +36,10 @@ extern "C" {
 /**
  * @fn QueuedUser
  */
-QueuedUser::QueuedUser(QObject *parent,
+QueuedUser::QueuedUser(QObject *_parent,
                        const QueuedUserDefinitions &definitions,
                        const long long index)
-    : QObject(parent)
+    : QObject(_parent)
     , m_definitions(definitions)
     , m_index(index)
 {

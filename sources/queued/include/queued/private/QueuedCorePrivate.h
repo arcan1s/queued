@@ -13,7 +13,7 @@
  * all copies or substantial portions of the Software.
  */
 /**
- * @file QueuedCore.h
+ * @file QueuedCorePrivate.h
  * Header of Queued library
  * @author Queued team
  * @copyright MIT
@@ -21,38 +21,47 @@
  */
 
 
-#ifndef QUEUEDCORE_H
-#define QUEUEDCORE_H
+#ifndef QUEUEDCOREPRIVATE_H
+#define QUEUEDCOREPRIVATE_H
 
 #include <QObject>
 
-#include "QueuedEnums.h"
-#include "QueuedLimits.h"
-#include "QueuedResult.h"
+#include "queued/QueuedEnums.h"
+#include "queued/QueuedLimits.h"
+#include "queued/QueuedResult.h"
+#include "queued/QueuedStaticConfig.h"
 
 
-class QueuedCorePrivate;
+class QueuedAdvancedSettings;
+class QueuedCorePrivateHelper;
+class QueuedDatabase;
+class QueuedDatabaseManager;
+class QueuedPluginManager;
 class QueuedProcess;
+class QueuedProcessManager;
+class QueuedReportManager;
+class QueuedSettings;
 class QueuedUser;
+class QueuedUserManager;
 
 /**
- * @brief aggregator of queued classes
+ * @brief private aggregator of queued classes
  */
-class QueuedCore : public QObject
+class QueuedCorePrivate : public QObject
 {
     Q_OBJECT
 
 public:
     /**
-     * @brief QueuedCore class constructor
+     * @brief QueuedCorePrivate class constructor
      * @param _parent
      * pointer to parent item
      */
-    explicit QueuedCore(QObject *_parent);
+    explicit QueuedCorePrivate(QObject *_parent);
     /**
-     * @brief QueuedCore class destructor
+     * @brief QueuedCorePrivate class destructor
      */
-    virtual ~QueuedCore();
+    virtual ~QueuedCorePrivate();
     /**
      * @brief add plugin to autoload and load it now
      * @param _plugin
@@ -305,17 +314,101 @@ public:
      */
     void init(const QString &_configuration);
 
+private slots:
+    /**
+     * @brief notify clients about settings update
+     * @param _id
+     * updated key id
+     * @param _key
+     * updated key
+     * @param _value
+     * new value
+     */
+    void updateSettings(const QueuedConfig::QueuedSettings _id,
+                        const QString &_key, const QVariant &_value);
+    /**
+     * @brief update process time
+     * @param _id
+     * task id
+     * @param _startTime
+     * task start time or empty
+     * @param _endTime
+     * task end time or empty
+     */
+    void updateTaskTime(const long long _id, const QDateTime &_startTime,
+                        const QDateTime &_endTime);
+    /**
+     * @brief update user login time
+     * @param _id
+     * user ID
+     * @param _time
+     * user login time
+     */
+    void updateUserLoginTime(const long long _id, const QDateTime &_time);
+
 private:
     /**
-     * @brief pointer to private implementation
+     * @brief private helper pointer
      */
-    QueuedCorePrivate *m_impl = nullptr;
+    friend class QueuedCorePrivateHelper;
+    QueuedCorePrivateHelper *m_helper = nullptr;
     /**
-     * @brief init DBus interface
-     * @throw QueuedDBusException
+     * @brief pointer to advanced settings object
      */
-    void initDBus();
+    QueuedAdvancedSettings *m_advancedSettings = nullptr;
+    /**
+     * @brief pointer to database object
+     */
+    QueuedDatabase *m_database = nullptr;
+    /**
+     * @brief pointer to database manager object
+     */
+    QueuedDatabaseManager *m_databaseManager = nullptr;
+    /**
+     * @brief pointer to plugin manager
+     */
+    QueuedPluginManager *m_plugins = nullptr;
+    /**
+     * @brief pointer to process manager
+     */
+    QueuedProcessManager *m_processes = nullptr;
+    /**
+     * @brief pointer to report manager
+     */
+    QueuedReportManager *m_reports = nullptr;
+    /**
+     * @brief pointer to settings object
+     */
+    QueuedSettings *m_settings = nullptr;
+    /**
+     * @brief pointer to user manager
+     */
+    QueuedUserManager *m_users = nullptr;
+    // additional properties
+    /**
+     * @brief connection list
+     */
+    QList<QMetaObject::Connection> m_connections;
+    /**
+     * @brief init plugins
+     */
+    void initPlugins();
+    /**
+     * @brief init processes
+     */
+    void initProcesses();
+    /**
+     * @brief init settings and database
+     * @param _configuration
+     * path to configuration file
+     * @throw QueuedDatabaseException
+     */
+    void initSettings(const QString &_configuration);
+    /**
+     * @brief init users
+     */
+    void initUsers();
 };
 
 
-#endif /* QUEUEDCORE_H */
+#endif /* QUEUEDCOREPRIVATE_H */

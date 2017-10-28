@@ -75,9 +75,9 @@ QueuedResult<QString>
 QueuedCoreAdaptor::sendPasswordHash(const QString &_password)
 {
     QVariantList args = {_password};
-    return sendRequest<QString>(QueuedConfig::DBUS_SERVICE,
-                                QueuedConfig::DBUS_OBJECT_PATH,
-                                QueuedConfig::DBUS_SERVICE, "Auth", args);
+    return sendRequest<QString>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_OBJECT_PATH,
+        QueuedConfig::DBUS_SERVICE, "PasswordHash", args);
 }
 
 
@@ -348,11 +348,11 @@ QueuedResult<QVariantHash> QueuedCoreAdaptor::getTask(const long long _id)
     auto res = getTask(_id, "");
 
     QueuedResult<QVariantHash> output;
-    Result::match(res,
-                  [&output](const QVariant &val) {
-                      output = toResult<QVariantHash>(val);
-                  },
-                  [&output](const QueuedError &err) { output = err; });
+    res.match(
+        [&output](const QVariant &val) {
+            output = toResult<QVariantHash>(val);
+        },
+        [&output](const QueuedError &err) { output = err; });
 
     return output;
 }
@@ -400,11 +400,11 @@ QueuedResult<QVariantHash> QueuedCoreAdaptor::getUser(const long long _id)
     auto res = getUser(_id, "");
 
     QueuedResult<QVariantHash> output;
-    Result::match(res,
-                  [&output](const QVariant &val) {
-                      output = toResult<QVariantHash>(val);
-                  },
-                  [&output](const QueuedError &err) { output = err; });
+    res.match(
+        [&output](const QVariant &val) {
+            output = toResult<QVariantHash>(val);
+        },
+        [&output](const QueuedError &err) { output = err; });
 
     return output;
 }

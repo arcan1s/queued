@@ -54,10 +54,10 @@ public:
 
     /**
      * @brief QueuedTokenManager class constructor
-     * @param parent
+     * @param _parent
      * pointer to parent item
      */
-    explicit QueuedTokenManager(QObject *parent);
+    explicit QueuedTokenManager(QObject *_parent);
     /**
      * @brief QueuedTokenManager class destructor
      */

@@ -28,10 +28,10 @@ QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
     auto res = QueuedCoreAdaptor::sendPluginAdd(_plugin, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res, [&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match([&output](const bool val) { output.status = val; },
+              [&output](const QueuedError &err) {
+                  output.output = err.message().c_str();
+              });
 
     return output;
 }
@@ -43,14 +43,14 @@ QueuedctlCommon::QueuedctlResult QueuedctlPlugins::listPlugins()
         = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res,
-                  [&output](const QVariant &val) {
-                      output.status = val.isValid();
-                      output.output = val.toString();
-                  },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output](const QVariant &val) {
+            output.status = val.isValid();
+            output.output = val.toString();
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
 
     return output;
 }
@@ -64,10 +64,10 @@ QueuedctlPlugins::removePlugin(const QString &_plugin, const QString &_token)
     auto res = QueuedCoreAdaptor::sendPluginRemove(_plugin, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res, [&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match([&output](const bool val) { output.status = val; },
+              [&output](const QueuedError &err) {
+                  output.output = err.message().c_str();
+              });
 
     return output;
 }

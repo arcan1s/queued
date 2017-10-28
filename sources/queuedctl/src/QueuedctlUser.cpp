@@ -37,14 +37,14 @@ QueuedctlUser::addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
     auto res = QueuedCoreAdaptor::sendUserAdd(_definitions, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res,
-                  [&output](const long long val) {
-                      output.status = (val > 0);
-                      output.output = QString::number(val);
-                  },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output](const long long val) {
+            output.status = (val > 0);
+            output.output = QString::number(val);
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
 
     return output;
 }
@@ -64,14 +64,14 @@ QueuedctlUser::getReport(const QCommandLineParser &_parser,
     auto res = QueuedCoreAdaptor::getPerformance(start, stop, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res,
-                  [&output](const QList<QVariantHash> &val) {
-                      output.status = true;
-                      output.output = QueuedctlCommon::hashListToString(val);
-                  },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output](const QList<QVariantHash> &val) {
+            output.status = true;
+            output.output = QueuedctlCommon::hashListToString(val);
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
 
     return output;
 }
@@ -88,12 +88,12 @@ QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
 
     // define password first
     definitions.password = _parser.isSet("stdin-password")
-                           ? getPassword()
-                           : _parser.value("password");
+                               ? getPassword()
+                               : _parser.value("password");
     auto res = QueuedCoreAdaptor::sendPasswordHash(definitions.password);
-    Result::match(
-        res, [&definitions](const QString &val) { definitions.password = val; },
-        [](const QueuedError &) {});
+    res.match(
+        [&definitions](const QString &val) { definitions.password = val; },
+        [&definitions](const QueuedError &) { definitions.password = ""; });
 
     definitions.email = _parser.value("email");
     // limits now
@@ -144,24 +144,24 @@ QueuedctlUser::getUser(const long long _id, const QString &_property)
 
     if (_property.isEmpty()) {
         auto res = QueuedCoreAdaptor::getUser(_id);
-        Result::match(res,
-                      [&output](const QVariantHash &val) {
-                          output.status = true;
-                          output.output = QueuedctlCommon::hashToString(val);
-                      },
-                      [&output](const QueuedError &err) {
-                          output.output = err.message().c_str();
-                      });
+        res.match(
+            [&output](const QVariantHash &val) {
+                output.status = true;
+                output.output = QueuedctlCommon::hashToString(val);
+            },
+            [&output](const QueuedError &err) {
+                output.output = err.message().c_str();
+            });
     } else {
         auto res = QueuedCoreAdaptor::getUser(_id, _property);
-        Result::match(res,
-                      [&output](const QVariant &val) {
-                          output.status = val.isValid();
-                          output.output = val.toString();
-                      },
-                      [&output](const QueuedError &err) {
-                          output.output = err.message().c_str();
-                      });
+        res.match(
+            [&output](const QVariant &val) {
+                output.status = val.isValid();
+                output.output = val.toString();
+            },
+            [&output](const QueuedError &err) {
+                output.output = err.message().c_str();
+            });
     }
 
     return output;
@@ -182,14 +182,14 @@ QueuedctlUser::getUsers(const QCommandLineParser &_parser,
     auto res = QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res,
-                  [&output](const QList<QVariantHash> &val) {
-                      output.status = true;
-                      output.output = QueuedctlCommon::hashListToString(val);
-                  },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output](const QList<QVariantHash> &val) {
+            output.status = true;
+            output.output = QueuedctlCommon::hashListToString(val);
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
 
     return output;
 }
@@ -326,10 +326,10 @@ QueuedctlUser::setUser(const long long _id,
     auto res = QueuedCoreAdaptor::sendUserEdit(_id, _definitions, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res, [&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match([&output](const bool val) { output.status = val; },
+              [&output](const QueuedError &err) {
+                  output.output = err.message().c_str();
+              });
 
     return output;
 }

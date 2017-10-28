@@ -30,10 +30,10 @@
 /**
  * @fn QueuedDatabaseManager
  */
-QueuedDatabaseManager::QueuedDatabaseManager(QObject *parent,
-                                             QueuedDatabase *database)
-    : QObject(parent)
-    , m_database(database)
+QueuedDatabaseManager::QueuedDatabaseManager(QObject *_parent,
+                                             QueuedDatabase *_database)
+    : QObject(_parent)
+    , m_database(_database)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 

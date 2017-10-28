@@ -32,8 +32,8 @@
 /**
  * @fn QueuedTokenManager
  */
-QueuedTokenManager::QueuedTokenManager(QObject *parent)
-    : QObject(parent)
+QueuedTokenManager::QueuedTokenManager(QObject *_parent)
+    : QObject(_parent)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 }

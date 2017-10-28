@@ -36,8 +36,7 @@ QVariantHash QueuedTcpServerResponseHelperPermissions::addPermission(
         = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const QVariant &) {
             output = {{"code", 200}};
         },
@@ -66,8 +65,7 @@ QVariantHash QueuedTcpServerResponseHelperPermissions::removePermission(
         = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission, _token);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const QVariant &) {
             output = {{"code", 200}};
         },

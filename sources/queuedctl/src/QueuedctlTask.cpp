@@ -35,14 +35,14 @@ QueuedctlCommon::QueuedctlResult QueuedctlTask::addTask(
     auto res = QueuedCoreAdaptor::sendTaskAdd(_definitions, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res,
-                  [&output](const long long val) {
-                      output.status = (val > 0);
-                      output.output = QString::number(val);
-                  },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output](const long long val) {
+            output.status = (val > 0);
+            output.output = QString::number(val);
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
 
     return output;
 }
@@ -69,8 +69,7 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
         definitions.user = 0;
     } else {
         auto res = QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
-        Result::match(
-            res,
+        res.match(
             [&definitions](const long long val) { definitions.user = val; },
             [&definitions](const QueuedError &) { definitions.user = 0; });
     }
@@ -114,24 +113,24 @@ QueuedctlTask::getTask(const long long _id, const QString &_property)
 
     if (_property.isEmpty()) {
         auto res = QueuedCoreAdaptor::getTask(_id);
-        Result::match(res,
-                      [&output](const QVariantHash &val) {
-                          output.status = true;
-                          output.output = QueuedctlCommon::hashToString(val);
-                      },
-                      [&output](const QueuedError &err) {
-                          output.output = err.message().c_str();
-                      });
+        res.match(
+            [&output](const QVariantHash &val) {
+                output.status = true;
+                output.output = QueuedctlCommon::hashToString(val);
+            },
+            [&output](const QueuedError &err) {
+                output.output = err.message().c_str();
+            });
     } else {
         auto res = QueuedCoreAdaptor::getTask(_id, _property);
-        Result::match(res,
-                      [&output](const QVariant &val) {
-                          output.status = val.isValid();
-                          output.output = val.toString();
-                      },
-                      [&output](const QueuedError &err) {
-                          output.output = err.message().c_str();
-                      });
+        res.match(
+            [&output](const QVariant &val) {
+                output.status = val.isValid();
+                output.output = val.toString();
+            },
+            [&output](const QueuedError &err) {
+                output.output = err.message().c_str();
+            });
     }
 
     return output;
@@ -145,8 +144,8 @@ QueuedctlTask::getTasks(const QCommandLineParser &_parser,
     long long userId = -1;
     if (!_parser.value("task-user").isEmpty()) {
         auto res = QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
-        Result::match(res, [&userId](const long long val) { userId = val; },
-                      [&userId](const QueuedError &) {});
+        res.match([&userId](const long long val) { userId = val; },
+                  [&userId](const QueuedError &) {});
     }
     QDateTime stop
         = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
@@ -156,14 +155,14 @@ QueuedctlTask::getTasks(const QCommandLineParser &_parser,
     QueuedctlCommon::QueuedctlResult output;
 
     auto res = QueuedCoreAdaptor::getTasks(userId, start, stop, _token);
-    Result::match(res,
-                  [&output](const QList<QVariantHash> &val) {
-                      output.status = true;
-                      output.output = QueuedctlCommon::hashListToString(val);
-                  },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output](const QList<QVariantHash> &val) {
+            output.status = true;
+            output.output = QueuedctlCommon::hashListToString(val);
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
 
     return output;
 }
@@ -310,10 +309,10 @@ QueuedctlCommon::QueuedctlResult QueuedctlTask::setTask(
     auto res = QueuedCoreAdaptor::sendTaskEdit(_id, _definitions, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res, [&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match([&output](const bool val) { output.status = val; },
+              [&output](const QueuedError &err) {
+                  output.output = err.message().c_str();
+              });
 
     return output;
 }
@@ -327,10 +326,10 @@ QueuedctlCommon::QueuedctlResult QueuedctlTask::startTask(const long long _id,
     auto res = QueuedCoreAdaptor::sendTaskStart(_id, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res, [&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match([&output](const bool val) { output.status = val; },
+              [&output](const QueuedError &err) {
+                  output.output = err.message().c_str();
+              });
 
     return output;
 }
@@ -344,10 +343,10 @@ QueuedctlCommon::QueuedctlResult QueuedctlTask::stopTask(const long long _id,
     auto res = QueuedCoreAdaptor::sendTaskStart(_id, _token);
 
     QueuedctlCommon::QueuedctlResult output;
-    Result::match(res, [&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match([&output](const bool val) { output.status = val; },
+              [&output](const QueuedError &err) {
+                  output.output = err.message().c_str();
+              });
 
     return output;
 }

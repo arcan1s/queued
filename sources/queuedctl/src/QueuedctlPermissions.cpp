@@ -33,10 +33,10 @@ QueuedctlCommon::QueuedctlResult QueuedctlPermissions::addPermission(
     } else {
         auto res
             = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
-        Result::match(res, [&output](const bool val) { output.status = val; },
-                      [&output](const QueuedError &err) {
-                          output.output = err.message().c_str();
-                      });
+        res.match([&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
     }
 
     return output;
@@ -56,10 +56,10 @@ QueuedctlCommon::QueuedctlResult QueuedctlPermissions::removePermission(
     } else {
         auto res = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission,
                                                                _token);
-        Result::match(res, [&output](const bool val) { output.status = val; },
-                      [&output](const QueuedError &err) {
-                          output.output = err.message().c_str();
-                      });
+        res.match([&output](const bool val) { output.status = val; },
+                  [&output](const QueuedError &err) {
+                      output.output = err.message().c_str();
+                  });
     }
 
     return output;

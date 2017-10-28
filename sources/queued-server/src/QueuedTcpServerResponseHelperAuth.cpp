@@ -28,8 +28,7 @@ QVariantHash QueuedTcpServerResponseHelperAuth::auth(const QVariantHash &_data)
         auto res = QueuedCoreAdaptor::auth(_data["user"].toString(),
                                            _data["password"].toString());
 
-        Result::match(
-            res,
+        res.match(
             [&output](const QString &val) {
                 output = {{"code", 200}, {"token", val}};
             },
@@ -51,8 +50,8 @@ bool QueuedTcpServerResponseHelperAuth::tryAuth(const QString &_token)
     auto res = QueuedCoreAdaptor::auth(_token);
 
     bool ret = true;
-    Result::match(res, [&ret](const bool val) { ret = val; },
-                  [&ret](const QueuedError &err) { ret = false; });
+    res.match([&ret](const bool val) { ret = val; },
+              [&ret](const QueuedError &err) { ret = false; });
 
     return ret;
 }

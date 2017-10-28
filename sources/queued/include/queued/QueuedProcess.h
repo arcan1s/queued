@@ -94,14 +94,14 @@ public:
 
     /**
      * @brief QueuedProcess class constructor
-     * @param parent
+     * @param _parent
      * pointer to parent item
      * @param definitions
      * definitions of process
      * @param index
      * index of process
      */
-    explicit QueuedProcess(QObject *parent,
+    explicit QueuedProcess(QObject *_parent,
                            const QueuedProcessDefinitions &definitions,
                            const long long index);
     /**

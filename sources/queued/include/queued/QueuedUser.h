@@ -71,14 +71,14 @@ public:
 
     /**
      * @brief QueuedUser class constructor
-     * @param parent
+     * @param _parent
      * pointer to parent item
      * @param definitions
      * definitions of user
      * @param index
      * index of process
      */
-    explicit QueuedUser(QObject *parent,
+    explicit QueuedUser(QObject *_parent,
                         const QueuedUserDefinitions &definitions,
                         const long long index);
     /**

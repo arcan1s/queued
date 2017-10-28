@@ -30,8 +30,7 @@ QVariantHash QueuedTcpServerResponseHelperTask::addOrEditTask(
     if (_id > 0) {
         // edit existing task
         auto res = QueuedCoreAdaptor::sendTaskEdit(_id, defs, _token);
-        Result::match(
-            res,
+        res.match(
             [&output](const bool val) {
                 output = {{"code", val ? 200 : 500}};
             },
@@ -41,8 +40,7 @@ QVariantHash QueuedTcpServerResponseHelperTask::addOrEditTask(
     } else {
         // add new task
         auto res = QueuedCoreAdaptor::sendTaskAdd(defs, _token);
-        Result::match(
-            res,
+        res.match(
             [&output](const long long val) {
                 output = {{"code", val ? 200 : 500}, {"id", val}};
             },
@@ -98,16 +96,14 @@ QueuedTcpServerResponseHelperTask::getTask(const long long _id,
     QVariantHash output = {{"code", 200}};
     if (property.isEmpty()) {
         auto res = QueuedCoreAdaptor::getTask(_id);
-        Result::match(
-            res,
+        res.match(
             [&output](const QVariantHash &val) { output["properties"] = val; },
             [&output](const QueuedError &err) {
                 output = {{"code", 500}, {"message", err.message().c_str()}};
             });
     } else {
         auto res = QueuedCoreAdaptor::getTask(_id, property);
-        Result::match(
-            res,
+        res.match(
             [&output, &property](const QVariant &val) {
                 output["properties"] = {{property, val}};
             },
@@ -136,8 +132,7 @@ QueuedTcpServerResponseHelperTask::getTasks(const QVariantHash &_data,
     // some conversion magic
     QVariantList outputReport;
     auto res = QueuedCoreAdaptor::getTasks(userId, start, stop, _token);
-    Result::match(
-        res,
+    res.match(
         [&output, &outputReport](const QList<QVariantHash> &val) {
             for (auto &user : val)
                 outputReport += user;
@@ -160,8 +155,7 @@ QueuedTcpServerResponseHelperTask::startOrStopTask(const long long _id,
     auto res = QueuedCoreAdaptor::getTask(_id);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output, &_id, &_token](const QVariantHash &val) {
             if (val["startTime"].toString().isEmpty()
                 || !val["endTime"].toString().isEmpty())
@@ -185,8 +179,7 @@ QVariantHash QueuedTcpServerResponseHelperTask::startTask(const long long _id,
     auto res = QueuedCoreAdaptor::sendTaskStart(_id, _token);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const bool val) {
             output = {{"code", val ? 200 : 500}};
         },
@@ -206,8 +199,7 @@ QVariantHash QueuedTcpServerResponseHelperTask::stopTask(const long long _id,
     auto res = QueuedCoreAdaptor::sendTaskStop(_id, _token);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const bool val) {
             output = {{"code", val ? 200 : 500}};
         },

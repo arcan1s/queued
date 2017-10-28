@@ -27,13 +27,13 @@ QueuedTcpServerResponseHelperOption::getOption(const QString &_option)
     auto res = QueuedCoreAdaptor::getOption(_option);
 
     QVariantHash output;
-    Result::match(res,
-                  [&output](const QVariant &val) {
-                      output = {{"code", 200}, {"token", val}};
-                  },
-                  [&output](const QueuedError &) {
-                      output = {{"code", 404}, {"message", "Option not found"}};
-                  });
+    res.match(
+        [&output](const QVariant &val) {
+            output = {{"code", 200}, {"token", val}};
+        },
+        [&output](const QueuedError &) {
+            output = {{"code", 404}, {"message", "Option not found"}};
+        });
 
     return output;
 }
@@ -51,8 +51,7 @@ QVariantHash QueuedTcpServerResponseHelperOption::setOption(
         = QueuedCoreAdaptor::sendOptionEdit(_option, _value["value"], _token);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const QVariant &) {
             output = {{"code", 200}};
         },

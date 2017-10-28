@@ -28,10 +28,10 @@ QueuedctlOption::editOption(const QString &_option, const QVariant &_value,
 
     QueuedctlCommon::QueuedctlResult output;
     auto res = QueuedCoreAdaptor::sendOptionEdit(_option, _value, _token);
-    Result::match(res, [&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match([&output](const bool val) { output.status = val; },
+              [&output](const QueuedError &err) {
+                  output.output = err.message().c_str();
+              });
 
     return output;
 }
@@ -44,14 +44,14 @@ QueuedctlOption::getOption(const QString &_option)
 
     QueuedctlCommon::QueuedctlResult output;
     auto res = QueuedCoreAdaptor::getOption(_option);
-    Result::match(res,
-                  [&output](const QVariant &val) {
-                      output.status = val.isValid();
-                      output.output = val.toString();
-                  },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output](const QVariant &val) {
+            output.status = val.isValid();
+            output.output = val.toString();
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
 
     return output;
 }

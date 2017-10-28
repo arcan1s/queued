@@ -236,11 +236,10 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::PermissionAdd: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
         long long userId = -1;
-        Result::match(userIdRes,
-                      [&userId](const long long val) { userId = val; },
-                      [&result](const QueuedError &err) {
-                          result.output = err.message().c_str();
-                      });
+        userIdRes.match([&userId](const long long val) { userId = val; },
+                        [&result](const QueuedError &err) {
+                            result.output = err.message().c_str();
+                        });
         if (userId == -1)
             break;
         QString token = QueuedctlAuth::getToken(_cache, _user);
@@ -250,11 +249,10 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::PermissionRemove: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
         long long userId = -1;
-        Result::match(userIdRes,
-                      [&userId](const long long val) { userId = val; },
-                      [&result](const QueuedError &err) {
-                          result.output = err.message().c_str();
-                      });
+        userIdRes.match([&userId](const long long val) { userId = val; },
+                        [&result](const QueuedError &err) {
+                            result.output = err.message().c_str();
+                        });
         if (userId == -1)
             break;
         QString token = QueuedctlAuth::getToken(_cache, _user);
@@ -283,14 +281,14 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     }
     case QueuedctlArgument::Status: {
         auto res = QueuedCoreAdaptor::getStatus();
-        Result::match(res,
-                      [&result](const QueuedStatusMap &val) {
-                          result.status = true;
-                          result.output = hashHashToString(val);
-                      },
-                      [&result](const QueuedError &err) {
-                          result.output = err.message().c_str();
-                      });
+        res.match(
+            [&result](const QueuedStatusMap &val) {
+                result.status = true;
+                result.output = hashHashToString(val);
+            },
+            [&result](const QueuedError &err) {
+                result.output = err.message().c_str();
+            });
         break;
     }
     case QueuedctlArgument::TaskAdd: {
@@ -334,11 +332,10 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::UserGet: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
         long long userId = -1;
-        Result::match(userIdRes,
-                      [&userId](const long long val) { userId = val; },
-                      [&result](const QueuedError &err) {
-                          result.output = err.message().c_str();
-                      });
+        userIdRes.match([&userId](const long long val) { userId = val; },
+                        [&result](const QueuedError &err) {
+                            result.output = err.message().c_str();
+                        });
         if (userId == -1)
             break;
         result = QueuedctlUser::getUser(userId, args.at(2));
@@ -352,11 +349,10 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::UserSet: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
         long long userId = -1;
-        Result::match(userIdRes,
-                      [&userId](const long long val) { userId = val; },
-                      [&result](const QueuedError &err) {
-                          result.output = err.message().c_str();
-                      });
+        userIdRes.match([&userId](const long long val) { userId = val; },
+                        [&result](const QueuedError &err) {
+                            result.output = err.message().c_str();
+                        });
         if (userId == -1)
             break;
         QString token = QueuedctlAuth::getToken(_cache, _user);

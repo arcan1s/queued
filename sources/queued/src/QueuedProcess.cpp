@@ -33,10 +33,10 @@
 /**
  * @fn QueuedProcess
  */
-QueuedProcess::QueuedProcess(QObject *parent,
+QueuedProcess::QueuedProcess(QObject *_parent,
                              const QueuedProcessDefinitions &definitions,
                              const long long index)
-    : QProcess(parent)
+    : QProcess(_parent)
     , m_definitions(definitions)
     , m_index(index)
 {

@@ -49,6 +49,7 @@ QueuedApplication::~QueuedApplication()
 
 void QueuedApplication::init()
 {
+    m_core->deinit();
     m_core->init(m_configuration["config"].toString());
 }
 

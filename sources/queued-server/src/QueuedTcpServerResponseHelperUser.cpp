@@ -27,8 +27,8 @@ QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(
     // try define if user exists first
     auto userIdRes = QueuedCoreAdaptor::getUserId(_user);
     long long userId = -1;
-    Result::match(userIdRes, [&userId](const long long val) { userId = val; },
-                  [&userId](const QueuedError &) {});
+    userIdRes.match([&userId](const long long val) { userId = val; },
+                    [&userId](const QueuedError &) {});
 
     auto defs = getDefinitions(_data);
     defs.name = _user;
@@ -37,8 +37,7 @@ QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(
     if (userId > 0) {
         // edit existing user
         auto res = QueuedCoreAdaptor::sendUserEdit(userId, defs, _token);
-        Result::match(
-            res,
+        res.match(
             [&output](const bool val) {
                 output = {{"code", val ? 200 : 500}};
             },
@@ -48,8 +47,7 @@ QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(
     } else {
         // add new user
         auto res = QueuedCoreAdaptor::sendUserAdd(defs, _token);
-        Result::match(
-            res,
+        res.match(
             [&output](const long long val) {
                 output = {{"code", val ? 200 : 500}, {"id", val}};
             },
@@ -69,10 +67,10 @@ QueuedTcpServerResponseHelperUser::getDefinitions(const QVariantHash &_data)
 
     QueuedUser::QueuedUserDefinitions defs;
     defs.email = _data["email"].toString();
-    auto res = QueuedCoreAdaptor::sendPasswordHash(_data["password"].toString());
-    Result::match(
-            res, [&defs](const QString &val) { defs.password = val; },
-            [](const QueuedError &) {});
+    auto res
+        = QueuedCoreAdaptor::sendPasswordHash(_data["password"].toString());
+    res.match([&defs](const QString &val) { defs.password = val; },
+              [](const QueuedError &) {});
     defs.permissions = _data["permissions"].toUInt();
     // limits
     QueuedLimits::Limits limits;
@@ -102,8 +100,7 @@ QueuedTcpServerResponseHelperUser::getReport(const QVariantHash &_data,
     // some conversion magic
     QVariantList outputReport;
     auto res = QueuedCoreAdaptor::getPerformance(start, stop, _token);
-    Result::match(
-        res,
+    res.match(
         [&output, &outputReport](const QList<QVariantHash> &val) {
             for (auto &user : val)
                 outputReport += user;
@@ -125,8 +122,8 @@ QueuedTcpServerResponseHelperUser::getUser(const QString &_user,
 
     auto userIdRes = QueuedCoreAdaptor::getUserId(_user);
     long long userId = -1;
-    Result::match(userIdRes, [&userId](const long long val) { userId = val; },
-                  [](const QueuedError &) {});
+    userIdRes.match([&userId](const long long val) { userId = val; },
+                    [](const QueuedError &) {});
     if (userId == -1)
         return {{"code", 500}};
 
@@ -135,16 +132,14 @@ QueuedTcpServerResponseHelperUser::getUser(const QString &_user,
     QVariantHash output = {{"code", 200}};
     if (property.isEmpty()) {
         auto res = QueuedCoreAdaptor::getUser(userId);
-        Result::match(
-            res,
+        res.match(
             [&output](const QVariantHash &val) { output["properties"] = val; },
             [&output](const QueuedError &err) {
                 output = {{"code", 500}, {"message", err.message().c_str()}};
             });
     } else {
         auto res = QueuedCoreAdaptor::getUser(userId, property);
-        Result::match(
-            res,
+        res.match(
             [&output, &property](const QVariant &val) {
                 output["properties"] = {{property, val}};
             },
@@ -172,8 +167,7 @@ QueuedTcpServerResponseHelperUser::getUsers(const QVariantHash &_data,
     // some conversion magic
     QVariantList outputReport;
     auto res = QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
-    Result::match(
-        res,
+    res.match(
         [&output, &outputReport](const QList<QVariantHash> &val) {
             for (auto &user : val)
                 outputReport += user;

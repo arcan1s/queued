@@ -28,8 +28,7 @@ QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
     auto res = QueuedCoreAdaptor::sendPluginAdd(_name, _token);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const bool) {
             output = {{"code", 200}};
         },
@@ -47,8 +46,7 @@ QVariantHash QueuedTcpServerResponseHelperPlugins::listPlugins()
         = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const QVariant &val) {
             output = {{"code", 200}, {"plugins", val.toStringList()}};
         },
@@ -69,8 +67,7 @@ QueuedTcpServerResponseHelperPlugins::removePlugin(const QString &_name,
     auto res = QueuedCoreAdaptor::sendPluginRemove(_name, _token);
 
     QVariantHash output;
-    Result::match(
-        res,
+    res.match(
         [&output](const bool) {
             output = {{"code", 200}};
         },

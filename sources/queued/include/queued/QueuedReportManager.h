@@ -43,12 +43,12 @@ class QueuedReportManager : public QObject
 public:
     /**
      * @brief QueuedReportManager class constructor
-     * @param parent
+     * @param _parent
      * pointer to parent item
-     * @param database
+     * @param _database
      * pointer to database object
      */
-    explicit QueuedReportManager(QObject *parent, QueuedDatabase *database);
+    explicit QueuedReportManager(QObject *_parent, QueuedDatabase *_database);
     /**
      * @brief QueuedReportManager class destructor
      */

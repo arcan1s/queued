@@ -31,15 +31,15 @@ QueuedctlCommon::QueuedctlResult QueuedctlAuth::auth(const QString &_user,
     QueuedctlCommon::QueuedctlResult output;
 
     auto res = QueuedCoreAdaptor::auth(_user, QueuedctlUser::getPassword());
-    Result::match(res,
-                  [&output, &_user, &_cache](const QString &val) {
-                      setToken(val, _user, _cache);
-                      output.status = true;
-                  },
-                  [&output](const QueuedError &err) {
-                      output.status = false;
-                      output.output = err.message().c_str();
-                  });
+    res.match(
+        [&output, &_user, &_cache](const QString &val) {
+            setToken(val, _user, _cache);
+            output.status = true;
+        },
+        [&output](const QueuedError &err) {
+            output.status = false;
+            output.output = err.message().c_str();
+        });
 
     return output;
 }
