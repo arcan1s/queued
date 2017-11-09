@@ -30,25 +30,24 @@
 #include "QueuedLimits.h"
 
 
+class QueuedControlGroupsAdaptor;
+
 /**
  * @brief implementation over QProcess to run processes
  */
 class QueuedProcess : public QProcess
 {
     Q_OBJECT
+    Q_PROPERTY(QList<Q_PID> childrenPids READ childrenPids)
     Q_PROPERTY(long long index READ index)
     Q_PROPERTY(QString name READ name)
     // mutable properties
-    Q_PROPERTY(QString command READ command WRITE setCommand)
-    Q_PROPERTY(QStringList commandArguments READ commandArguments WRITE
-                   setCommandArguments)
     Q_PROPERTY(QDateTime endTime READ endTime WRITE setEndTime)
     Q_PROPERTY(uint gid READ uid WRITE setGid)
     Q_PROPERTY(QString limits READ limits WRITE setLimits)
     Q_PROPERTY(QString logError READ logError WRITE setLogError)
     Q_PROPERTY(QString logOutput READ logOutput WRITE setLogOutput)
     Q_PROPERTY(uint nice READ nice WRITE setNice)
-    Q_PROPERTY(QString processLine READ processLine WRITE setProcessLine)
     Q_PROPERTY(QDateTime startTime READ startTime WRITE setStartTime)
     Q_PROPERTY(uint uid READ uid WRITE setUid)
     Q_PROPERTY(long long user READ user WRITE setUser)
@@ -109,10 +108,19 @@ public:
      */
     virtual ~QueuedProcess();
     /**
-     * @brief update command arguments
+     * @brief force kill ald children
      */
-    void updateArguments();
+    void killChildren();
+    /**
+     * @brief update cgroup limits
+     */
+    void updateLimits();
     // properties
+    /**
+     * @brief children processes
+     * @return list of pids of children processes
+     */
+    QList<Q_PID> childrenPids() const;
     /**
      * @brief index of process
      * @return assigned index of process
@@ -124,16 +132,6 @@ public:
      */
     QString name() const;
     // mutable properties
-    /**
-     * @brief command line
-     * @return process command line
-     */
-    QString command() const;
-    /**
-     * @brief command line arguments
-     * @return process command line arguments
-     */
-    QStringList commandArguments() const;
     /**
      * @brief process end time
      * @return process end time
@@ -170,11 +168,6 @@ public:
      */
     uint nice() const;
     /**
-     * @brief process line
-     * @return process line as is in configuration
-     */
-    QString processLine() const;
-    /**
      * @brief process start time
      * @return process start time
      */
@@ -194,17 +187,6 @@ public:
      * @return process working directory
      */
     QString workDirectory() const;
-    /**
-     * @brief set command line
-     * @param _command       new command line
-     */
-    void setCommand(const QString &_command);
-    /**
-     * @brief set command line arguments
-     * @param _commandArguments
-     * new command line arguments
-     */
-    void setCommandArguments(const QStringList &_commandArguments);
     /**
      * @brief set end time
      * @param _time
@@ -238,17 +220,6 @@ public:
      */
     void setNice(const uint _nice);
     /**
-     * @brief set process line
-     * @param _processLine
-     * original process line
-     * @remark values in {} will be replaced
-     * 1. Property names, like {name}, {uid}, etc
-     * 2. {cpu} will be replaced to QueuedSystemInfo::cpuWeight(limit) in %
-     * 3. {memory} will be replaced to limit
-     * 4. {application} will be replaced to application line and arguments
-     */
-    void setProcessLine(const QString &_processLine);
-    /**
      * @brief set start time
      * @param _time
      * process start time
@@ -280,7 +251,20 @@ public:
      */
     bool operator==(const QueuedProcess &_other);
 
+public slots:
+    /**
+     * @brief method which will be called to apply cgroup after start
+     */
+    void applyCGroup();
+
+protected:
+    /**
+     * @brief apply child process properties
+     */
+    void setupChildProcess();
+
 private:
+    QueuedControlGroupsAdaptor *m_cgroup = nullptr;
     /**
      * @brief process definitions
      */
@@ -289,10 +273,6 @@ private:
      * @brief index of process
      */
     long long m_index = -1;
-    /**
-     * @brief process line to launch
-     */
-    QString m_processLine;
 };
 
 

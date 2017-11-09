@@ -23,7 +23,10 @@
 
 #include <queued/Queued.h>
 
+#include <csignal>
+
 extern "C" {
+#include <sys/prctl.h>
 #include <unistd.h>
 }
 
@@ -97,7 +100,6 @@ QueuedProcess *QueuedProcessManager::add(
         return process(_index);
 
     auto *process = new QueuedProcess(this, _definitions, _index);
-    process->setProcessLine(processLine());
     m_processes[_index] = process;
     // connect to signal
     m_connections[_index] = connect(
@@ -249,6 +251,7 @@ void QueuedProcessManager::stop(const long long _index)
         return;
     }
 
+    pr->killChildren();
     switch (onExit()) {
     case QueuedEnums::ExitAction::Kill:
         pr->kill();
@@ -270,15 +273,6 @@ QueuedEnums::ExitAction QueuedProcessManager::onExit() const
 
 
 /**
- * @fn processLine
- */
-QString QueuedProcessManager::processLine() const
-{
-    return m_processLine;
-}
-
-
-/**
  * @fn setExitAction
  */
 void QueuedProcessManager::setExitAction(const QueuedEnums::ExitAction _action)
@@ -286,19 +280,16 @@ void QueuedProcessManager::setExitAction(const QueuedEnums::ExitAction _action)
     qCDebug(LOG_LIB) << "New action on exit" << static_cast<int>(_action);
 
     m_onExit = _action;
-}
 
-
-/**
- * @fn setProcessLine
- */
-void QueuedProcessManager::setProcessLine(const QString _processLine)
-{
-    qCDebug(LOG_LIB) << "Set process line to" << _processLine;
-
-    m_processLine = _processLine;
-    for (auto process : processes().values())
-        process->setProcessLine(processLine());
+    // update child signal handler
+    switch (onExit()) {
+    case QueuedEnums::ExitAction::Kill:
+        prctl(PR_SET_PDEATHSIG, SIGKILL);
+        break;
+    case QueuedEnums::ExitAction::Terminate:
+        prctl(PR_SET_PDEATHSIG, SIGTERM);
+        break;
+    }
 }
 
 

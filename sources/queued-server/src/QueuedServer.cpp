@@ -18,6 +18,8 @@
 
 #include <queued/Queued.h>
 
+#include <QCoreApplication>
+
 #include "QueuedTcpServer.h"
 
 
@@ -43,6 +45,15 @@ QueuedServer::~QueuedServer()
 
 void QueuedServer::init()
 {
+    while (QueuedCoreAdaptor::getStatus().type() != Result::Content::Value) {
+        qCWarning(LOG_SERV)
+            << "Daemon seems to be unavailable wait" << WAIT_FOR_DAEMON;
+
+        QTime timer = QTime::currentTime().addMSecs(WAIT_FOR_DAEMON);
+        while (QTime::currentTime() < timer)
+            QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
+    }
+
     m_server->init(QueuedCoreAdaptor::getOption(
                        QueuedConfig::QueuedSettings::ServerTimeout)
                        .get()

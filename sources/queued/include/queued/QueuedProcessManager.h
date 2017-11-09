@@ -41,7 +41,6 @@ class QueuedProcessManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QueuedEnums::ExitAction onExit READ onExit WRITE setExitAction)
-    Q_PROPERTY(QString processLine READ processLine WRITE setProcessLine)
 
 public:
     /**
@@ -133,22 +132,11 @@ public:
      */
     QueuedEnums::ExitAction onExit() const;
     /**
-     * @brief process command line
-     * @return current command line
-     */
-    QString processLine() const;
-    /**
      * @brief set on exit action
      * @param _action
      * new on exit action
      */
     void setExitAction(const QueuedEnums::ExitAction _action);
-    /**
-     * @brief set command line
-     * @param _processLine
-     * new command line
-     */
-    void setProcessLine(const QString _processLine);
     /**
      * @brief get used limits
      * @return used system limits
@@ -200,10 +188,6 @@ private:
      * @brief processes list
      */
     QueuedProcessMap m_processes;
-    /**
-     * @brief command line
-     */
-    QString m_processLine;
 };
 
 

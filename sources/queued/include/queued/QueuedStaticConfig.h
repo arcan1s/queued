@@ -95,8 +95,6 @@ typedef struct {
  * on queued exit action enum
  * @var QueuedSettings::Plugins
  * plugin list
- * @var QueuedSettings::ProcessCommandLine
- * control process command line
  * @var QueuedSettings::ServerAddress
  * queued server bind address
  * @var QueuedSettings::ServerMaxConnections
@@ -117,7 +115,6 @@ enum class QueuedSettings {
     KeepUsers,
     OnExitAction,
     Plugins,
-    ProcessCommandLine,
     ServerAddress,
     ServerMaxConnections,
     ServerPort,
@@ -154,10 +151,6 @@ static const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
     {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
     {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
     {"Plugins", {QueuedSettings::Plugins, ""}},
-    {"ProcessCommandLine",
-     {QueuedSettings::ProcessCommandLine,
-      "systemd-run\n--scope\n--unit={name}\n--uid={uid}\n--gid={gid}"
-      "\n-p\nCPUQuota={cpu}%\n-p\nMemoryHigh={memory}\n{application}"}},
     {"ServerAddress", {QueuedSettings::ServerAddress, ""}},
     {"ServerMaxConnections", {QueuedSettings::ServerMaxConnections, 30}},
     {"ServerPort", {QueuedSettings::ServerPort, 8080}},

@@ -340,7 +340,7 @@ QueuedctlCommon::QueuedctlResult QueuedctlTask::stopTask(const long long _id,
 {
     qCDebug(LOG_APP) << "Stop task" << _id;
 
-    auto res = QueuedCoreAdaptor::sendTaskStart(_id, _token);
+    auto res = QueuedCoreAdaptor::sendTaskStop(_id, _token);
 
     QueuedctlCommon::QueuedctlResult output;
     res.match([&output](const bool val) { output.status = val; },

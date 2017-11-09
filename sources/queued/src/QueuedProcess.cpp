@@ -23,8 +23,16 @@
 
 #include <queued/Queued.h>
 
+#include <QDir>
 #include <QMetaProperty>
 #include <QStandardPaths>
+
+#include <cmath>
+#include <csignal>
+
+extern "C" {
+#include <unistd.h>
+}
 
 
 /**
@@ -44,10 +52,16 @@ QueuedProcess::QueuedProcess(QObject *_parent,
 
     qRegisterMetaType<QueuedLimits::Limits>("QueuedLimits::Limits");
 
+    m_cgroup = new QueuedControlGroupsAdaptor(this, name());
+
     // update QProcess related values as well
-    setCommand(m_definitions.command);
-    setCommandArguments(m_definitions.arguments);
+    setProgram(m_definitions.command);
+    setArguments(m_definitions.arguments);
     setWorkDirectory(m_definitions.workingDirectory);
+
+    updateLimits();
+
+    connect(this, SIGNAL(started()), this, SLOT(applyCGroup()));
 }
 
 
@@ -61,43 +75,65 @@ QueuedProcess::~QueuedProcess()
 
 
 /**
- * @fn updateArguments
+ * @fn killChildren
  */
-void QueuedProcess::updateArguments()
+void QueuedProcess::killChildren()
 {
-    QString application = processLine();
+    auto pids = childrenPids();
+    qCInfo(LOG_LIB) << "Found children pids" << pids;
 
-    // replace generic properties first
-    auto meta = metaObject();
-    int count = meta->propertyCount();
-    for (int i = 0; i < count; i++) {
-        QMetaProperty prop = meta->property(i);
-        auto name = prop.name();
-        // replace string now
-        application.replace(QString("{%1}").arg(name),
-                            property(name).toString());
+    for (auto pid : pids) {
+        if (::kill(pid, SIGTERM) != 0) {
+            qCWarning(LOG_LIB) << "SIGTERM failed, trying to kill";
+            ::kill(pid, SIGKILL);
+        }
     }
+}
 
-    // replace limits now
-    application.replace(
-        "{cpu}", QString("%1").arg(
-                     QueuedSystemInfo::cpuWeight(nativeLimits().cpu) * 100.0, 0,
-                     'f', 0));
-    application.replace(
-        "{memory}",
-        QString("%1").arg(QueuedSystemInfo::memoryWeight(nativeLimits().memory)
-                              * QueuedSystemInfo::memoryCount(),
-                          0, 'f', 0));
 
-    // command line
-    QString commandLine = command() + "\n" + commandArguments().join('\n');
-    application.replace("{application}", commandLine);
+/**
+ * @fn updateLimits
+ */
+void QueuedProcess::updateLimits()
+{
+    auto nl = nativeLimits();
 
-    QStringList arguments = application.split('\n');
+    m_cgroup->setCpuLimit(
+        std::llround(QueuedSystemInfo::cpuWeight(nl.cpu) * 100.0));
+    m_cgroup->setMemoryLimit(
+        std::llround(QueuedSystemInfo::memoryWeight(nl.memory)
+                     * QueuedSystemInfo::memoryCount()));
+}
 
-    // set QProcess properties
-    setProgram(arguments.takeFirst());
-    setArguments(arguments);
+
+/**
+ * @fn childrenPids
+ */
+QList<Q_PID> QueuedProcess::childrenPids() const
+{
+    QStringList allDirectories = QDir("/proc").entryList(
+        QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    QStringList directories = allDirectories.filter(QRegExp("(\\d+)"));
+
+    QList<Q_PID> pids = std::accumulate(
+        directories.cbegin(), directories.cend(), QList<Q_PID>(),
+        [this](QList<Q_PID> &list, const QString &dir) {
+            QFile statFile(QString("/proc/%1/stat").arg(dir));
+            if (!statFile.open(QIODevice::ReadOnly | QIODevice::Text))
+                return list;
+
+            QString output = statFile.readAll();
+            output.remove(QRegExp("\\d+ \\(.*\\) . "));
+            Q_PID ppid = output.split(' ').first().toLongLong();
+            if (ppid == pid())
+                list.append(dir.toLongLong());
+
+            statFile.close();
+
+            return list;
+        });
+
+    return pids;
 }
 
 
@@ -116,24 +152,6 @@ long long QueuedProcess::index() const
 QString QueuedProcess::name() const
 {
     return QString("queued-task-%1").arg(index());
-}
-
-
-/**
- * @fn command
- */
-QString QueuedProcess::command() const
-{
-    return m_definitions.command;
-}
-
-
-/**
- * @fn commandArguments
- */
-QStringList QueuedProcess::commandArguments() const
-{
-    return m_definitions.arguments;
 }
 
 
@@ -201,15 +219,6 @@ uint QueuedProcess::nice() const
 
 
 /**
- * @fn processLine
- */
-QString QueuedProcess::processLine() const
-{
-    return m_processLine;
-}
-
-
-/**
  * @fn startTime
  */
 QDateTime QueuedProcess::startTime() const
@@ -246,30 +255,6 @@ QString QueuedProcess::workDirectory() const
 
 
 /**
- * @fn setCommand
- */
-void QueuedProcess::setCommand(const QString &_command)
-{
-    qCDebug(LOG_LIB) << "Set command to" << _command;
-
-    m_definitions.command = _command;
-    updateArguments();
-}
-
-
-/**
- * @fn setCommandArguments
- */
-void QueuedProcess::setCommandArguments(const QStringList &_commandArguments)
-{
-    qCDebug(LOG_LIB) << "Set command line arguments to" << _commandArguments;
-
-    m_definitions.arguments = _commandArguments;
-    updateArguments();
-}
-
-
-/**
  * @fn setEndTime
  */
 void QueuedProcess::setEndTime(const QDateTime &_time)
@@ -288,7 +273,6 @@ void QueuedProcess::setGid(const uint _gid)
     qCDebug(LOG_LIB) << "Set process GID to" << _gid;
 
     m_definitions.gid = _gid;
-    updateArguments();
 }
 
 
@@ -300,7 +284,7 @@ void QueuedProcess::setLimits(const QString &_limits)
     qCDebug(LOG_LIB) << "Set process limits" << _limits;
 
     m_definitions.limits = _limits;
-    updateArguments();
+    updateLimits();
 }
 
 
@@ -334,18 +318,6 @@ void QueuedProcess::setNice(const uint _nice)
 
 
 /**
- * @fn setProcessLine
- */
-void QueuedProcess::setProcessLine(const QString &_processLine)
-{
-    qCDebug(LOG_LIB) << "Set process line to" << _processLine;
-
-    m_processLine = _processLine;
-    updateArguments();
-}
-
-
-/**
  * @fn setStartTime
  */
 void QueuedProcess::setStartTime(const QDateTime &_time)
@@ -364,7 +336,6 @@ void QueuedProcess::setUid(const uint _uid)
     qCDebug(LOG_LIB) << "Set process UID to" << _uid;
 
     m_definitions.uid = _uid;
-    updateArguments();
 }
 
 
@@ -403,4 +374,24 @@ void QueuedProcess::setWorkDirectory(const QString &_workDirectory)
 bool QueuedProcess::operator==(const QueuedProcess &_other)
 {
     return name() == _other.name();
+}
+
+/**
+ * applyCGroup
+ */
+void QueuedProcess::applyCGroup()
+{
+    m_cgroup->addProcess(pid());
+}
+
+
+/**
+ * @fn setupChildProcess
+ */
+void QueuedProcess::setupChildProcess()
+{
+    ::setuid(m_definitions.uid);
+    ::setgid(m_definitions.gid);
+
+    return QProcess::setupChildProcess();
 }

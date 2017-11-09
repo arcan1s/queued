@@ -123,13 +123,8 @@ void QueuedCorePrivate::initProcesses()
     auto onExitAction = static_cast<QueuedEnums::ExitAction>(
         m_advancedSettings->get(QueuedConfig::QueuedSettings::OnExitAction)
             .toInt());
-    auto processLine
-        = m_advancedSettings
-              ->get(QueuedConfig::QueuedSettings::ProcessCommandLine)
-              .toString();
 
     m_processes = m_helper->initObject(m_processes);
-    m_processes->setProcessLine(processLine);
     m_processes->setExitAction(onExitAction);
     auto dbProcesses
         = m_database->get(QueuedDB::TASKS_TABLE, "WHERE endTime IS NULL");

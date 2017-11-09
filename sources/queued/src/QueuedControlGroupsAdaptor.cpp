@@ -33,12 +33,12 @@
  * @fn QueuedControlGroupsAdaptor
  */
 QueuedControlGroupsAdaptor::QueuedControlGroupsAdaptor(QObject *_parent,
-                                                       QString &_name)
+                                                       QString _name)
     : QObject(_parent)
-    , m_name(_name)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
+    m_name = std::move(_name);
     createGroup();
 }
 
@@ -51,6 +51,17 @@ QueuedControlGroupsAdaptor::~QueuedControlGroupsAdaptor()
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
     removeGroup();
+}
+
+
+/**
+ * @fn groupPath
+ */
+QString QueuedControlGroupsAdaptor::groupPath(const QString &_base) const
+{
+    qCDebug(LOG_LIB) << "Get group path for base" << _base;
+
+    return QDir(_base).filePath(name());
 }
 
 
@@ -86,7 +97,7 @@ QString QueuedControlGroupsAdaptor::memoryPath()
  */
 long long QueuedControlGroupsAdaptor::cpuLimit() const
 {
-    QFile file(QDir(cpuPath()).filePath("cpu.cfs_quota_us"));
+    QFile file(QDir(groupPath(cpuPath())).filePath(CG_CPU_LIMIT));
 
     long long limit = 0;
     if (file.open(QIODevice::ReadOnly | QFile::Text)) {
@@ -107,7 +118,7 @@ long long QueuedControlGroupsAdaptor::cpuLimit() const
  */
 long long QueuedControlGroupsAdaptor::memoryLimit() const
 {
-    QFile file(QDir(memoryPath()).filePath("memory.limit_in_bytes"));
+    QFile file(QDir(groupPath(memoryPath())).filePath(CG_MEMORY_LIMIT));
 
     long long limit = 0;
     if (file.open(QIODevice::ReadOnly | QFile::Text)) {
@@ -139,11 +150,12 @@ void QueuedControlGroupsAdaptor::setCpuLimit(const long long _value)
 {
     qCDebug(LOG_LIB) << "Set new CPU limit to" << _value;
 
-    QFile file(QDir(cpuPath()).filePath("cpu.cfs_quota_us"));
+    QFile file(QDir(groupPath(cpuPath())).filePath(CG_CPU_LIMIT));
 
-    if (file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
         stream << _value;
+        stream.flush();
     } else {
         qCCritical(LOG_LIB)
             << "Could not set CPU limit" << name() << "to" << _value;
@@ -160,17 +172,20 @@ void QueuedControlGroupsAdaptor::setMemoryLimit(const long long _value)
 {
     qCDebug(LOG_LIB) << "Set new memory limit to" << _value;
 
-    QFile file(QDir(cpuPath()).filePath("memory.limit_in_bytes"));
+    QFile file(QDir(groupPath(memoryPath())).filePath(CG_MEMORY_LIMIT));
 
-    if (file.open(QIODevice::ReadWrite)) {
+    if (file.open(QIODevice::WriteOnly)) {
         QTextStream stream(&file);
         stream << _value;
+        stream.flush();
     } else {
         qCCritical(LOG_LIB)
             << "Could not set memory limit" << name() << "to" << _value;
         return;
     }
     file.close();
+
+    Q_ASSERT(_value == memoryLimit());
 }
 
 
@@ -182,7 +197,7 @@ bool QueuedControlGroupsAdaptor::addProcess(const uint _pid)
     qCDebug(LOG_LIB) << "Assign add process" << _pid;
 
     for (auto &path : controlPaths()) {
-        auto proc = QDir(QDir(path).filePath(name())).filePath(CG_PROC_FILE);
+        auto proc = QDir(groupPath(path)).filePath(CG_PROC_FILE);
         QFile file(proc);
 
         if (file.open(QIODevice::ReadWrite)) {
@@ -210,9 +225,44 @@ bool QueuedControlGroupsAdaptor::createGroup()
 
     auto paths = controlPaths();
 
-    return std::all_of(
+    // create cgroups
+    bool status = std::all_of(
         paths.cbegin(), paths.cend(),
         [this](const QString &path) { return QDir(path).mkpath(name()); });
+    // apply settings
+    status &= std::all_of(
+        paths.cbegin(), paths.cend(), [this](const QString &path) {
+            auto notify
+                = QDir(groupPath(path)).filePath(CG_NOTIFY_ON_RELEASE_FILE);
+            QFile file(notify);
+            if (file.open(QIODevice::WriteOnly)) {
+                QTextStream stream(&file);
+                stream << 1;
+            } else {
+                qCCritical(LOG_LIB)
+                    << "Could not apply rules to" << CG_NOTIFY_ON_RELEASE_FILE;
+                return false;
+            }
+            return true;
+        });
+    status &= std::all_of(
+        paths.cbegin(), paths.cend(), [this](const QString &path) {
+            auto agent = QDir(groupPath(path)).filePath(CG_RELEASE_FILE);
+            QFile file(agent);
+            if (file.open(QIODevice::WriteOnly)) {
+                QTextStream stream(&file);
+                stream
+                    << QString("rmdir \"%1\"").arg(QDir(path).filePath(name()));
+            } else {
+                qCCritical(LOG_LIB)
+                    << "Could not apply rules to" << CG_RELEASE_FILE;
+                return false;
+            }
+            return true;
+        });
+
+
+    return status;
 }
 
 
@@ -226,7 +276,6 @@ bool QueuedControlGroupsAdaptor::removeGroup()
     auto paths = controlPaths();
 
     return std::all_of(
-        paths.cbegin(), paths.cend(), [this](const QString &path) {
-            return QDir(QDir(path).filePath(name())).removeRecursively();
-        });
+        paths.cbegin(), paths.cend(),
+        [this](const QString &path) { return QDir(path).rmdir(name()); });
 }

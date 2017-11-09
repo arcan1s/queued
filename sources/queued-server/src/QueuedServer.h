@@ -28,6 +28,8 @@ class QueuedServer : public QObject
     Q_OBJECT
 
 public:
+    static const long WAIT_FOR_DAEMON = 30000;
+
     explicit QueuedServer(QObject *parent, const QVariantHash &args);
     virtual ~QueuedServer();
     void init();

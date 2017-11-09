@@ -70,9 +70,6 @@ void QueuedCorePrivate::updateSettings(const QueuedConfig::QueuedSettings _id,
     case QueuedConfig::QueuedSettings::Plugins:
         // do nothing here
         break;
-    case QueuedConfig::QueuedSettings::ProcessCommandLine:
-        m_processes->setProcessLine(_value.toString());
-        break;
     case QueuedConfig::QueuedSettings::ServerAddress:
     case QueuedConfig::QueuedSettings::ServerMaxConnections:
     case QueuedConfig::QueuedSettings::ServerPort:

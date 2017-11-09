@@ -45,9 +45,25 @@ class QueuedControlGroupsAdaptor : public QObject
 public:
     // constants
     /**
+     * @brief name of file contains cpu limit
+     */
+    const char *CG_CPU_LIMIT = "cpu.cfs_quota_us";
+    /**
+     * @brief name of file contains memory limit
+     */
+    const char *CG_MEMORY_LIMIT = "memory.limit_in_bytes";
+    /**
+     * @brief name of file contains notify status
+     */
+    const char *CG_NOTIFY_ON_RELEASE_FILE = "notify_on_release";
+    /**
      * @brief name of file contains processes list
      */
     const char *CG_PROC_FILE = "cgroup.procs";
+    /**
+     * @brief name of file contains release command
+     */
+    const char *CG_RELEASE_FILE = "release_agent";
 
     /**
      * @brief QueuedControlGroupsAdaptor class constructor
@@ -56,11 +72,18 @@ public:
      * @param _name
      * control group name
      */
-    explicit QueuedControlGroupsAdaptor(QObject *_parent, QString &_name);
+    explicit QueuedControlGroupsAdaptor(QObject *_parent, QString _name);
     /**
      * @brief QueuedControlGroupsAdaptor class destructor
      */
     virtual ~QueuedControlGroupsAdaptor();
+    /**
+     * @brief build group path for specific base directory
+     * @param _base
+     * full path to base directory
+     * @return full path to group properties
+     */
+    QString groupPath(const QString &_base) const;
     // static properties
     /**
      * @brief paths to all control directories
