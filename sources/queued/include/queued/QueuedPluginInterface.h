@@ -40,13 +40,7 @@ public:
     /**
      * @brief QueuedPluginInterface class destructor
      */
-    virtual ~QueuedPluginInterface() = default;
-    /**
-     * @brief will be emitted to map interface signals to plugin slots
-     * @param _manager
-     * pointer to manager interface object
-     */
-    virtual void connect(const QueuedPluginManagerInterface *_manager) = 0;
+    virtual ~QueuedPluginInterface(){};
     /**
      * @brief plugin initialization method
      * @param _settings
@@ -62,6 +56,12 @@ public:
      * new token ID
      */
     virtual void setToken(const QString &_token) = 0;
+    /**
+     * @brief will be emitted to map interface signals to plugin slots
+     * @param _manager
+     * pointer to manager interface object
+     */
+    virtual void setup(const QueuedPluginManagerInterface *_manager) = 0;
     /**
      * @brief method which will be called on option update
      * @param _key

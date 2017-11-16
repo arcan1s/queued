@@ -386,8 +386,10 @@ QVariantHash QueuedCorePrivate::pluginSettings(const QString &_plugin)
                           QString("WHERE key LIKE 'Plugin.%1.%'").arg(_plugin));
     QVariantHash settings;
     std::for_each(dbSettings.cbegin(), dbSettings.cend(),
-                  [&settings](const QVariantHash &value) {
-                      settings[value["key"].toString()] = value["value"];
+                  [&settings, &_plugin](const QVariantHash &value) {
+                      auto key = value["key"].toString();
+                      key.remove(QString("Plugin.%1.").arg(_plugin));
+                      settings[key] = value["value"];
                   });
 
     return settings;

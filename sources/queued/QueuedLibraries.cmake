@@ -37,8 +37,8 @@ add_definitions(
 # Qt include paths
 ##
 set(Qt_INCLUDE
-        ${Qt5Core_INCLUDE_DIRS} ${Qt5DBus_INCLUDE_DIRS} ${Qt5Network_INCLUDE_DIRS}
-        ${Qt5Sql_INCLUDE_DIRS}
+        ${Qt5Core_INCLUDE_DIRS} ${Qt5DBus_INCLUDE_DIRS}
+        ${Qt5Network_INCLUDE_DIRS} ${Qt5Sql_INCLUDE_DIRS}
 )
 ##
 # @def Qt_LIBRARIES

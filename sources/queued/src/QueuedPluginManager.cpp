@@ -131,7 +131,7 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
             m_plugins[_name] = item;
             item->init(pluginSettings);
             item->setToken(m_token);
-            item->connect(interface());
+            item->setup(interface());
         } else {
             qCCritical(LOG_PL) << "Could not cast plugin" << _name;
         }

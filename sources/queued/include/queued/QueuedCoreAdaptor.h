@@ -306,19 +306,6 @@ template <class T> QDBusVariant toDBusVariant(const QueuedResult<T> &_data)
     return QDBusVariant(QVariant::fromValue<QueuedResult<T>>(_data));
 };
 /**
- * @brief additional method to avoid conversion from QDBusVariant to
- * QueuedResult
- * @tparam T
- * QueuedResult payload class
- * @param _data
- * input data
- * @return converted data to QueuedResult
- */
-template <class T> QueuedResult<T> toResult(const QDBusVariant &_data)
-{
-    return qdbus_cast<QueuedResult<T>>(_data.variant().value<QDBusArgument>());
-};
-/**
  * @brief additional method to avoid conversion from QVariant to
  * QueuedResult
  * @tparam T
@@ -361,7 +348,7 @@ QueuedResult<T> sendRequest(const QString &_service, const QString &_path,
 
     if (dbusResponse.isValid()) {
         auto response = dbusResponse.value();
-        return toResult<T>(response);
+        return toResult<T>(response.variant());
     } else {
         return QueuedError(dbusResponse.error().message().toStdString());
     }

@@ -27,6 +27,7 @@ message(STATUS "Version: ${PROJECT_VERSION}")
 message(STATUS "Build date: ${CURRENT_DATE}")
 
 # components
+option(BUILD_PLUGINS "Build plugins" ON)
 option(BUILD_DEB_PACKAGE "Build deb package" OFF)
 option(BUILD_RPM_PACKAGE "Build rpm package" OFF)
 # build details
@@ -53,6 +54,9 @@ add_subdirectory("queued")
 add_subdirectory("queued-daemon")
 add_subdirectory("queued-server")
 add_subdirectory("queuedctl")
+if (BUILD_PLUGINS)
+    add_subdirectory("plugins")
+endif()
 if (BUILD_TESTING)
     enable_testing()
     add_subdirectory("test")

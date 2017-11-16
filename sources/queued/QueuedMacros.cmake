@@ -27,11 +27,12 @@
 ##
 # @fn queued_install_plugin root [name] [libraries]
 # @brief build and install plugin
-# @param PLUGIN_ROOT         plugin root directory
-# @param PLUGIN              plugin name (optional). Will be assigned from path
-#                            if empty
-# @param ADDS_LIBRARIES      additional libraries (optional)
-#
+# @param PLUGIN_ROOT
+# plugin root directory
+# @param PLUGIN
+# plugin name (optional). Will be assigned from path if empty
+# @param ADDS_LIBRARIES
+# additional libraries (optional)
 ##
 macro(queued_install_plugin PLUGIN_ROOT)
     set(PLUGIN "${ARGV1}")
@@ -47,13 +48,13 @@ macro(queued_install_plugin PLUGIN_ROOT)
 
     # include directories
     include_directories ("${CMAKE_CURRENT_BINARY_DIR}"
-                         "${Qt_INCLUDE}"
-                         "${QUEUED_INCLUDE_DIRS}")
+            "${Qt_INCLUDE}" "${QUEUED_INCLUDE_DIRS}")
 
     # build
-    add_library ("${PLUGIN}" MODULE "${${PLUGIN}_SOURCES}" "${${PLUGIN}_HEADERS}"
-            "${${PLUGIN}_MOC_SOURCES}")
-    target_link_libraries ("${PLUGIN}" "${QUEUED_LIBRARIES}" "${Qt_LIBRARIES}" "${ADDS_LIBRARIES}")
+    add_library ("${PLUGIN}" MODULE "${${PLUGIN}_SOURCES}"
+            "${${PLUGIN}_HEADERS}" "${${PLUGIN}_MOC_SOURCES}")
+    target_link_libraries ("${PLUGIN}" "${QUEUED_LIBRARIES}" "${Qt_LIBRARIES}"
+            "${ADDS_LIBRARIES}")
 
     # install
     install (TARGETS "${PLUGIN}" DESTINATION "${QUEUED_PLUGIN_ROOT}")

@@ -4,10 +4,10 @@ file (GLOB_RECURSE SUBPROJECT_HEADERS "*.h")
 
 # include_path
 include_directories ("${PROJECT_LIBRARY_DIR}/include"
-                     "${CMAKE_CURRENT_BINARY_DIR}"
-                     "${CMAKE_BINARY_DIR}"
-                     "${PROJECT_TRDPARTY_DIR}"
-                     "${Qt_INCLUDE}")
+        "${CMAKE_CURRENT_BINARY_DIR}"
+        "${CMAKE_BINARY_DIR}"
+        "${PROJECT_TRDPARTY_DIR}"
+        "${Qt_INCLUDE}")
 
 qt5_wrap_cpp (SUBPROJECT_MOC_SOURCES "${SUBPROJECT_HEADERS}")
 
