@@ -43,25 +43,18 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
     // info
-    QCommandLineOption infoOption(QStringList() << "i"
-                                                << "info",
-                                  "Shows additional info.");
+    QCommandLineOption infoOption({"i", "info"}, "Shows additional info.");
     parser.addOption(infoOption);
 
     // debug mode
-    QCommandLineOption debugOption(QStringList() << "d"
-                                                 << "debug",
-                                   "Prints debug information.");
+    QCommandLineOption debugOption({"d", "debug"}, "Prints debug information.");
     parser.addOption(debugOption);
 
     // configuration option
-    QCommandLineOption tokenOption(QStringList() << "t"
-                                                 << "token",
-                                   "Path to cached token.", "token",
-                                   QueuedSettings::defaultTokenPath());
+    QCommandLineOption tokenOption({"t", "token"}, "Path to cached token.",
+                                   "token", QueuedSettings::defaultTokenPath());
     parser.addOption(tokenOption);
-    QCommandLineOption userOption(QStringList() << "u"
-                                                << "user",
+    QCommandLineOption userOption({"u", "user"},
                                   "User to login instead of current one.",
                                   "user", ::getlogin());
     parser.addOption(userOption);

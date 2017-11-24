@@ -124,15 +124,15 @@ QDBusVariant QueuedCoreInterface::PluginRemove(const QString &plugin,
  */
 QDBusVariant QueuedCoreInterface::TaskAdd(
     const QString &command, const QStringList &arguments,
-    const QString &workingDirectory, const qlonglong user, const qlonglong cpu,
-    const qlonglong gpu, const qlonglong memory, const qlonglong gpumemory,
-    const qlonglong storage, const QString &token)
+    const QString &workingDirectory, const qlonglong user, const uint nice,
+    const qlonglong cpu, const qlonglong gpu, const qlonglong memory,
+    const qlonglong gpumemory, const qlonglong storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new task with parameters" << command << arguments
                       << workingDirectory << "from user" << user;
 
     return QueuedCoreAdaptor::toDBusVariant(m_core->addTask(
-        command, arguments, workingDirectory, user,
+        command, arguments, workingDirectory, user, nice,
         QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token));
 }
 
@@ -229,18 +229,17 @@ QDBusVariant QueuedCoreInterface::TryAuth(const QString &token)
 /**
  * @fn UserAdd
  */
-QDBusVariant
-QueuedCoreInterface::UserAdd(const QString &name, const QString &email,
-                             const QString &password, const uint permissions,
-                             const qlonglong cpu, const qlonglong gpu,
-                             const qlonglong memory, const qlonglong gpumemory,
-                             const qlonglong storage, const QString &token)
+QDBusVariant QueuedCoreInterface::UserAdd(
+    const QString &name, const QString &email, const QString &password,
+    const uint permissions, const uint priority, const qlonglong cpu,
+    const qlonglong gpu, const qlonglong memory, const qlonglong gpumemory,
+    const qlonglong storage, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Add new user with paramaters" << name << email
                       << permissions;
 
     return QueuedCoreAdaptor::toDBusVariant(m_core->addUser(
-        name, email, password, permissions,
+        name, email, password, permissions, priority,
         QueuedLimits::Limits(cpu, gpu, memory, gpumemory, storage), token));
 }
 

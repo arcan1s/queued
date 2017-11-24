@@ -173,8 +173,7 @@ void QueuedctlTask::parserAdd(QCommandLineParser &_parser)
     _parser.addPositionalArgument("program", "Command line.", "<program>");
 
     // command line arguments
-    QCommandLineOption argumentOption(QStringList() << "a"
-                                                    << "argument",
+    QCommandLineOption argumentOption({"a", "argument"},
                                       "Command line argument.", "argument", "");
     _parser.addOption(argumentOption);
     // working directory
@@ -239,13 +238,11 @@ void QueuedctlTask::parserSet(QCommandLineParser &_parser)
     _parser.addPositionalArgument("id", "Task ID.", "<id>");
 
     // command line
-    QCommandLineOption commandOption(QStringList() << "p"
-                                                   << "program",
-                                     "Command line.", "program", "");
+    QCommandLineOption commandOption({"p", "program"}, "Command line.",
+                                     "program", "");
     _parser.addOption(commandOption);
     // command line arguments
-    QCommandLineOption argumentOption(QStringList() << "a"
-                                                    << "argument",
+    QCommandLineOption argumentOption({"a", "argument"},
                                       "Command line argument.", "argument", "");
     _parser.addOption(argumentOption);
     // working directory

@@ -202,8 +202,8 @@ private:
      * value to build payload
      * @return list of keys and list of values
      */
-    QPair<QStringList, QStringList>
-    getQueryPayload(const QString &_table, const QVariantHash &_value) const;
+    QHash<QString, QString> getQueryPayload(const QString &_table,
+                                            const QVariantHash &_value) const;
 };
 
 

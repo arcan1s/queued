@@ -22,6 +22,7 @@
 
 
 #include <queued/Queued.h>
+#include <queued/QueuedUser.h>
 
 
 /**
@@ -64,6 +65,7 @@ QueuedUser *QueuedUserManager::add(const QVariantHash &_properties,
     defs.email = _properties["email"].toString();
     defs.password = _properties["password"].toString();
     defs.permissions = _properties["permissions"].toUInt();
+    defs.priority = _properties["priority"].toUInt();
     defs.limits = _properties["limits"].toString();
 
     return add(defs, _id);

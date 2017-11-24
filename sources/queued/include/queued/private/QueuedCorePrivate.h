@@ -81,16 +81,20 @@ public:
      * working directory
      * @param _userId
      * task owner user ID
+     * @param _nice
+     * task nice level
      * @param _limits
      * task defined limits
      * @param _token
      * user auth token
      * @return task ID or -1 if no task added
      */
-    QueuedResult<long long>
-    addTask(const QString &_command, const QStringList &_arguments,
-            const QString &_workingDirectory, const long long _userId,
-            const QueuedLimits::Limits &_limits, const QString &_token);
+    QueuedResult<long long> addTask(const QString &_command,
+                                    const QStringList &_arguments,
+                                    const QString &_workingDirectory,
+                                    const long long _userId, const uint _nice,
+                                    const QueuedLimits::Limits &_limits,
+                                    const QString &_token);
     /**
      * @brief add new user
      * @param _name
@@ -101,6 +105,8 @@ public:
      * user password
      * @param _permissions
      * user permissions
+     * @param _priority
+     * user priority
      * @param _limits
      * user limits
      * @param _token
@@ -110,6 +116,7 @@ public:
     QueuedResult<long long> addUser(const QString &_name, const QString &_email,
                                     const QString &_password,
                                     const uint _permissions,
+                                    const uint _priority,
                                     const QueuedLimits::Limits &_limits,
                                     const QString &_token);
     /**

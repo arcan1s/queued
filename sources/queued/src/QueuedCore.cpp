@@ -71,13 +71,14 @@ QueuedResult<bool> QueuedCore::addPlugin(const QString &_plugin,
 QueuedResult<long long>
 QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
                     const QString &_workingDirectory, const long long _userId,
-                    const QueuedLimits::Limits &_limits, const QString &_token)
+                    const uint _nice, const QueuedLimits::Limits &_limits,
+                    const QString &_token)
 {
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
                      << "from user" << _userId;
 
     return m_impl->addTask(_command, _arguments, _workingDirectory, _userId,
-                           _limits, _token);
+                           _nice, _limits, _token);
 }
 
 
@@ -87,13 +88,14 @@ QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
 QueuedResult<long long>
 QueuedCore::addUser(const QString &_name, const QString &_email,
                     const QString &_password, const uint _permissions,
-                    const QueuedLimits::Limits &_limits, const QString &_token)
+                    const uint _priority, const QueuedLimits::Limits &_limits,
+                    const QString &_token)
 {
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
                      << "and permissions" << _permissions;
 
-    return m_impl->addUser(_name, _email, _password, _permissions, _limits,
-                           _token);
+    return m_impl->addUser(_name, _email, _password, _permissions, _priority,
+                           _limits, _token);
 }
 
 

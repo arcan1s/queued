@@ -199,6 +199,15 @@ uint QueuedUser::permissions() const
 
 
 /**
+ * @fn priority
+ */
+uint QueuedUser::priority() const
+{
+    return m_definitions.priority;
+}
+
+
+/**
  * @fn limits
  */
 QString QueuedUser::limits() const
@@ -248,6 +257,17 @@ void QueuedUser::setPermissions(const uint _permissions)
     qCDebug(LOG_LIB) << "New user permissions" << _permissions;
 
     m_definitions.permissions = _permissions;
+}
+
+
+/**
+ * @fn setPriority
+ */
+void QueuedUser::setPriority(const uint _priority)
+{
+    qCDebug(LOG_LIB) << "New user priority" << _priority;
+
+    m_definitions.priority = _priority;
 }
 
 

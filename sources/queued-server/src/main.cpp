@@ -55,20 +55,15 @@ int main(int argc, char *argv[])
     parser.addHelpOption();
     parser.addVersionOption();
     // info
-    QCommandLineOption infoOption(QStringList() << "i"
-                                                << "info",
-                                  "Show additional info.");
+    QCommandLineOption infoOption({"i", "info"}, "Show additional info.");
     parser.addOption(infoOption);
 
     // debug mode
-    QCommandLineOption debugOption(QStringList() << "d"
-                                                 << "debug",
-                                   "Print debug information.");
+    QCommandLineOption debugOption({"d", "debug"}, "Print debug information.");
     parser.addOption(debugOption);
 
     // daemon mode
-    QCommandLineOption daemonOption(QStringList() << "daemon",
-                                    "Start detached.");
+    QCommandLineOption daemonOption("daemon", "Start detached.");
     parser.addOption(daemonOption);
 
     parser.process(app);

@@ -17,6 +17,7 @@
 #include "QueuedTcpServerResponseHelperUser.h"
 
 #include <queued/Queued.h>
+#include <queued/QueuedUser.h>
 
 
 QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(
@@ -72,6 +73,7 @@ QueuedTcpServerResponseHelperUser::getDefinitions(const QVariantHash &_data)
     res.match([&defs](const QString &val) { defs.password = val; },
               [](const QueuedError &) {});
     defs.permissions = _data["permissions"].toUInt();
+    defs.priority = _data["priority"].toUInt();
     // limits
     QueuedLimits::Limits limits;
     limits.cpu = _data["limitCpu"].toLongLong();

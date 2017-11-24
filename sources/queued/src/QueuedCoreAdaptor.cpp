@@ -22,6 +22,7 @@
 
 
 #include <queued/Queued.h>
+#include <queued/QueuedUser.h>
 
 
 /**
@@ -125,6 +126,7 @@ QueuedResult<long long> QueuedCoreAdaptor::sendTaskAdd(
                          _definitions.arguments,
                          _definitions.workingDirectory,
                          _definitions.user,
+                         _definitions.nice,
                          limits.cpu,
                          limits.gpu,
                          limits.memory,
@@ -212,6 +214,7 @@ QueuedResult<long long> QueuedCoreAdaptor::sendUserAdd(
                          _definitions.email,
                          _definitions.password,
                          _definitions.permissions,
+                         _definitions.priority,
                          limits.cpu,
                          limits.gpu,
                          limits.memory,

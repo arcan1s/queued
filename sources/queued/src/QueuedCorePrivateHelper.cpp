@@ -124,7 +124,7 @@ QueuedCorePrivateHelper::dropAdminFields(const QString &_table,
  */
 QueuedResult<long long> QueuedCorePrivateHelper::addTaskPrivate(
     const QString &_command, const QStringList &_arguments,
-    const QString &_workingDirectory, const long long _userId,
+    const QString &_workingDirectory, const long long _userId, const uint _nice,
     const QueuedLimits::Limits &_limits)
 {
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
@@ -148,7 +148,7 @@ QueuedResult<long long> QueuedCorePrivateHelper::addTaskPrivate(
                                {"command", _command},
                                {"commandArguments", _arguments},
                                {"workDirectory", _workingDirectory},
-                               {"nice", 0},
+                               {"nice", std::min(_nice, userObj->priority())},
                                {"uid", ids.first},
                                {"gid", ids.second},
                                {"limits", taskLimits.toString()}};
@@ -173,16 +173,16 @@ QueuedResult<long long> QueuedCorePrivateHelper::addTaskPrivate(
  */
 QueuedResult<long long> QueuedCorePrivateHelper::addUserPrivate(
     const QString &_name, const QString &_email, const QString &_password,
-    const uint _permissions, const QueuedLimits::Limits &_limits)
+    const uint _permissions, const uint _priority,
+    const QueuedLimits::Limits &_limits)
 {
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
                      << "and permissions" << _permissions;
     // add to database
-    QVariantHash properties = {{"name", _name},
-                               {"password", _password},
-                               {"email", _email},
-                               {"permissions", _permissions},
-                               {"limits", _limits.toString()}};
+    QVariantHash properties
+        = {{"name", _name},         {"password", _password},
+           {"email", _email},       {"permissions", _permissions},
+           {"priority", _priority}, {"limits", _limits.toString()}};
     auto id = database()->add(QueuedDB::USERS_TABLE, properties);
     if (id == -1) {
         qCWarning(LOG_LIB) << "Could not add user" << _name;

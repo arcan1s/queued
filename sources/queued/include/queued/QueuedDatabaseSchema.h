@@ -115,7 +115,8 @@ static const QueuedDBSchema DBSchema = {
       {"email", {"email", "TEXT", QVariant::String, false}},
       {"lastLogin", {"lastLogin", "TEXT", QVariant::String, true}},
       {"limits", {"limits", "TEXT", QVariant::String, true}},
-      {"permissions", {"permissions", "INT", QVariant::UInt, true}}}}};
+      {"permissions", {"permissions", "INT", QVariant::UInt, true}},
+      {"priotiry", {"priority", "INT", QVariant::UInt, true}}}}};
 };
 
 #endif /* QUEUEDDATABASESCHEMA_H */

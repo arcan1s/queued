@@ -96,6 +96,7 @@ QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
         [&definitions](const QueuedError &) { definitions.password = ""; });
 
     definitions.email = _parser.value("email");
+    definitions.priority = _parser.value("priority").toUInt();
     // limits now
     QueuedLimits::Limits limits(
         _parser.value("limit-cpu").toLongLong(),
@@ -200,15 +201,16 @@ void QueuedctlUser::parserAdd(QCommandLineParser &_parser)
     _parser.addPositionalArgument("name", "User name.", "<name>");
 
     // permissions
-    QCommandLineOption accessOption(QStringList() << "a"
-                                                  << "access",
-                                    "User permission.", "access", "0");
+    QCommandLineOption accessOption({"a", "access"}, "User permission.",
+                                    "access", "0");
     _parser.addOption(accessOption);
     // email
-    QCommandLineOption emailOption(QStringList() << "e"
-                                                 << "email",
-                                   "User email.", "email", "");
+    QCommandLineOption emailOption({"e", "email"}, "User email.", "email", "");
     _parser.addOption(emailOption);
+    // priority
+    QCommandLineOption priorityOption({"p", "priority"}, "User priority.",
+                                      "priority", "0");
+    _parser.addOption(priorityOption);
     // password
     QCommandLineOption passwordOption("password", "User password.", "password",
                                       "");
@@ -276,15 +278,15 @@ void QueuedctlUser::parserSet(QCommandLineParser &_parser)
     _parser.addPositionalArgument("id", "User ID.", "<id>");
 
     // email
-    QCommandLineOption emailOption(QStringList() << "e"
-                                                 << "email",
-                                   "User email.", "email", "");
+    QCommandLineOption emailOption({"e", "email"}, "User email.", "email", "");
     _parser.addOption(emailOption);
     // name
-    QCommandLineOption nameOption(QStringList() << "n"
-                                                << "name",
-                                  "User name.", "name", "");
+    QCommandLineOption nameOption({"n", "name"}, "User name.", "name", "");
     _parser.addOption(nameOption);
+    // priority
+    QCommandLineOption priorityOption({"p", "priority"}, "User priority.",
+                                      "priority", "0");
+    _parser.addOption(priorityOption);
     // password
     QCommandLineOption passwordOption("password", "User password.", "password",
                                       "");

@@ -43,6 +43,7 @@ class QueuedUser : public QObject
     Q_PROPERTY(QString name READ name WRITE setName)
     Q_PROPERTY(QString password READ password WRITE setPassword)
     Q_PROPERTY(uint permissions READ permissions WRITE setPermissions)
+    Q_PROPERTY(uint priority READ priority WRITE setPriority)
     // limits
     Q_PROPERTY(QString limits READ limits WRITE setLimits)
 
@@ -66,6 +67,7 @@ public:
         QString email;
         QString password;
         uint permissions = 0;
+        uint priority = 0;
         QString limits;
     } QueuedUserDefinitions;
 
@@ -164,6 +166,11 @@ public:
      * @return sum of user permissions from QueuedUser::Permissions
      */
     uint permissions() const;
+    /**
+     * @brief user max priority
+     * @return user maximal priority value
+     */
+    uint priority() const;
     // permissions
     /**
      * @brief user limits
@@ -195,6 +202,12 @@ public:
      * new user permissions
      */
     void setPermissions(const uint _permissions);
+    /**
+     * @brief set user priority
+     * @param _priority
+     * new user priority value
+     */
+    void setPriority(const uint _priority);
     // permissions
     /**
      * @brief set limits

@@ -125,15 +125,16 @@ private:
      * working directory
      * @param _userId
      * task owner user ID
+     * @param _nice
+     * task nice level
      * @param _limits
      * task defined limits
      * @return task ID or -1 if no task added
      */
-    QueuedResult<long long> addTaskPrivate(const QString &_command,
-                                           const QStringList &_arguments,
-                                           const QString &_workingDirectory,
-                                           const long long _userId,
-                                           const QueuedLimits::Limits &_limits);
+    QueuedResult<long long>
+    addTaskPrivate(const QString &_command, const QStringList &_arguments,
+                   const QString &_workingDirectory, const long long _userId,
+                   const uint _nice, const QueuedLimits::Limits &_limits);
     /**
      * @brief add new user
      * @param _name
@@ -144,15 +145,16 @@ private:
      * user password
      * @param _permissions
      * user permissions
+     * @param _priority
+     * user priority
      * @param _limits
      * user limits
      * @return user ID or -1 if no user found
      */
-    QueuedResult<long long> addUserPrivate(const QString &_name,
-                                           const QString &_email,
-                                           const QString &_password,
-                                           const uint _permissions,
-                                           const QueuedLimits::Limits &_limits);
+    QueuedResult<long long>
+    addUserPrivate(const QString &_name, const QString &_email,
+                   const QString &_password, const uint _permissions,
+                   const uint _priority, const QueuedLimits::Limits &_limits);
     /**
      * @brief edit advanced settings
      * @param _key

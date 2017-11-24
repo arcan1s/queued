@@ -109,6 +109,8 @@ public slots:
      * working directory
      * @param user
      * user ID
+     * @param nice
+     * nice level
      * @param cpu
      * limit by CPU cores
      * @param gpu
@@ -125,9 +127,10 @@ public slots:
      */
     QDBusVariant TaskAdd(const QString &command, const QStringList &arguments,
                          const QString &workingDirectory, const qlonglong user,
-                         const qlonglong cpu, const qlonglong gpu,
-                         const qlonglong memory, const qlonglong gpumemory,
-                         const qlonglong storage, const QString &token);
+                         const uint nice, const qlonglong cpu,
+                         const qlonglong gpu, const qlonglong memory,
+                         const qlonglong gpumemory, const qlonglong storage,
+                         const QString &token);
     /**
      * @brief edit task
      * @param id
@@ -202,6 +205,8 @@ public slots:
      * user password
      * @param permissions
      * user permissions
+     * @param priority
+     * user permissions
      * @param cpu
      * limit by CPU cores
      * @param gpu
@@ -218,9 +223,10 @@ public slots:
      */
     QDBusVariant UserAdd(const QString &name, const QString &email,
                          const QString &password, const uint permissions,
-                         const qlonglong cpu, const qlonglong gpu,
-                         const qlonglong memory, const qlonglong gpumemory,
-                         const qlonglong storage, const QString &token);
+                         const uint priority, const qlonglong cpu,
+                         const qlonglong gpu, const qlonglong memory,
+                         const qlonglong gpumemory, const qlonglong storage,
+                         const QString &token);
     /**
      * @brief edit user
      * @param id

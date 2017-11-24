@@ -56,7 +56,7 @@ QueuedResult<bool> QueuedCorePrivate::addPlugin(const QString &_plugin,
  */
 QueuedResult<long long> QueuedCorePrivate::addTask(
     const QString &_command, const QStringList &_arguments,
-    const QString &_workingDirectory, const long long _userId,
+    const QString &_workingDirectory, const long long _userId, const uint _nice,
     const QueuedLimits::Limits &_limits, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
@@ -93,18 +93,17 @@ QueuedResult<long long> QueuedCorePrivate::addTask(
     }
 
     return m_helper->addTaskPrivate(_command, _arguments, _workingDirectory,
-                                    _userId, _limits);
+                                    _userId, _nice, _limits);
 }
 
 
 /**
  * @fn addUser
  */
-QueuedResult<long long>
-QueuedCorePrivate::addUser(const QString &_name, const QString &_email,
-                           const QString &_password, const uint _permissions,
-                           const QueuedLimits::Limits &_limits,
-                           const QString &_token)
+QueuedResult<long long> QueuedCorePrivate::addUser(
+    const QString &_name, const QString &_email, const QString &_password,
+    const uint _permissions, const uint _priority,
+    const QueuedLimits::Limits &_limits, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
                      << "and permissions" << _permissions;
@@ -126,7 +125,7 @@ QueuedCorePrivate::addUser(const QString &_name, const QString &_email,
     }
 
     return m_helper->addUserPrivate(_name, _email, _password, _permissions,
-                                    _limits);
+                                    _priority, _limits);
 }
 
 
@@ -245,6 +244,9 @@ QueuedResult<bool> QueuedCorePrivate::editTask(const long long _id,
     QVariantHash payload
         = isAdmin ? _taskData
                   : m_helper->dropAdminFields(QueuedDB::TASKS_TABLE, _taskData);
+    if (payload.contains("nice"))
+        payload["nice"]
+            = std::min(payload["nice"].toUInt(), authUser->priority());
 
     return m_helper->editTaskPrivate(_id, payload);
 }

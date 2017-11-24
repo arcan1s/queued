@@ -212,8 +212,8 @@ long long QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
     // build query
     QSqlQuery query = m_database.exec(QString("INSERT INTO %1 (%2) VALUES (%3)")
                                           .arg(_table)
-                                          .arg(payload.first.join(','))
-                                          .arg(payload.second.join(',')));
+                                          .arg(payload.keys().join(','))
+                                          .arg(payload.values().join(',')));
     QSqlError error = query.lastError();
     if (error.isValid()) {
         qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
@@ -236,10 +236,8 @@ bool QueuedDatabase::modify(const QString &_table, const long long _id,
 
     auto payload = getQueryPayload(_table, _value);
     QStringList stringPayload;
-    for (int i = 0; i < payload.first.count(); i++)
-        stringPayload.append(QString("%1=%2")
-                                 .arg(payload.first.at(i))
-                                 .arg(payload.second.at(i)));
+    for (auto &key : payload.keys())
+        stringPayload.append(QString("%1=%2").arg(key).arg(payload[key]));
     // build query
     QSqlQuery query = m_database.exec(QString("UPDATE %1 SET %2 WHERE _id=%3")
                                           .arg(_table)
@@ -427,14 +425,13 @@ long long QueuedDatabase::lastInsertionId(const QString &_table) const
 /**
  * @fn getQueryPayload
  */
-QPair<QStringList, QStringList>
+QHash<QString, QString>
 QueuedDatabase::getQueryPayload(const QString &_table,
                                 const QVariantHash &_value) const
 {
     qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
 
-    QStringList keys;
-    QStringList values;
+    QHash<QString, QString> output;
     QStringList schemaColumns = QueuedDB::DBSchema[_table].keys();
     for (auto &key : _value.keys()) {
         if (!schemaColumns.contains(key)) {
@@ -446,9 +443,8 @@ QueuedDatabase::getQueryPayload(const QString &_table,
             qCWarning(LOG_LIB) << "Modifying record ID is not allowed";
             continue;
         }
-        keys.append(key);
-        values.append(QString("'%1'").arg(_value[key].toString()));
+        output[key] = QString("'%1'").arg(_value[key].toString());
     }
 
-    return {keys, values};
+    return output;
 }
