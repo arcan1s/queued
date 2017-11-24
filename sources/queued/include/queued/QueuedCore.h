@@ -196,9 +196,11 @@ public:
      * @brief get value from advanced settings
      * @param _key
      * key string
+     * @param _token
+     * user auth token
      * @return option value or empty QVariant
      */
-    QueuedResult<QVariant> option(const QString &_key);
+    QueuedResult<QVariant> option(const QString &_key, const QString &_token);
     /**
      * @brief usage report
      * @param _from

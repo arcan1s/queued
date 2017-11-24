@@ -22,6 +22,7 @@
 
 
 #include <queued/Queued.h>
+#include <queued/QueuedStaticConfig.h>
 
 
 /**
@@ -136,6 +137,32 @@ QueuedAdvancedSettings::internalId(const QueuedConfig::QueuedSettings _key)
     }
 
     return "";
+}
+
+
+/**
+ * @fn isAdmin
+ */
+bool QueuedAdvancedSettings::isAdmin(const QString &_key) const
+{
+    qCDebug(LOG_LIB) << "Check if admin option" << _key;
+
+    if ((_key.startsWith("Plugin.")) || (_key.startsWith("plugin.")))
+        return true;
+    else
+        return QueuedConfig::QueuedSettingsDefaults[internalId(_key)].isAdmin;
+}
+
+
+/**
+ * @fn isAdmin
+ */
+bool QueuedAdvancedSettings::isAdmin(
+    const QueuedConfig::QueuedSettings &_key) const
+{
+    qCDebug(LOG_LIB) << "Check if admin option" << static_cast<int>(_key);
+
+    return QueuedConfig::QueuedSettingsDefaults[internalId(_key)].isAdmin;
 }
 
 

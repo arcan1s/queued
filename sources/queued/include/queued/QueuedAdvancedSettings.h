@@ -89,6 +89,20 @@ public:
      */
     static QString internalId(const QueuedConfig::QueuedSettings _key);
     /**
+     * @brief check whether requested option is admin only
+     * @param _key
+     * key to search in
+     * @return true if this value is hidden for non-admins
+     */
+    bool isAdmin(const QString &_key) const;
+    /**
+     * @brief check whether requested option is admin only
+     * @param _key
+     * key to search in
+     * @return true if this value is hidden for non-admins
+     */
+    bool isAdmin(const QueuedConfig::QueuedSettings &_key) const;
+    /**
      * @brief set value
      * @param _key
      * key to change

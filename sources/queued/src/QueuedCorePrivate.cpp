@@ -333,11 +333,18 @@ QueuedCorePrivate::hashFromPassword(const QString &_password)
 /**
  * @fn option
  */
-QueuedResult<QVariant> QueuedCorePrivate::option(const QString &_key)
+QueuedResult<QVariant> QueuedCorePrivate::option(const QString &_key,
+                                                 const QString &_token)
 {
     qCDebug(LOG_LIB) << "Look for option" << _key;
 
-    return m_advancedSettings->get(_key);
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
+
+    if ((isAdmin) || (!m_advancedSettings->isAdmin(_key)))
+        return m_advancedSettings->get(_key);
+    else
+        return QueuedError("Not allowed",
+                           QueuedEnums::ReturnStatus::InsufficientPermissions);
 }
 
 

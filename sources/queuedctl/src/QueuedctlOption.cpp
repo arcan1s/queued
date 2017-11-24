@@ -38,12 +38,12 @@ QueuedctlOption::editOption(const QString &_option, const QVariant &_value,
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlOption::getOption(const QString &_option)
+QueuedctlOption::getOption(const QString &_option, const QString &_token)
 {
     qCDebug(LOG_APP) << "Get option" << _option;
 
     QueuedctlCommon::QueuedctlResult output;
-    auto res = QueuedCoreAdaptor::getOption(_option);
+    auto res = QueuedCoreAdaptor::getOption(_option, _token);
     res.match(
         [&output](const QVariant &val) {
             output.status = val.isValid();

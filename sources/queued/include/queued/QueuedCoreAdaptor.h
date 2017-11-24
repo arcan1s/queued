@@ -194,16 +194,22 @@ sendUserPermissionRemove(const long long _id,
  * @brief get option
  * @param _property
  * option name
+ * @param _token
+ * user auth token
  * @return option value
  */
-QueuedResult<QVariant> getOption(const QString &_property);
+QueuedResult<QVariant> getOption(const QString &_property,
+                                 const QString &_token);
 /**
  * @brief get option
  * @param _property
  * option name
+ * @param _token
+ * user auth token
  * @return option value
  */
-QueuedResult<QVariant> getOption(const QueuedConfig::QueuedSettings _property);
+QueuedResult<QVariant> getOption(const QueuedConfig::QueuedSettings _property,
+                                 const QString &_token);
 /**
  * @brief performance report
  * @param _from

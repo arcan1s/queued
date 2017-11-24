@@ -42,8 +42,8 @@ QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
 
 QVariantHash QueuedTcpServerResponseHelperPlugins::listPlugins()
 {
-    auto res
-        = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins);
+    auto res = QueuedCoreAdaptor::getOption(
+        QueuedConfig::QueuedSettings::Plugins, "");
 
     QVariantHash output;
     res.match(

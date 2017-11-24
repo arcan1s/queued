@@ -39,8 +39,8 @@ QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
 
 QueuedctlCommon::QueuedctlResult QueuedctlPlugins::listPlugins()
 {
-    auto res
-        = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins);
+    auto res = QueuedCoreAdaptor::getOption(
+        QueuedConfig::QueuedSettings::Plugins, "");
 
     QueuedctlCommon::QueuedctlResult output;
     res.match(

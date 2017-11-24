@@ -27,7 +27,8 @@ namespace QueuedctlOption
 QueuedctlCommon::QueuedctlResult editOption(const QString &_option,
                                             const QVariant &_value,
                                             const QString &_token);
-QueuedctlCommon::QueuedctlResult getOption(const QString &_option);
+QueuedctlCommon::QueuedctlResult getOption(const QString &_option,
+                                           const QString &_token);
 void parserGet(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
 };

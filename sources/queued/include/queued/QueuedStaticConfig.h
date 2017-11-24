@@ -132,6 +132,7 @@ enum class QueuedSettings {
 typedef struct {
     QueuedSettings id;
     QVariant defaultValue;
+    bool isAdmin = true;
 } QueuedSettingsField;
 /**
  * @typedef QueuedSettingsDefaultMap
@@ -142,20 +143,20 @@ typedef QHash<QString, QueuedSettingsField> QueuedSettingsDefaultMap;
  * @brief default settings map
  */
 static const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
-    {"", {QueuedSettings::Invalid, QVariant()}},
-    {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000}},
+    {"", {QueuedSettings::Invalid, QVariant(), false}},
+    {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000, true}},
     {"DatabaseVersion",
-     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION}},
-    {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\n0\n0\n0\n0"}},
-    {"KeepTasks", {QueuedSettings::KeepTasks, 0}},
-    {"KeepUsers", {QueuedSettings::KeepUsers, 0}},
-    {"OnExitAction", {QueuedSettings::OnExitAction, 2}},
-    {"Plugins", {QueuedSettings::Plugins, ""}},
-    {"ServerAddress", {QueuedSettings::ServerAddress, ""}},
-    {"ServerMaxConnections", {QueuedSettings::ServerMaxConnections, 30}},
-    {"ServerPort", {QueuedSettings::ServerPort, 8080}},
-    {"ServerTimeout", {QueuedSettings::ServerTimeout, -1}},
-    {"TokenExpiration", {QueuedSettings::TokenExpiration, 30}},
+     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION, true}},
+    {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\n0\n0\n0\n0", false}},
+    {"KeepTasks", {QueuedSettings::KeepTasks, 0, false}},
+    {"KeepUsers", {QueuedSettings::KeepUsers, 0, false}},
+    {"OnExitAction", {QueuedSettings::OnExitAction, 2, false}},
+    {"Plugins", {QueuedSettings::Plugins, "", false}},
+    {"ServerAddress", {QueuedSettings::ServerAddress, "", false}},
+    {"ServerMaxConnections", {QueuedSettings::ServerMaxConnections, 30, false}},
+    {"ServerPort", {QueuedSettings::ServerPort, 8080, false}},
+    {"ServerTimeout", {QueuedSettings::ServerTimeout, -1, false}},
+    {"TokenExpiration", {QueuedSettings::TokenExpiration, 30, false}},
 };
 };
 

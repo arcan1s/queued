@@ -290,11 +290,12 @@ QueuedResult<bool> QueuedCoreAdaptor::sendUserPermissionRemove(
 /**
  * @fn getOption
  */
-QueuedResult<QVariant> QueuedCoreAdaptor::getOption(const QString &_property)
+QueuedResult<QVariant> QueuedCoreAdaptor::getOption(const QString &_property,
+                                                    const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get option" << _property;
 
-    QVariantList args = {_property};
+    QVariantList args = {_property, _token};
     return sendRequest<QVariant>(QueuedConfig::DBUS_SERVICE,
                                  QueuedConfig::DBUS_PROPERTY_PATH,
                                  QueuedConfig::DBUS_SERVICE, "Option", args);
@@ -305,11 +306,12 @@ QueuedResult<QVariant> QueuedCoreAdaptor::getOption(const QString &_property)
  * @fn getOption
  */
 QueuedResult<QVariant>
-QueuedCoreAdaptor::getOption(const QueuedConfig::QueuedSettings _property)
+QueuedCoreAdaptor::getOption(const QueuedConfig::QueuedSettings _property,
+                             const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get option" << static_cast<int>(_property);
 
-    return getOption(QueuedAdvancedSettings::internalId(_property));
+    return getOption(QueuedAdvancedSettings::internalId(_property), _token);
 }
 
 

@@ -186,11 +186,12 @@ QueuedResult<QString> QueuedCore::hashFromPassword(const QString &_password)
 /**
  * @fn option
  */
-QueuedResult<QVariant> QueuedCore::option(const QString &_key)
+QueuedResult<QVariant> QueuedCore::option(const QString &_key,
+                                          const QString &_token)
 {
     qCDebug(LOG_LIB) << "Look for option" << _key;
 
-    return m_impl->option(_key);
+    return m_impl->option(_key, _token);
 }
 
 

@@ -225,7 +225,8 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::OptionGet: {
-        result = QueuedctlOption::getOption(args.at(1));
+        QString token = QueuedctlAuth::getToken(_cache, _user);
+        result = QueuedctlOption::getOption(args.at(1), token);
         break;
     }
     case QueuedctlArgument::OptionSet: {

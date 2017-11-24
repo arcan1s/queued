@@ -57,9 +57,11 @@ public slots:
      * @brief get advanced option
      * @param property
      * property name
+     * @param token
+     * user auth token
      * @return property value or empty if property not found
      */
-    QDBusVariant Option(const QString &property);
+    QDBusVariant Option(const QString &property, const QString &token);
     /**
      * @brief get task property
      * @param id

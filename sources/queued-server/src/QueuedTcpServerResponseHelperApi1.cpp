@@ -50,7 +50,8 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         break;
     case QueuedTcpServerResponseHelper::RequestPath::Option:
         if (_type == "GET")
-            output = QueuedTcpServerResponseHelperOption::getOption(_arg);
+            output
+                = QueuedTcpServerResponseHelperOption::getOption(_arg, _token);
         else if (_type == "POST")
             output = QueuedTcpServerResponseHelperOption::setOption(_arg, _data,
                                                                     _token);

@@ -56,11 +56,12 @@ QueuedPropertyInterface::~QueuedPropertyInterface()
 /**
  * @fn Option
  */
-QDBusVariant QueuedPropertyInterface::Option(const QString &property)
+QDBusVariant QueuedPropertyInterface::Option(const QString &property,
+                                             const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get property" << property;
 
-    return QueuedCoreAdaptor::toDBusVariant(m_core->option(property));
+    return QueuedCoreAdaptor::toDBusVariant(m_core->option(property, token));
 }
 
 

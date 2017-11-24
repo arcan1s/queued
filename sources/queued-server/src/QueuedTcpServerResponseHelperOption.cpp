@@ -20,11 +20,12 @@
 
 
 QVariantHash
-QueuedTcpServerResponseHelperOption::getOption(const QString &_option)
+QueuedTcpServerResponseHelperOption::getOption(const QString &_option,
+                                               const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get option" << _option;
 
-    auto res = QueuedCoreAdaptor::getOption(_option);
+    auto res = QueuedCoreAdaptor::getOption(_option, _token);
 
     QVariantHash output;
     res.match(
