@@ -253,9 +253,11 @@ public:
      * @brief get task by ID
      * @param _id
      * task ID
+     * @param _token
+     * user auth token
      * @return task object or nullptr if no task found
      */
-    const QueuedProcess *task(const long long _id) const;
+    const QueuedProcess *task(const long long _id, const QString &_token) const;
     /**
      * list of tasks which match criteria
      * @param _user
@@ -276,16 +278,20 @@ public:
      * @brief get user by ID
      * @param _id
      * user ID
+     * @param _token
+     * user auth token
      * @return user object or nullptr if no user found
      */
-    const QueuedUser *user(const long long _id) const;
+    const QueuedUser *user(const long long _id, const QString &_token) const;
     /**
      * @brief get user by name
      * @param _name
      * user name
+     * @param _token
+     * user auth token
      * @return user object or nullptr if no user found
      */
-    const QueuedUser *user(const QString &_name) const;
+    const QueuedUser *user(const QString &_name, const QString &_token) const;
     /**
      * list of users which match criteria
      * @param _lastLogged

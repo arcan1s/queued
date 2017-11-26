@@ -39,6 +39,7 @@ void QueuedEmailNotify::init(const QVariantHash &_settings)
 void QueuedEmailNotify::setToken(const QString &_token)
 {
     m_token = _token;
+    m_helper->setToken(_token);
 }
 
 

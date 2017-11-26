@@ -69,11 +69,12 @@ QDBusVariant QueuedPropertyInterface::Option(const QString &property,
  * @fn Task
  */
 QDBusVariant QueuedPropertyInterface::Task(const long long id,
-                                           const QString &property)
+                                           const QString &property,
+                                           const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from task" << id;
 
-    auto task = m_core->task(id);
+    auto task = m_core->task(id, token);
     if (!task) {
         qCWarning(LOG_DBUS) << "Could not find task" << id;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(
@@ -99,11 +100,12 @@ QDBusVariant QueuedPropertyInterface::Task(const long long id,
  * @fn User
  */
 QDBusVariant QueuedPropertyInterface::User(const long long id,
-                                           const QString &property)
+                                           const QString &property,
+                                           const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from user" << id;
 
-    auto user = m_core->user(id);
+    auto user = m_core->user(id, token);
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << id;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(
@@ -128,11 +130,12 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
 /**
  * @fn UserIdByName
  */
-QDBusVariant QueuedPropertyInterface::UserIdByName(const QString &name)
+QDBusVariant QueuedPropertyInterface::UserIdByName(const QString &name,
+                                                   const QString &token)
 {
     qCDebug(LOG_DBUS) << "Look for user ID" << name;
 
-    auto user = m_core->user(name);
+    auto user = m_core->user(name, token);
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << name;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<long long>(

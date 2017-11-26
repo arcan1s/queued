@@ -28,7 +28,8 @@ QVariantHash addOrEditUser(const QString &_user, const QVariantHash &_data,
                            const QString &_token);
 QueuedUser::QueuedUserDefinitions getDefinitions(const QVariantHash &_data);
 QVariantHash getReport(const QVariantHash &_data, const QString &_token);
-QVariantHash getUser(const QString &_user, const QVariantHash &_data);
+QVariantHash getUser(const QString &_user, const QVariantHash &_data,
+                     const QString &_token);
 QVariantHash getUsers(const QVariantHash &_data, const QString &_token);
 };
 

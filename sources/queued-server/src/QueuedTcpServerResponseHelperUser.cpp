@@ -26,7 +26,7 @@ QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(
     qCDebug(LOG_SERV) << "Add user" << _user << "with data" << _data;
 
     // try define if user exists first
-    auto userIdRes = QueuedCoreAdaptor::getUserId(_user);
+    auto userIdRes = QueuedCoreAdaptor::getUserId(_user, _token);
     long long userId = -1;
     userIdRes.match([&userId](const long long val) { userId = val; },
                     [&userId](const QueuedError &) {});
@@ -116,13 +116,12 @@ QueuedTcpServerResponseHelperUser::getReport(const QVariantHash &_data,
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperUser::getUser(const QString &_user,
-                                           const QVariantHash &_data)
+QVariantHash QueuedTcpServerResponseHelperUser::getUser(
+    const QString &_user, const QVariantHash &_data, const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get user data for" << _user << _data;
 
-    auto userIdRes = QueuedCoreAdaptor::getUserId(_user);
+    auto userIdRes = QueuedCoreAdaptor::getUserId(_user, _token);
     long long userId = -1;
     userIdRes.match([&userId](const long long val) { userId = val; },
                     [](const QueuedError &) {});
@@ -133,7 +132,7 @@ QueuedTcpServerResponseHelperUser::getUser(const QString &_user,
 
     QVariantHash output = {{"code", 200}};
     if (property.isEmpty()) {
-        auto res = QueuedCoreAdaptor::getUser(userId);
+        auto res = QueuedCoreAdaptor::getUser(userId, _token);
         res.match(
             [&output](const QVariantHash &val) { output["properties"] = val; },
             [&output](const QueuedError &err) {

@@ -34,8 +34,8 @@ QueuedctlCommon::QueuedctlResult getReport(const QCommandLineParser &_parser,
 QueuedUser::QueuedUserDefinitions
 getDefinitions(const QCommandLineParser &_parser, const bool _expandAll);
 QString getPassword();
-QueuedctlCommon::QueuedctlResult getUser(const long long _id,
-                                         const QString &_property);
+QueuedctlCommon::QueuedctlResult
+getUser(const long long _id, const QString &_property, const QString &_token);
 QueuedctlCommon::QueuedctlResult getUsers(const QCommandLineParser &_parser,
                                           const QString &_token);
 void parserAdd(QCommandLineParser &_parser);

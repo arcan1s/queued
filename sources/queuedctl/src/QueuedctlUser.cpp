@@ -137,14 +137,15 @@ QString QueuedctlUser::getPassword()
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlUser::getUser(const long long _id, const QString &_property)
+QueuedctlUser::getUser(const long long _id, const QString &_property,
+                       const QString &_token)
 {
     qCDebug(LOG_APP) << "Get property" << _property << "from user" << _id;
 
     QueuedctlCommon::QueuedctlResult output;
 
     if (_property.isEmpty()) {
-        auto res = QueuedCoreAdaptor::getUser(_id);
+        auto res = QueuedCoreAdaptor::getUser(_id, _token);
         res.match(
             [&output](const QVariantHash &val) {
                 output.status = true;

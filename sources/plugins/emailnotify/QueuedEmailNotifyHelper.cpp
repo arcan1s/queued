@@ -102,6 +102,12 @@ QString QueuedEmailNotifyHelper::server() const
 }
 
 
+QString QueuedEmailNotifyHelper::token() const
+{
+    return m_token;
+}
+
+
 QString QueuedEmailNotifyHelper::username() const
 {
     return m_username;
@@ -153,6 +159,12 @@ void QueuedEmailNotifyHelper::setSslEnabled(const bool _sslEnabled)
     qCDebug(LOG_PL) << "Set ssl enabled" << _sslEnabled;
 
     m_ssl = _sslEnabled;
+}
+
+
+void QueuedEmailNotifyHelper::setToken(const QString &_token)
+{
+    m_token = _token;
 }
 
 
@@ -215,14 +227,14 @@ QString QueuedEmailNotifyHelper::getEmail(const long long _id) const
 {
     qCDebug(LOG_PL) << "Get email for task ID" << _id;
 
-    auto task = QueuedCoreAdaptor::getTask(_id, "user");
+    auto task = QueuedCoreAdaptor::getTask(_id, "user", token());
     if (task.type() != Result::Content::Value) {
         qCWarning(LOG_LIB) << "Could not get task information" << _id;
         return "";
     }
 
     auto userId = task.get().toLongLong();
-    auto user = QueuedCoreAdaptor::getUser(userId, "email");
+    auto user = QueuedCoreAdaptor::getUser(userId, "email", token());
     if (user.type() != Result::Content::Value) {
         qCWarning(LOG_LIB) << "Could not get user information" << userId;
         return "";

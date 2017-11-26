@@ -30,9 +30,10 @@ QueuedctlCommon::QueuedctlResult
 addTask(const QueuedProcess::QueuedProcessDefinitions &_definitions,
         const QString &_token);
 QueuedProcess::QueuedProcessDefinitions
-getDefinitions(const QCommandLineParser &_parser, const bool _expandAll);
-QueuedctlCommon::QueuedctlResult getTask(const long long _id,
-                                         const QString &_property);
+getDefinitions(const QCommandLineParser &_parser, const bool _expandAll,
+               const QString &_token);
+QueuedctlCommon::QueuedctlResult
+getTask(const long long _id, const QString &_property, const QString &_token);
 QueuedctlCommon::QueuedctlResult getTasks(const QCommandLineParser &_parser,
                                           const QString &_token);
 void parserAdd(QCommandLineParser &_parser);

@@ -151,7 +151,7 @@ QDBusVariant QueuedCoreInterface::TaskEdit(
                       << nice << uid << gid << cpu << gpu << memory << gpumemory
                       << storage;
 
-    auto task = m_core->task(id);
+    auto task = m_core->task(id, token);
     if (!task) {
         qCWarning(LOG_DBUS) << "Could not find task" << id;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<bool>(
@@ -258,7 +258,7 @@ QueuedCoreInterface::UserEdit(const qlonglong id, const QString &name,
                       << memory << gpumemory << storage;
 
     // get user object first to match limits
-    auto user = m_core->user(id);
+    auto user = m_core->user(id, token);
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << id;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<bool>(

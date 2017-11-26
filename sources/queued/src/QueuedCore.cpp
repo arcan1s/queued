@@ -258,11 +258,12 @@ QueuedResult<bool> QueuedCore::stopTask(const long long _id,
 /**
  * @fn task
  */
-const QueuedProcess *QueuedCore::task(const long long _id) const
+const QueuedProcess *QueuedCore::task(const long long _id,
+                                      const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get task by ID" << _id;
 
-    return m_impl->task(_id);
+    return m_impl->task(_id, _token);
 }
 
 
@@ -282,22 +283,24 @@ QueuedCore::taskReport(const long long _user, const QDateTime &_from,
 /**
  * @fn user
  */
-const QueuedUser *QueuedCore::user(const long long _id) const
+const QueuedUser *QueuedCore::user(const long long _id,
+                                   const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get user by ID" << _id;
 
-    return m_impl->user(_id);
+    return m_impl->user(_id, _token);
 }
 
 
 /**
  * @fn user
  */
-const QueuedUser *QueuedCore::user(const QString &_name) const
+const QueuedUser *QueuedCore::user(const QString &_name,
+                                   const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get user by name" << _name;
 
-    return m_impl->user(_name);
+    return m_impl->user(_name, _token);
 }
 
 

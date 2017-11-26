@@ -346,11 +346,12 @@ QueuedResult<QueuedStatusMap> QueuedCoreAdaptor::getStatus()
 /**
  * @fn getTask
  */
-QueuedResult<QVariantHash> QueuedCoreAdaptor::getTask(const long long _id)
+QueuedResult<QVariantHash> QueuedCoreAdaptor::getTask(const long long _id,
+                                                      const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get task properties" << _id;
 
-    auto res = getTask(_id, "");
+    auto res = getTask(_id, "", _token);
 
     QueuedResult<QVariantHash> output;
     res.match(
@@ -367,11 +368,12 @@ QueuedResult<QVariantHash> QueuedCoreAdaptor::getTask(const long long _id)
  * @fn getTask
  */
 QueuedResult<QVariant> QueuedCoreAdaptor::getTask(const long long _id,
-                                                  const QString &_property)
+                                                  const QString &_property,
+                                                  const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get task property" << _id << _property;
 
-    QVariantList args = {_id, _property};
+    QVariantList args = {_id, _property, _token};
     return sendRequest<QVariant>(QueuedConfig::DBUS_SERVICE,
                                  QueuedConfig::DBUS_PROPERTY_PATH,
                                  QueuedConfig::DBUS_SERVICE, "Task", args);
@@ -398,11 +400,12 @@ QueuedCoreAdaptor::getTasks(const long long _user, const QDateTime &_from,
 /**
  * @fn getUser
  */
-QueuedResult<QVariantHash> QueuedCoreAdaptor::getUser(const long long _id)
+QueuedResult<QVariantHash> QueuedCoreAdaptor::getUser(const long long _id,
+                                                      const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get user property" << _id;
 
-    auto res = getUser(_id, "");
+    auto res = getUser(_id, "", _token);
 
     QueuedResult<QVariantHash> output;
     res.match(
@@ -419,11 +422,12 @@ QueuedResult<QVariantHash> QueuedCoreAdaptor::getUser(const long long _id)
  * @fn getUser
  */
 QueuedResult<QVariant> QueuedCoreAdaptor::getUser(const long long _id,
-                                                  const QString &_property)
+                                                  const QString &_property,
+                                                  const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get user property" << _id << _property;
 
-    QVariantList args = {_id, _property};
+    QVariantList args = {_id, _property, _token};
     return sendRequest<QVariant>(QueuedConfig::DBUS_SERVICE,
                                  QueuedConfig::DBUS_PROPERTY_PATH,
                                  QueuedConfig::DBUS_SERVICE, "User", args);
@@ -433,7 +437,8 @@ QueuedResult<QVariant> QueuedCoreAdaptor::getUser(const long long _id,
 /**
  * @fn getUserId
  */
-QueuedResult<long long> QueuedCoreAdaptor::getUserId(const QString &_name)
+QueuedResult<long long> QueuedCoreAdaptor::getUserId(const QString &_name,
+                                                     const QString &_token)
 {
     qCDebug(LOG_DBUS) << "Get user ID for" << _name;
 
@@ -442,7 +447,7 @@ QueuedResult<long long> QueuedCoreAdaptor::getUserId(const QString &_name)
     if (status)
         return stringToLong;
 
-    QVariantList args = {_name};
+    QVariantList args = {_name, _token};
     return sendRequest<long long>(
         QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_PROPERTY_PATH,
         QueuedConfig::DBUS_SERVICE, "UserIdByName", args);

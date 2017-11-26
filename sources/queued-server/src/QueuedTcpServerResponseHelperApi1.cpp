@@ -96,7 +96,7 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
     case QueuedTcpServerResponseHelper::RequestPath::Task:
         if (_type == "GET")
             output = QueuedTcpServerResponseHelperTask::getTask(
-                _arg.toLongLong(), _data);
+                _arg.toLongLong(), _data, _token);
         else if (_type == "POST")
             output = QueuedTcpServerResponseHelperTask::addOrEditTask(
                 _arg.toLongLong(), _data, _token);
@@ -114,7 +114,8 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         break;
     case QueuedTcpServerResponseHelper::RequestPath::User:
         if (_type == "GET")
-            output = QueuedTcpServerResponseHelperUser::getUser(_arg, _data);
+            output = QueuedTcpServerResponseHelperUser::getUser(_arg, _data,
+                                                                _token);
         else if (_type == "POST")
             output = QueuedTcpServerResponseHelperUser::addOrEditUser(
                 _arg, _data, _token);

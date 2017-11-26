@@ -50,7 +50,7 @@ QueuedctlCommon::QueuedctlResult QueuedctlTask::addTask(
 
 QueuedProcess::QueuedProcessDefinitions
 QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
-                              const bool _expandAll)
+                              const bool _expandAll, const QString &_token)
 {
     qCDebug(LOG_APP) << "Parse task definitions from parser, expand all"
                      << _expandAll;
@@ -68,7 +68,8 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
     if (_parser.value("task-user").isEmpty()) {
         definitions.user = 0;
     } else {
-        auto res = QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
+        auto res
+            = QueuedCoreAdaptor::getUserId(_parser.value("task-user"), _token);
         res.match(
             [&definitions](const long long val) { definitions.user = val; },
             [&definitions](const QueuedError &) { definitions.user = 0; });
@@ -105,14 +106,15 @@ QueuedctlTask::getDefinitions(const QCommandLineParser &_parser,
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlTask::getTask(const long long _id, const QString &_property)
+QueuedctlTask::getTask(const long long _id, const QString &_property,
+                       const QString &_token)
 {
     qCDebug(LOG_APP) << "Get property" << _property << "from task" << _id;
 
     QueuedctlCommon::QueuedctlResult output;
 
     if (_property.isEmpty()) {
-        auto res = QueuedCoreAdaptor::getTask(_id);
+        auto res = QueuedCoreAdaptor::getTask(_id, _token);
         res.match(
             [&output](const QVariantHash &val) {
                 output.status = true;
@@ -143,7 +145,8 @@ QueuedctlTask::getTasks(const QCommandLineParser &_parser,
 {
     long long userId = -1;
     if (!_parser.value("task-user").isEmpty()) {
-        auto res = QueuedCoreAdaptor::getUserId(_parser.value("task-user"));
+        auto res
+            = QueuedCoreAdaptor::getUserId(_parser.value("task-user"), _token);
         res.match([&userId](const long long val) { userId = val; },
                   [&userId](const QueuedError &) {});
     }

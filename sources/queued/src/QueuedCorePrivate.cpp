@@ -24,7 +24,7 @@
 #include <queued/Queued.h>
 #include <queued/private/QueuedCorePrivate.h>
 
-#include "queued/QueuedDatabaseSchema.h"
+#include <queued/QueuedDatabaseSchema.h>
 
 #include <queued/private/QueuedCorePrivateHelper.h>
 
@@ -117,7 +117,7 @@ QueuedResult<long long> QueuedCorePrivate::addUser(
     }
 
     // check if already exists
-    auto userObj = user(_name);
+    auto userObj = user(_name, _token);
     if (userObj) {
         qCWarning(LOG_LIB) << "User" << _name << "already exists";
         return QueuedError("User already exists",
@@ -261,7 +261,7 @@ QueuedResult<bool> QueuedCorePrivate::editUser(const long long _id,
 {
     qCDebug(LOG_LIB) << "Edit user with ID" << _id;
 
-    auto userObj = user(_id);
+    auto userObj = user(_id, _token);
     if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
         return QueuedError("User does not exist",
@@ -508,11 +508,34 @@ QueuedResult<bool> QueuedCorePrivate::stopTask(const long long _id,
 /**
  * @fn task
  */
-const QueuedProcess *QueuedCorePrivate::task(const long long _id) const
+const QueuedProcess *QueuedCorePrivate::task(const long long _id,
+                                             const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get task by ID" << _id;
 
-    return m_processes->process(_id);
+    auto task = m_processes->process(_id);
+    if (!task) {
+        qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
+        return task;
+    }
+
+    // check permissions
+    auto authUser = m_users->user(_token, true);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _token;
+        return nullptr;
+    }
+    long long userAuthId = authUser->index();
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
+
+    if (isAdmin) {
+        return task;
+    } else if (userAuthId == task->user()) {
+        return task;
+    } else {
+        qCInfo(LOG_LIB) << "User" << _token << "not allowed to get task" << _id;
+        return nullptr;
+    }
 }
 
 
@@ -554,22 +577,48 @@ QueuedCorePrivate::taskReport(const long long _user, const QDateTime &_from,
 /**
  * @fn user
  */
-const QueuedUser *QueuedCorePrivate::user(const long long _id) const
+const QueuedUser *QueuedCorePrivate::user(const long long _id,
+                                          const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get user by ID" << _id;
 
-    return m_users->user(_id);
+    auto user = m_users->user(_id);
+    if (!user) {
+        qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
+        return user;
+    }
+
+    // check permissions
+    auto authUser = m_users->user(_token, true);
+    if (!authUser) {
+        qCWarning(LOG_LIB) << "Could not find auth user" << _token;
+        return nullptr;
+    }
+    long long userAuthId = authUser->index();
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
+
+    if (isAdmin) {
+        return user;
+    } else if (userAuthId == user->index()) {
+        return user;
+    } else {
+        qCInfo(LOG_LIB) << "User" << _token << "not allowed to get user" << _id;
+        return nullptr;
+    }
 }
 
 
 /**
  * @fn user
  */
-const QueuedUser *QueuedCorePrivate::user(const QString &_name) const
+const QueuedUser *QueuedCorePrivate::user(const QString &_name,
+                                          const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get user by name" << _name;
 
-    return m_users->user(_name, false);
+    auto userObj = m_users->user(_name, false);
+
+    return userObj ? user(userObj->index(), _token) : nullptr;
 }
 
 

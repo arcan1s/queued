@@ -80,8 +80,12 @@ void QueuedCorePrivate::init(const QString &_configuration)
     // init parts
     initSettings(_configuration);
     initUsers();
+    // create admin token
+    m_adminToken = m_users->authorize(m_settings->admin().name);
+
     initPlugins();
     initProcesses();
+    initReports();
 
     // settings update notifier
     m_connections
@@ -106,9 +110,8 @@ void QueuedCorePrivate::initPlugins()
         = m_advancedSettings->get(QueuedConfig::QueuedSettings::Plugins)
               .toString()
               .split('\n');
-    QString token = m_users->authorize(m_settings->admin().name);
 
-    m_plugins = m_helper->initObject(m_plugins, token);
+    m_plugins = m_helper->initObject(m_plugins, m_adminToken);
     for (auto &plugin : pluginList)
         m_plugins->loadPlugin(plugin, pluginSettings(plugin));
 }
@@ -140,6 +143,16 @@ void QueuedCorePrivate::initProcesses()
                    [this](const long long _index, const QDateTime &_time) {
                        return updateTaskTime(_index, QDateTime(), _time);
                    });
+}
+
+
+/**
+ * @fn initReports
+ */
+void QueuedCorePrivate::initReports()
+{
+    // report manager
+    m_reports = m_helper->initObject(m_reports, m_database, m_adminToken);
 }
 
 
@@ -179,8 +192,6 @@ void QueuedCorePrivate::initSettings(const QString &_configuration)
             QueuedConfig::DATABASE_VERSION);
     }
 
-    // report manager
-    m_reports = m_helper->initObject(m_reports, m_database);
     // database manager
     m_databaseManager = m_helper->initObject(m_databaseManager, m_database);
 }

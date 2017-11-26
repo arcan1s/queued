@@ -33,9 +33,11 @@
  * @fn QueuedReportManager
  */
 QueuedReportManager::QueuedReportManager(QObject *_parent,
-                                         QueuedDatabase *_database)
+                                         QueuedDatabase *_database,
+                                         const QString &_token)
     : QObject(_parent)
     , m_database(_database)
+    , m_token(_token)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 }
@@ -98,7 +100,7 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
 
         // append
         long long userId = task.value("user").toLongLong();
-        auto userObj = _core->user(userId);
+        auto userObj = _core->user(userId, m_token);
         QVariantHash currentData = hashOutput[userId];
         currentData["cpu"]
             = currentData.value("cpu", 0).toLongLong() + limits.cpu;

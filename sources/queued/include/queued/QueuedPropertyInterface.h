@@ -68,27 +68,35 @@ public slots:
      * task ID
      * @param property
      * property name
+     * @param token
+     * user auth token
      * @remark if property is empty it return map of all properties
      * @return property value or empty if task or property not found
      */
-    QDBusVariant Task(const long long id, const QString &property);
+    QDBusVariant Task(const long long id, const QString &property,
+                      const QString &token);
     /**
      * @brief get user property
      * @param id
      * user ID
      * @param property
      * property name
+     * @param token
+     * user auth token
      * @remark if property is empty it return map of all properties
      * @return property value or empty if user or property not found
      */
-    QDBusVariant User(const long long id, const QString &property);
+    QDBusVariant User(const long long id, const QString &property,
+                      const QString &token);
     /**
      * @brief get user ID by name
      * @param name
      * user name
+     * @param token
+     * user auth token
      * @return user ID or -1 if no user found
      */
-    QDBusVariant UserIdByName(const QString &name);
+    QDBusVariant UserIdByName(const QString &name, const QString &token);
 
 private:
     /**

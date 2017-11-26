@@ -29,6 +29,7 @@ class QueuedEmailNotifyHelper : public QObject
     Q_PROPERTY(int port READ port WRITE setPort)
     Q_PROPERTY(QString server READ server WRITE setServer)
     Q_PROPERTY(bool ssl READ isSslEnabled WRITE setSslEnabled)
+    Q_PROPERTY(QString token READ token WRITE setToken)
     Q_PROPERTY(QString username READ username WRITE setUsername)
 
 public:
@@ -50,6 +51,7 @@ public:
     QString password() const;
     int port() const;
     QString server() const;
+    QString token() const;
     QString username() const;
     void setFrom(const QString &_from);
     void setInsecureCurl(const bool _insecureCurl);
@@ -57,6 +59,7 @@ public:
     void setPort(const int &_port);
     void setServer(const QString &_server);
     void setSslEnabled(const bool _sslEnabled);
+    void setToken(const QString &_token);
     void setUsername(const QString &_username);
 
 public slots:
@@ -71,6 +74,7 @@ private:
     int m_port = 0;
     QString m_server;
     bool m_ssl = false;
+    QString m_token;
     QString m_username;
 };
 

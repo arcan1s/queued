@@ -219,23 +219,25 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                   : QueuedctlArgument::Invalid;
     checkArgs(args, QueuedctlArguments[command].positionalArgsCount, _parser);
 
+    QString token = (id == QueuedctlArgument::Auth)
+                        ? ""
+                        : QueuedctlAuth::getToken(_cache, _user);
+
     switch (id) {
     case QueuedctlArgument::Auth: {
         result = QueuedctlAuth::auth(_user, _cache);
         break;
     }
     case QueuedctlArgument::OptionGet: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlOption::getOption(args.at(1), token);
         break;
     }
     case QueuedctlArgument::OptionSet: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlOption::editOption(args.at(1), args.at(2), token);
         break;
     }
     case QueuedctlArgument::PermissionAdd: {
-        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
         userIdRes.match([&userId](const long long val) { userId = val; },
                         [&result](const QueuedError &err) {
@@ -243,12 +245,11 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                         });
         if (userId == -1)
             break;
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlPermissions::addPermission(userId, args.at(2), token);
         break;
     }
     case QueuedctlArgument::PermissionRemove: {
-        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
         userIdRes.match([&userId](const long long val) { userId = val; },
                         [&result](const QueuedError &err) {
@@ -256,13 +257,11 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                         });
         if (userId == -1)
             break;
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result
             = QueuedctlPermissions::removePermission(userId, args.at(2), token);
         break;
     }
     case QueuedctlArgument::PluginAdd: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlPlugins::addPlugin(args.at(1), token);
         break;
     }
@@ -271,12 +270,10 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::PluginRemove: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlPlugins::removePlugin(args.at(1), token);
         break;
     }
     case QueuedctlArgument::Report: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlUser::getReport(_parser, token);
         break;
     }
@@ -293,45 +290,40 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::TaskAdd: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
-        auto definitions = QueuedctlTask::getDefinitions(_parser, false);
+        auto definitions = QueuedctlTask::getDefinitions(_parser, false, token);
         result = QueuedctlTask::addTask(definitions, token);
         break;
     }
     case QueuedctlArgument::TaskGet: {
-        result = QueuedctlTask::getTask(args.at(1).toLongLong(), args.at(2));
+        result = QueuedctlTask::getTask(args.at(1).toLongLong(), args.at(2),
+                                        token);
         break;
     }
     case QueuedctlArgument::TaskList: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlTask::getTasks(_parser, token);
         break;
     }
     case QueuedctlArgument::TaskSet: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
-        auto definitions = QueuedctlTask::getDefinitions(_parser, true);
+        auto definitions = QueuedctlTask::getDefinitions(_parser, true, token);
         result = QueuedctlTask::setTask(args.at(1).toLongLong(), definitions,
                                         token);
         break;
     }
     case QueuedctlArgument::TaskStart: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlTask::startTask(args.at(1).toLongLong(), token);
         break;
     }
     case QueuedctlArgument::TaskStop: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlTask::stopTask(args.at(1).toLongLong(), token);
         break;
     }
     case QueuedctlArgument::UserAdd: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlUser::getDefinitions(_parser, false);
         result = QueuedctlUser::addUser(definitions, token);
         break;
     }
     case QueuedctlArgument::UserGet: {
-        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
         userIdRes.match([&userId](const long long val) { userId = val; },
                         [&result](const QueuedError &err) {
@@ -339,16 +331,15 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                         });
         if (userId == -1)
             break;
-        result = QueuedctlUser::getUser(userId, args.at(2));
+        result = QueuedctlUser::getUser(userId, args.at(2), token);
         break;
     }
     case QueuedctlArgument::UserList: {
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         result = QueuedctlUser::getUsers(_parser, token);
         break;
     }
     case QueuedctlArgument::UserSet: {
-        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1));
+        auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
         userIdRes.match([&userId](const long long val) { userId = val; },
                         [&result](const QueuedError &err) {
@@ -356,7 +347,6 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                         });
         if (userId == -1)
             break;
-        QString token = QueuedctlAuth::getToken(_cache, _user);
         auto definitions = QueuedctlUser::getDefinitions(_parser, true);
         result = QueuedctlUser::setUser(userId, definitions, token);
         break;

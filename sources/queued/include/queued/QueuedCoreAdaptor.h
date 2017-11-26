@@ -232,18 +232,23 @@ QueuedResult<QueuedStatusMap> getStatus();
  * @brief get all task properties
  * @param _id
  * task ID
+ * @param _token
+ * user auth token
  * @return task properties
  */
-QueuedResult<QVariantHash> getTask(const long long _id);
+QueuedResult<QVariantHash> getTask(const long long _id, const QString &_token);
 /**
  * @brief get task property
  * @param _id
  * task id
  * @param _property
  * task property name
+ * @param _token
+ * user auth token
  * @return task property value
  */
-QueuedResult<QVariant> getTask(const long long _id, const QString &_property);
+QueuedResult<QVariant> getTask(const long long _id, const QString &_property,
+                               const QString &_token);
 /**
  * @brief get tasks list
  * @param _user
@@ -264,26 +269,33 @@ QueuedResult<QList<QVariantHash>> getTasks(const long long _user,
  * @brief get user properties
  * @param _id
  * user id
+ * @param _token
+ * user auth token
  * @return user properties
  */
-QueuedResult<QVariantHash> getUser(const long long _id);
+QueuedResult<QVariantHash> getUser(const long long _id, const QString &_token);
 /**
  * @brief get user property
  * @param _id
  * user id
  * @param _property
  * user property name
+ * @param _token
+ * user auth token
  * @return user property value
  */
-QueuedResult<QVariant> getUser(const long long _id, const QString &_property);
+QueuedResult<QVariant> getUser(const long long _id, const QString &_property,
+                               const QString &_token);
 /**
  * @brief get user ID
  * @param _name
  * user name
+ * @param _token
+ * user auth token
  * @return user ID or {0, -1} if no user found. If _name is numeric value it
  * returns converted one
  */
-QueuedResult<long long> getUserId(const QString &_name);
+QueuedResult<long long> getUserId(const QString &_name, const QString &_token);
 /**
  * @brief get users list
  * @param _lastLogged

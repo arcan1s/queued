@@ -26,6 +26,7 @@
 
 #include "queued/QueuedDatabaseSchema.h"
 
+#include <queued/QueuedStaticConfig.h>
 #include <queued/private/QueuedCorePrivate.h>
 
 
@@ -132,7 +133,7 @@ QueuedResult<long long> QueuedCorePrivateHelper::addTaskPrivate(
 
     // add to database
     auto ids = users()->ids(_userId);
-    auto userObj = m_core->user(_userId);
+    auto userObj = m_core->user(_userId, m_core->m_adminToken);
     if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find task user" << _userId;
         return QueuedError("Invalid token",

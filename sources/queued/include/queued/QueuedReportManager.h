@@ -47,8 +47,11 @@ public:
      * pointer to parent item
      * @param _database
      * pointer to database object
+     * @param _token
+     * user auth token
      */
-    explicit QueuedReportManager(QObject *_parent, QueuedDatabase *_database);
+    explicit QueuedReportManager(QObject *_parent, QueuedDatabase *_database,
+                                 const QString &_token);
     /**
      * @brief QueuedReportManager class destructor
      */
@@ -96,6 +99,10 @@ private:
      * @brief pointer to database object
      */
     QueuedDatabase *m_database = nullptr;
+    /**
+     * @brief object token
+     */
+    QString m_token;
 };
 
 

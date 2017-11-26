@@ -85,9 +85,8 @@ QueuedTcpServerResponseHelperTask::getDefinitions(const QVariantHash &_data)
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperTask::getTask(const long long _id,
-                                           const QVariantHash &_data)
+QVariantHash QueuedTcpServerResponseHelperTask::getTask(
+    const long long _id, const QVariantHash &_data, const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get task" << _id << _data;
 
@@ -95,7 +94,7 @@ QueuedTcpServerResponseHelperTask::getTask(const long long _id,
 
     QVariantHash output = {{"code", 200}};
     if (property.isEmpty()) {
-        auto res = QueuedCoreAdaptor::getTask(_id);
+        auto res = QueuedCoreAdaptor::getTask(_id, _token);
         res.match(
             [&output](const QVariantHash &val) { output["properties"] = val; },
             [&output](const QueuedError &err) {
@@ -152,7 +151,7 @@ QueuedTcpServerResponseHelperTask::startOrStopTask(const long long _id,
 {
     qCDebug(LOG_SERV) << "Change task state" << _id;
 
-    auto res = QueuedCoreAdaptor::getTask(_id);
+    auto res = QueuedCoreAdaptor::getTask(_id, _token);
 
     QVariantHash output;
     res.match(
