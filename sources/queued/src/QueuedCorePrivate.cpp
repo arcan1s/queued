@@ -384,11 +384,36 @@ QueuedResult<QList<QVariantHash>> QueuedCorePrivate::performanceReport(
 
 
 /**
+ * @fn plugin
+ */
+QueuedResult<QVariantHash> QueuedCorePrivate::plugin(const QString &_plugin,
+                                                     const QString &_token)
+{
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
+    if (!isAdmin)
+        return QueuedError("Not allowed",
+                           QueuedEnums::ReturnStatus::InsufficientPermissions);
+
+    auto spec = m_plugins->loadSpecification(_plugin);
+    auto map = QueuedPluginSpecification::dumpSpecification(spec);
+    // do something if we need
+
+    return map;
+}
+
+
+/**
  * @fn pluginSettings
  */
-QVariantHash QueuedCorePrivate::pluginSettings(const QString &_plugin)
+QueuedResult<QVariantHash>
+QueuedCorePrivate::pluginSettings(const QString &_plugin, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Get plugin settings for" << _plugin;
+
+    bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
+    if (!isAdmin)
+        return QueuedError("Not allowed",
+                           QueuedEnums::ReturnStatus::InsufficientPermissions);
 
     auto dbSettings
         = m_database->get(QueuedDB::SETTINGS_TABLE,
@@ -400,6 +425,15 @@ QVariantHash QueuedCorePrivate::pluginSettings(const QString &_plugin)
                       key.remove(QString("Plugin.%1.").arg(_plugin));
                       settings[key] = value["value"];
                   });
+
+    // append default
+    auto spec = m_plugins->loadSpecification(_plugin);
+    QVariantHash defaultOpts;
+    for (auto &opt : spec.options) {
+        if (settings.contains(opt.name))
+            continue;
+        settings[opt.name] = opt.defaultValue;
+    }
 
     return settings;
 }

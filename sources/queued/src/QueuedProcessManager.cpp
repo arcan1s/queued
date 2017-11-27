@@ -40,6 +40,8 @@ QueuedProcessManager::QueuedProcessManager(QObject *_parent)
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
     qRegisterMetaType<QueuedEnums::ExitAction>("QueuedEnums::ExitAction");
+
+    m_onExit = QueuedEnums::ExitAction::Terminate;
 }
 
 

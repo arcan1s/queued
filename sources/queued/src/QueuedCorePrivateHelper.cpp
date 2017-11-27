@@ -258,7 +258,9 @@ QueuedCorePrivateHelper::editPluginPrivate(const QString &_plugin,
 
     QueuedResult<bool> r;
     if (_add && !pluginList.contains(_plugin)) {
-        if (plugins()->loadPlugin(_plugin, m_core->pluginSettings(_plugin))) {
+        auto settings = m_core->pluginSettings(_plugin, m_core->m_adminToken);
+        if ((settings.type() == Result::Content::Value)
+            && (plugins()->loadPlugin(_plugin, settings.get()))) {
             pluginList.append(_plugin);
             r = true;
         }

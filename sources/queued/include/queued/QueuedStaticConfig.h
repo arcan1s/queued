@@ -47,11 +47,11 @@ namespace QueuedConfig
  * @var QueuedAdminSetup::salt
  * user passwords salt
  */
-typedef struct {
+struct QueuedAdminSetup {
     QString name;
     QString password;
     QString salt;
-} QueuedAdminSetup;
+};
 /**
  * @struct QueuedDBSetup
  * @brief structure to define database setup
@@ -68,14 +68,14 @@ typedef struct {
  * @var QueuedDBSetup::username
  * username to connect if any
  */
-typedef struct {
+struct QueuedDBSetup {
     QString driver;
     QString hostname;
     QString password;
     QString path;
     int port;
     QString username;
-} QueuedDBSetup;
+};
 /**
  * @enum QueuedSettings
  * @brief settings keys enum
@@ -129,11 +129,11 @@ enum class QueuedSettings {
  * @var QueuedSettingsField::defaultValue
  * settings default value
  */
-typedef struct {
+struct QueuedSettingsField {
     QueuedSettings id;
     QVariant defaultValue;
     bool isAdmin = true;
-} QueuedSettingsField;
+};
 /**
  * @typedef QueuedSettingsDefaultMap
  * map of settings indices to related values

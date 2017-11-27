@@ -112,8 +112,16 @@ void QueuedCorePrivate::initPlugins()
               .split('\n');
 
     m_plugins = m_helper->initObject(m_plugins, m_adminToken);
-    for (auto &plugin : pluginList)
-        m_plugins->loadPlugin(plugin, pluginSettings(plugin));
+    for (auto &plugin : pluginList) {
+        auto settings = pluginSettings(plugin, m_adminToken);
+        settings.match(
+            [this, &plugin](const QVariantHash &opts) {
+                m_plugins->loadPlugin(plugin, opts);
+            },
+            [&plugin](const QueuedError &) {
+                qCWarning(LOG_LIB) << "Could not load settings for" << plugin;
+            });
+    }
 }
 
 

@@ -58,4 +58,6 @@ macro(queued_install_plugin PLUGIN_ROOT)
 
     # install
     install (TARGETS "${PLUGIN}" DESTINATION "${QUEUED_PLUGIN_ROOT}")
+    install (FILES "${PLUGIN_ROOT}/${PLUGIN}.json" DESTINATION
+            "${QUEUED_PLUGIN_ROOT}")
 endmacro()

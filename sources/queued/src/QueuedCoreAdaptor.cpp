@@ -288,6 +288,31 @@ QueuedResult<bool> QueuedCoreAdaptor::sendUserPermissionRemove(
 
 
 /**
+ * @fn getPlugin
+ */
+QueuedResult<QueuedPluginSpecification::Plugin>
+QueuedCoreAdaptor::getPlugin(const QString &_plugin, const QString &_token)
+{
+    qCDebug(LOG_DBUS) << "Get information for plugin" << _plugin;
+
+    QVariantList args = {_plugin, _token};
+
+    auto result = sendRequest<QVariantHash>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_PROPERTY_PATH,
+        QueuedConfig::DBUS_SERVICE, "Plugin", args);
+
+    QueuedResult<QueuedPluginSpecification::Plugin> output;
+    result.match(
+        [&output](const QVariantHash &res) {
+            output = QueuedPluginSpecification::readSpecification(res);
+        },
+        [&output](const QueuedError &err) { output = err; });
+
+    return output;
+}
+
+
+/**
  * @fn getOption
  */
 QueuedResult<QVariant> QueuedCoreAdaptor::getOption(const QString &_property,

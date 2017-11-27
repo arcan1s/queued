@@ -38,6 +38,7 @@
 #include "QueuedPluginInterface.h"
 #include "QueuedPluginManager.h"
 #include "QueuedPluginManagerInterface.h"
+#include "QueuedPluginSpecification.h"
 #include "QueuedProcess.h"
 #include "QueuedProcessManager.h"
 #include "QueuedPropertyInterface.h"

@@ -27,8 +27,11 @@
 #include <QObject>
 #include <QVariant>
 
-#include "QueuedStaticConfig.h"
 
+namespace QueuedConfig
+{
+enum class QueuedSettings;
+}
 
 /**
  * @brief implementation over database stored settings

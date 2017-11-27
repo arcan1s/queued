@@ -28,9 +28,13 @@
 #include <QDBusReply>
 
 #include "QueuedProcess.h"
-#include "QueuedStaticConfig.h"
 #include "QueuedUser.h"
 
+
+namespace QueuedPluginSpecification
+{
+struct Plugin;
+};
 
 /**
  * @addtogroup QueuedCoreAdaptor
@@ -190,6 +194,16 @@ sendUserPermissionRemove(const long long _id,
                          const QueuedEnums::Permission _permission,
                          const QString &_token);
 // specific methods for properties
+/**
+ * @brief get plugin
+ * @param _plugin
+ * plugin name
+ * @param _token
+ * user auth token
+ * @return plugin specification body
+ */
+QueuedResult<QueuedPluginSpecification::Plugin>
+getPlugin(const QString &_plugin, const QString &_token);
 /**
  * @brief get option
  * @param _property

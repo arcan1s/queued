@@ -27,7 +27,7 @@
 #include <QDateTime>
 #include <QObject>
 
-#include <queued/QueuedEnums.h>
+#include "QueuedEnums.h"
 
 
 class QueuedCore;

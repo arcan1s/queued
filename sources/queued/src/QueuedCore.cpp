@@ -209,13 +209,26 @@ QueuedCore::performanceReport(const QDateTime &_from, const QDateTime &_to,
 
 
 /**
+ * @fn plugin
+ */
+QueuedResult<QVariantHash> QueuedCore::plugin(const QString &_plugin,
+                                              const QString &_token)
+{
+    qCDebug(LOG_LIB) << "Get data for plugin" << _plugin;
+
+    return m_impl->plugin(_plugin, _token);
+}
+
+
+/**
  * @fn pluginSettings
  */
-QVariantHash QueuedCore::pluginSettings(const QString &_plugin)
+QueuedResult<QVariantHash> QueuedCore::pluginSettings(const QString &_plugin,
+                                                      const QString &_token)
 {
     qCDebug(LOG_LIB) << "Get plugin settings for" << _plugin;
 
-    return m_impl->pluginSettings(_plugin);
+    return m_impl->pluginSettings(_plugin, _token);
 }
 
 

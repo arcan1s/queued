@@ -28,11 +28,14 @@
 #include <QHash>
 #include <QObject>
 
-#include "QueuedEnums.h"
 #include "QueuedProcess.h"
 
 
 class QueuedPluginManagerInterface;
+namespace QueuedEnums
+{
+enum class ExitAction;
+};
 
 /**
  * @brief implementation over QProcess to run processes
@@ -183,7 +186,7 @@ private:
     /**
      * @brief action on exit
      */
-    QueuedEnums::ExitAction m_onExit = QueuedEnums::ExitAction::Terminate;
+    QueuedEnums::ExitAction m_onExit;
     /**
      * @brief processes list
      */

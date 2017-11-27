@@ -41,6 +41,9 @@ QueuedPropertyInterface::QueuedPropertyInterface(QueuedCore *parent)
 
     qRegisterMetaType<QueuedResult<QVariant>>("QueuedResult<QVariant>");
     qDBusRegisterMetaType<QueuedResult<QVariant>>();
+
+    qRegisterMetaType<QueuedResult<QVariantHash>>("QueuedResult<QVariantHash>");
+    qDBusRegisterMetaType<QueuedResult<QVariantHash>>();
 }
 
 
@@ -50,6 +53,18 @@ QueuedPropertyInterface::QueuedPropertyInterface(QueuedCore *parent)
 QueuedPropertyInterface::~QueuedPropertyInterface()
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
+}
+
+
+/**
+ * @fn Plugin
+ */
+QDBusVariant QueuedPropertyInterface::Plugin(const QString &plugin,
+                                             const QString &token)
+{
+    qCDebug(LOG_DBUS) << "Get plugin" << plugin;
+
+    return QueuedCoreAdaptor::toDBusVariant(m_core->plugin(plugin, token));
 }
 
 

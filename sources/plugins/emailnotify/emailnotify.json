@@ -1,0 +1,44 @@
+{
+    "author": "Queued team",
+    "description": "Send email on job updates",
+    "homepage": "https://github.com/arcan1s/queued",
+    "license": "MIT",
+
+    "options": {
+        "From": {
+            "default": "mail@example.com",
+            "description": "from email field",
+            "type": "string"
+        },
+        "InsecureCurl": {
+            "default": false,
+            "description": "ignore insecure warnings",
+            "type": "boolean"
+        },
+        "Password": {
+            "default": "",
+            "description": "email service auth password",
+            "type": "string"
+        },
+        "Port": {
+            "default": 465,
+            "description": "email service port",
+            "type": "integer"
+        },
+        "Server": {
+            "default": "smtp://smtp.example.com",
+            "description": "email server url",
+            "type": "string"
+        },
+        "UseSSL": {
+            "default": false,
+            "description": "use ssl for connection",
+            "type": "boolean"
+        },
+        "Username": {
+            "default": "",
+            "description": "email service auth username",
+            "type": "string"
+        }
+    }
+}

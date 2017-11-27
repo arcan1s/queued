@@ -31,6 +31,10 @@
 
 class QueuedPluginInterface;
 class QueuedPluginManagerInterface;
+namespace QueuedPluginSpecification
+{
+struct Plugin;
+};
 
 /**
  * @brief report manager for queued
@@ -79,6 +83,13 @@ public:
      * @return true on success load otherwise return false
      */
     bool loadPlugin(const QString &_name, const QVariantHash &_settings);
+    /**
+     * @brief load plugin specification
+     * @param _name
+     * plugin name
+     * @return plugin specification object
+     */
+    QueuedPluginSpecification::Plugin loadSpecification(const QString &_name);
     /**
      * @brief path to plugin location
      * @return full path to plugin location

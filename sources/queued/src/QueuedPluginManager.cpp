@@ -55,7 +55,7 @@ QueuedPluginManager::~QueuedPluginManager()
     for (auto &plugin : plugins)
         unloadPlugin(plugin);
 
-    delete m_interface;
+    m_interface->deleteLater();
 }
 
 
@@ -140,6 +140,29 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
     }
 
     return m_plugins.contains(_name);
+}
+
+
+QueuedPluginSpecification::Plugin
+QueuedPluginManager::loadSpecification(const QString &_name)
+{
+    qCDebug(LOG_PL) << "Load specification for" << _name;
+
+    QString jsonName = QString("%1.json").arg(_name);
+    QString path;
+    for (auto &dir : pluginLocations()) {
+        if (!QDir(dir).entryList(QDir::Files).contains(jsonName))
+            continue;
+        path = QString("%1/%2").arg(dir).arg(jsonName);
+        break;
+    }
+
+    if (path.isEmpty()) {
+        qCWarning(LOG_PL) << "Could not find" << jsonName;
+        return QueuedPluginSpecification::Plugin();
+    } else {
+        return QueuedPluginSpecification::readSpecification(path);
+    }
 }
 
 

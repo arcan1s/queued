@@ -28,8 +28,12 @@
 #include <QVariant>
 
 #include "QueuedEnums.h"
-#include "QueuedLimits.h"
 
+
+namespace QueuedLimits
+{
+struct Limits;
+};
 
 /**
  * @brief representation of user in queued
@@ -62,14 +66,14 @@ public:
      * @var limits
      * user defined limits
      */
-    typedef struct {
+    struct QueuedUserDefinitions {
         QString name;
         QString email;
         QString password;
         uint permissions = 0;
         uint priority = 0;
         QString limits;
-    } QueuedUserDefinitions;
+    };
 
     /**
      * @brief QueuedUser class constructor

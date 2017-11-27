@@ -27,10 +27,12 @@
 #include <QDateTime>
 #include <QProcess>
 
-#include "QueuedLimits.h"
-
 
 class QueuedControlGroupsAdaptor;
+namespace QueuedLimits
+{
+struct Limits;
+};
 
 /**
  * @brief implementation over QProcess to run processes
@@ -78,7 +80,7 @@ public:
      * @var QueuedProcessDefinitions::limits
      * task limits
      */
-    typedef struct {
+    struct QueuedProcessDefinitions {
         QString command;
         QStringList arguments;
         QString workingDirectory;
@@ -89,7 +91,7 @@ public:
         QDateTime endTime;
         long long user = 0;
         QString limits;
-    } QueuedProcessDefinitions;
+    };
 
     /**
      * @brief QueuedProcess class constructor

@@ -27,7 +27,6 @@
 #include <QHash>
 #include <QObject>
 
-#include "QueuedEnums.h"
 #include "QueuedUser.h"
 
 

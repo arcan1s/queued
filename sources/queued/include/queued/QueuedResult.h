@@ -28,6 +28,7 @@
 
 #include <result/result.hpp>
 
+
 namespace QueuedEnums
 {
 enum class ReturnStatus;
@@ -98,6 +99,7 @@ Q_DECLARE_METATYPE(QueuedResult<QString>)
 Q_DECLARE_METATYPE(QueuedResult<QStringList>)
 Q_DECLARE_METATYPE(QueuedResult<QVariant>)
 Q_DECLARE_METATYPE(QueuedResult<QList<QVariantHash>>)
+Q_DECLARE_METATYPE(QueuedResult<QVariantHash>)
 Q_DECLARE_METATYPE(QueuedResult<QueuedStatusMap>)
 /**
  * @brief DBus marshalling method

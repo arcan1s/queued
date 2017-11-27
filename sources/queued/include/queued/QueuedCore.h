@@ -26,14 +26,20 @@
 
 #include <QObject>
 
-#include "QueuedEnums.h"
-#include "QueuedLimits.h"
 #include "QueuedResult.h"
 
 
 class QueuedCorePrivate;
 class QueuedProcess;
 class QueuedUser;
+namespace QueuedEnums
+{
+enum class Permission;
+};
+namespace QueuedLimits
+{
+struct Limits;
+}
 
 /**
  * @brief aggregator of queued classes
@@ -215,12 +221,25 @@ public:
     performanceReport(const QDateTime &_from, const QDateTime &_to,
                       const QString &_token) const;
     /**
+     * @brief get plugin description
+     * @param _plugin
+     * plugin name
+     * @param _token
+     * user auth token
+     * @return dictionary of PluginSpecification representation
+     */
+    QueuedResult<QVariantHash> plugin(const QString &_plugin,
+                                      const QString &_token);
+    /**
      * @brief get plugin settings
      * @param _plugin
      * plugin name
+     * @param _token
+     * user auth token
      * @return hash of plugin settings
      */
-    QVariantHash pluginSettings(const QString &_plugin);
+    QueuedResult<QVariantHash> pluginSettings(const QString &_plugin,
+                                              const QString &_token);
     /**
      * @brief remove plugin from autoload and unload it now
      * @param _plugin
