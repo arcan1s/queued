@@ -68,6 +68,13 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         else
             output = {{"code", 405}};
         break;
+    case QueuedTcpServerResponseHelper::RequestPath::Plugin:
+        if (_type == "GET")
+            output
+                = QueuedTcpServerResponseHelperPlugins::getPlugin(_arg, _token);
+        else
+            output = {{"code", 405}};
+        break;
     case QueuedTcpServerResponseHelper::RequestPath::Plugins:
         if (_type == "DELETE")
             output = QueuedTcpServerResponseHelperPlugins::removePlugin(_arg,

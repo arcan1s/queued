@@ -23,6 +23,7 @@
 namespace QueuedTcpServerResponseHelperPlugins
 {
 QVariantHash addPlugin(const QString &_name, const QString &_token);
+QVariantHash getPlugin(const QString &_name, const QString &_token);
 QVariantHash listPlugins();
 QVariantHash removePlugin(const QString &_name, const QString &_token);
 };

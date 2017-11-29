@@ -40,6 +40,29 @@ QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
 }
 
 
+QVariantHash
+QueuedTcpServerResponseHelperPlugins::getPlugin(const QString &_name,
+                                                const QString &_token)
+{
+    qCDebug(LOG_SERV) << "Get plugin" << _name;
+
+    auto res = QueuedCoreAdaptor::getPlugin(_name, _token);
+
+    QVariantHash output;
+    res.match(
+        [&output](const QueuedPluginSpecification::Plugin &val) {
+            auto dump = QueuedPluginSpecification::dumpSpecification(val);
+            QVariantList plugins = {dump};
+            output = {{"code", 200}, {"plugins", plugins}};
+        },
+        [&output](const QueuedError &err) {
+            output = {{"code", 500}, {"message", err.message().c_str()}};
+        });
+
+    return output;
+}
+
+
 QVariantHash QueuedTcpServerResponseHelperPlugins::listPlugins()
 {
     auto res = QueuedCoreAdaptor::getOption(

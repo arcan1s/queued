@@ -211,8 +211,8 @@ QueuedCore::performanceReport(const QDateTime &_from, const QDateTime &_to,
 /**
  * @fn plugin
  */
-QueuedResult<QVariantHash> QueuedCore::plugin(const QString &_plugin,
-                                              const QString &_token)
+QueuedResult<QueuedPluginSpecification::Plugin>
+QueuedCore::plugin(const QString &_plugin, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Get data for plugin" << _plugin;
 

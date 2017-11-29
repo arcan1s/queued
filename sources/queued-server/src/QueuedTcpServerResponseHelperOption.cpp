@@ -30,7 +30,8 @@ QueuedTcpServerResponseHelperOption::getOption(const QString &_option,
     QVariantHash output;
     res.match(
         [&output](const QVariant &val) {
-            output = {{"code", 200}, {"token", val}};
+            QVariantHash opt = {{"_option", val}};
+            output = {{"code", 200}, {"properties", opt}};
         },
         [&output](const QueuedError &) {
             output = {{"code", 404}, {"message", "Option not found"}};

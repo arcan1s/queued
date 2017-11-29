@@ -386,19 +386,15 @@ QueuedResult<QList<QVariantHash>> QueuedCorePrivate::performanceReport(
 /**
  * @fn plugin
  */
-QueuedResult<QVariantHash> QueuedCorePrivate::plugin(const QString &_plugin,
-                                                     const QString &_token)
+QueuedResult<QueuedPluginSpecification::Plugin>
+QueuedCorePrivate::plugin(const QString &_plugin, const QString &_token)
 {
     bool isAdmin = m_users->authorize(_token, QueuedEnums::Permission::Admin);
     if (!isAdmin)
         return QueuedError("Not allowed",
                            QueuedEnums::ReturnStatus::InsufficientPermissions);
 
-    auto spec = m_plugins->loadSpecification(_plugin);
-    auto map = QueuedPluginSpecification::dumpSpecification(spec);
-    // do something if we need
-
-    return map;
+    return m_plugins->loadSpecification(_plugin);
 }
 
 

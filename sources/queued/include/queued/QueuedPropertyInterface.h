@@ -63,6 +63,15 @@ public slots:
      */
     QDBusVariant Plugin(const QString &plugin, const QString &token);
     /**
+     * @brief get plugin options
+     * @param plugin
+     * plugin name
+     * @param token
+     * user auth token
+     * @return list of plugin options and their values
+     */
+    QDBusVariant PluginOptions(const QString &plugin, const QString &token);
+    /**
      * @brief get advanced option
      * @param property
      * property name

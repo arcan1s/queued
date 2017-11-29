@@ -24,6 +24,7 @@
 #ifndef QUEUEDPLUGINSPECIFICATION_H
 #define QUEUEDPLUGINSPECIFICATION_H
 
+#include <QDebug>
 #include <QString>
 
 
@@ -52,6 +53,50 @@ struct PluginOption {
     QString type;
 };
 /**
+ * @brief DBus marshalling method
+ * @param _argument
+ * output DBus argument
+ * @param _arg
+ * input variant object
+ * @return appended argument body
+ */
+inline QDBusArgument &operator<<(QDBusArgument &_argument,
+                                 const PluginOption &_arg)
+{
+    _argument.beginStructure();
+    _argument << QDBusVariant(_arg.defaultValue.isValid() ? _arg.defaultValue
+                                                          : "");
+    _argument << _arg.description;
+    _argument << _arg.name;
+    _argument << _arg.type;
+    _argument.endStructure();
+
+    return _argument;
+};
+/**
+ * @brief DBus un-marshalling method
+ * @param _argument
+ * input DBus argument
+ * @param _arg
+ * output variant object
+ * @return source DBus argument
+ */
+inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
+                                       PluginOption &_arg)
+{
+    QDBusVariant variant;
+
+    _argument.beginStructure();
+    _argument >> variant;
+    _arg.defaultValue = variant.variant();
+    _argument >> _arg.description;
+    _argument >> _arg.name;
+    _argument >> _arg.type;
+    _argument.endStructure();
+
+    return _argument;
+};
+/**
  * @struct Plugin
  * @brief plugin specification structure
  * @var Plugin::author
@@ -71,6 +116,47 @@ struct Plugin {
     QString homepage;
     QString license;
     QList<PluginOption> options;
+};
+/**
+ * @brief DBus marshalling method
+ * @param _argument
+ * output DBus argument
+ * @param _arg
+ * input variant object
+ * @return appended argument body
+ */
+inline QDBusArgument &operator<<(QDBusArgument &_argument, const Plugin &_arg)
+{
+    _argument.beginStructure();
+    _argument << _arg.author;
+    _argument << _arg.description;
+    _argument << _arg.homepage;
+    _argument << _arg.license;
+    _argument << _arg.options;
+    _argument.endStructure();
+
+    return _argument;
+};
+/**
+ * @brief DBus un-marshalling method
+ * @param _argument
+ * input DBus argument
+ * @param _arg
+ * output variant object
+ * @return source DBus argument
+ */
+inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
+                                       Plugin &_arg)
+{
+    _argument.beginStructure();
+    _argument >> _arg.author;
+    _argument >> _arg.description;
+    _argument >> _arg.homepage;
+    _argument >> _arg.license;
+    _argument >> _arg.options;
+    _argument.endStructure();
+
+    return _argument;
 };
 /**
  * @brief dump specification to map

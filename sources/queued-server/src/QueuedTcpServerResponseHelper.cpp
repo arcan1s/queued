@@ -84,6 +84,8 @@ QueuedTcpServerResponseHelper::pathToEnum(const QString &_path)
         return RequestPath::Option;
     else if (_path == "permissions")
         return RequestPath::Permissions;
+    else if (_path == "plugin")
+        return RequestPath::Plugin;
     else if (_path == "plugins")
         return RequestPath::Plugins;
     else if (_path == "reports")

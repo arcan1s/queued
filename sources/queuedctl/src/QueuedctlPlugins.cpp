@@ -37,6 +37,63 @@ QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
 }
 
 
+QueuedctlCommon::QueuedctlResult
+QueuedctlPlugins::getPlugin(const QString &_plugin, const QString &_token)
+{
+    qCDebug(LOG_APP) << "Get plugin" << _plugin;
+
+    auto res = QueuedCoreAdaptor::getPlugin(_plugin, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    res.match(
+        [&output](const QueuedPluginSpecification::Plugin &val) {
+            QStringList text;
+            text += QString("Author: %1").arg(val.author);
+            text += QString("Description: %1").arg(val.description);
+            text += QString("Homepage: %1").arg(val.homepage);
+            text += QString("License: %1").arg(val.license);
+            text += QString("Options:");
+            for (auto &opt : val.options) {
+                text += QString("  %1").arg(opt.name);
+                text += QString("    description: %1").arg(opt.description);
+                text += QString("    type: %1").arg(opt.type);
+                text += QString("    default: %1")
+                            .arg(opt.defaultValue.toString());
+            }
+
+            output.status = true;
+            output.output = text.join('\n');
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
+
+    return output;
+}
+
+
+QueuedctlCommon::QueuedctlResult
+QueuedctlPlugins::getPluginOptions(const QString &_plugin,
+                                   const QString &_token)
+{
+    qCDebug(LOG_APP) << "Get plugin options" << _plugin;
+
+    auto res = QueuedCoreAdaptor::getPluginOptions(_plugin, _token);
+
+    QueuedctlCommon::QueuedctlResult output;
+    res.match(
+        [&output](const QVariantHash &val) {
+            output.status = true;
+            output.output = QueuedctlCommon::hashToString(val);
+        },
+        [&output](const QueuedError &err) {
+            output.output = err.message().c_str();
+        });
+
+    return output;
+}
+
+
 QueuedctlCommon::QueuedctlResult QueuedctlPlugins::listPlugins()
 {
     auto res = QueuedCoreAdaptor::getOption(

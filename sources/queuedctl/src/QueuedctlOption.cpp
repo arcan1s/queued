@@ -45,9 +45,9 @@ QueuedctlOption::getOption(const QString &_option, const QString &_token)
     QueuedctlCommon::QueuedctlResult output;
     auto res = QueuedCoreAdaptor::getOption(_option, _token);
     res.match(
-        [&output](const QVariant &val) {
+        [&output, &_option](const QVariant &val) {
             output.status = val.isValid();
-            output.output = val.toString();
+            output.output = QString("%1: %2").arg(_option, val.toString());
         },
         [&output](const QueuedError &err) {
             output.output = err.message().c_str();

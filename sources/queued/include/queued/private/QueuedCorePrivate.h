@@ -231,8 +231,8 @@ public:
      * user auth token
      * @return dictionary of PluginSpecification representation
      */
-    QueuedResult<QVariantHash> plugin(const QString &_plugin,
-                                      const QString &_token);
+    QueuedResult<QueuedPluginSpecification::Plugin>
+    plugin(const QString &_plugin, const QString &_token);
     /**
      * @brief get plugin settings
      * @param _plugin

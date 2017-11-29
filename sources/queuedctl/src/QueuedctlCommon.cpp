@@ -149,7 +149,9 @@ void QueuedctlCommon::preprocess(const QStringList &_args,
         QueuedctlPermissions::parser(_parser);
         break;
     case QueuedctlArgument::PluginAdd:
+    case QueuedctlArgument::PluginOptions:
     case QueuedctlArgument::PluginRemove:
+    case QueuedctlArgument::PluginSpecification:
         QueuedctlPlugins::parser(_parser);
         break;
     case QueuedctlArgument::PluginList:
@@ -269,8 +271,16 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         result = QueuedctlPlugins::listPlugins();
         break;
     }
+    case QueuedctlArgument::PluginOptions: {
+        result = QueuedctlPlugins::getPluginOptions(args.at(1), token);
+        break;
+    }
     case QueuedctlArgument::PluginRemove: {
         result = QueuedctlPlugins::removePlugin(args.at(1), token);
+        break;
+    }
+    case QueuedctlArgument::PluginSpecification: {
+        result = QueuedctlPlugins::getPlugin(args.at(1), token);
         break;
     }
     case QueuedctlArgument::Report: {

@@ -44,6 +44,18 @@ QueuedPropertyInterface::QueuedPropertyInterface(QueuedCore *parent)
 
     qRegisterMetaType<QueuedResult<QVariantHash>>("QueuedResult<QVariantHash>");
     qDBusRegisterMetaType<QueuedResult<QVariantHash>>();
+
+    qRegisterMetaType<QueuedPluginSpecification::PluginOption>(
+        "QueuedPluginSpecification::PluginOption");
+    qDBusRegisterMetaType<QueuedPluginSpecification::PluginOption>();
+
+    qRegisterMetaType<QueuedPluginSpecification::Plugin>(
+        "QueuedPluginSpecification::Plugin");
+    qDBusRegisterMetaType<QueuedPluginSpecification::Plugin>();
+
+    qRegisterMetaType<QueuedResult<QueuedPluginSpecification::Plugin>>(
+        "QueuedResult<QueuedPluginSpecification::Plugin>");
+    qDBusRegisterMetaType<QueuedResult<QueuedPluginSpecification::Plugin>>();
 }
 
 
@@ -65,6 +77,19 @@ QDBusVariant QueuedPropertyInterface::Plugin(const QString &plugin,
     qCDebug(LOG_DBUS) << "Get plugin" << plugin;
 
     return QueuedCoreAdaptor::toDBusVariant(m_core->plugin(plugin, token));
+}
+
+
+/**
+ * @fn PluginOptions
+ */
+QDBusVariant QueuedPropertyInterface::PluginOptions(const QString &plugin,
+                                                    const QString &token)
+{
+    qCDebug(LOG_DBUS) << "Get plugin options" << plugin;
+
+    return QueuedCoreAdaptor::toDBusVariant(
+        m_core->pluginSettings(plugin, token));
 }
 
 

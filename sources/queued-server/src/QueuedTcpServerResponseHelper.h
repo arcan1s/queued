@@ -27,6 +27,7 @@ enum class RequestPath {
     Auth,
     Option,
     Permissions,
+    Plugin,
     Plugins,
     Reports,
     Status,

@@ -297,18 +297,26 @@ QueuedCoreAdaptor::getPlugin(const QString &_plugin, const QString &_token)
 
     QVariantList args = {_plugin, _token};
 
-    auto result = sendRequest<QVariantHash>(
+    return sendRequest<QueuedPluginSpecification::Plugin>(
         QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_PROPERTY_PATH,
         QueuedConfig::DBUS_SERVICE, "Plugin", args);
+}
 
-    QueuedResult<QueuedPluginSpecification::Plugin> output;
-    result.match(
-        [&output](const QVariantHash &res) {
-            output = QueuedPluginSpecification::readSpecification(res);
-        },
-        [&output](const QueuedError &err) { output = err; });
 
-    return output;
+/**
+ * @fn getPluginOptions
+ */
+QueuedResult<QVariantHash>
+QueuedCoreAdaptor::getPluginOptions(const QString &_plugin,
+                                    const QString &_token)
+{
+    qCDebug(LOG_DBUS) << "Get options for plugin" << _plugin;
+
+    QVariantList args = {_plugin, _token};
+
+    return sendRequest<QVariantHash>(
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_PROPERTY_PATH,
+        QueuedConfig::DBUS_SERVICE, "PluginOptions", args);
 }
 
 

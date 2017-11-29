@@ -28,11 +28,14 @@
 
 #include <result/result.hpp>
 
+#include "QueuedPluginSpecification.h"
+
 
 namespace QueuedEnums
 {
 enum class ReturnStatus;
 };
+
 
 /**
  * @typedef QueuedError
@@ -100,7 +103,11 @@ Q_DECLARE_METATYPE(QueuedResult<QStringList>)
 Q_DECLARE_METATYPE(QueuedResult<QVariant>)
 Q_DECLARE_METATYPE(QueuedResult<QList<QVariantHash>>)
 Q_DECLARE_METATYPE(QueuedResult<QVariantHash>)
+Q_DECLARE_METATYPE(QueuedResult<QueuedPluginSpecification::Plugin>)
+Q_DECLARE_METATYPE(QueuedResult<QueuedPluginSpecification::PluginOption>)
 Q_DECLARE_METATYPE(QueuedResult<QueuedStatusMap>)
+Q_DECLARE_METATYPE(QueuedPluginSpecification::Plugin)
+Q_DECLARE_METATYPE(QueuedPluginSpecification::PluginOption)
 /**
  * @brief DBus marshalling method
  * @param _argument

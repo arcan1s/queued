@@ -205,6 +205,16 @@ sendUserPermissionRemove(const long long _id,
 QueuedResult<QueuedPluginSpecification::Plugin>
 getPlugin(const QString &_plugin, const QString &_token);
 /**
+ * @brief get plugin options
+ * @param _plugin
+ * plugin name
+ * @param _token
+ * user auth token
+ * @return plugin options dictionary
+ */
+QueuedResult<QVariantHash> getPluginOptions(const QString &_plugin,
+                                            const QString &_token);
+/**
  * @brief get option
  * @param _property
  * option name
