@@ -35,6 +35,7 @@ class QueuedAdvancedSettings;
 class QueuedCorePrivate;
 class QueuedDatabase;
 class QueuedPluginManager;
+class QueuedProcess;
 class QueuedProcessManager;
 class QueuedUserManager;
 
@@ -177,15 +178,15 @@ private:
                                          const bool _add);
     /**
      * @brief edit task
-     * @param _id
-     * task ID to edit
+     * @param _process
+     * task object
      * @param _taskData
      * task data to edit
      * @remark _taskData should contain only fields defined in schema, any other
      * fields will be ignored. No need to pass all properties here
      * @return true on successful task edition
      */
-    QueuedResult<bool> editTaskPrivate(const long long _id,
+    QueuedResult<bool> editTaskPrivate(QueuedProcess *_process,
                                        const QVariantHash &_taskData);
     /**
      * @brief edit user

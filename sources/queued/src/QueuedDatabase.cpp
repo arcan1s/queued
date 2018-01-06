@@ -114,6 +114,56 @@ void QueuedDatabase::createAdministrator(const QString &_user,
 
 
 /**
+ * @fn createSchema
+ */
+void QueuedDatabase::createSchema(const QString &_table)
+{
+    qCDebug(LOG_LIB) << "Create schema for" << _table;
+
+    QSqlRecord record = m_database.record(_table);
+    // get column names
+    QStringList columns;
+    for (int i = 0; i < record.count(); i++)
+        columns.append(record.fieldName(i));
+
+    // check and append if any
+    QStringList schemaColumns = QueuedDB::DBSchema[_table].keys();
+    for (auto &column : schemaColumns) {
+        if (columns.contains(column))
+            continue;
+        QueuedDB::QueuedDBField field = QueuedDB::DBSchema[_table][column];
+        QSqlQuery query
+            = m_database.exec(QString("ALTER TABLE '%1' ADD `%2` %3")
+                                  .arg(_table)
+                                  .arg(column)
+                                  .arg(field.sqlDescription));
+        QSqlError error = query.lastError();
+        if (error.isValid())
+            qCCritical(LOG_LIB)
+                << "Could not insert column" << column << "to table" << _table
+                << "error:" << error.text();
+    }
+}
+
+
+/**
+ * @fn createTable
+ */
+void QueuedDatabase::createTable(const QString &_table)
+{
+    qCDebug(LOG_LIB) << "Create table" << _table;
+
+    QSqlQuery query = m_database.exec(
+        QString("CREATE TABLE '%1' (`_id` INTEGER PRIMARY KEY AUTOINCREMENT)")
+            .arg(_table));
+    QSqlError error = query.lastError();
+    if (error.isValid())
+        qCCritical(LOG_LIB)
+            << "Could not create table" << _table << "error:" << error.text();
+}
+
+
+/**
  * @fn get
  */
 QList<QVariantHash> QueuedDatabase::get(const QString &_table,
@@ -136,12 +186,11 @@ QList<QVariantHash> QueuedDatabase::get(const QString &_table,
     }
     QSqlRecord record = query.record();
 
-    QStringList columns = QueuedDB::DBSchema[_table].keys();
-    auto dbColumns = getColumnsInRecord(columns, record);
+    auto columns = getColumnsInRecord(record);
     while (query.next()) {
         QVariantHash entry;
         for (auto &column : columns)
-            entry[column] = query.value(dbColumns[column]);
+            entry[column] = query.value(column);
         output.append(entry);
     }
 
@@ -332,70 +381,17 @@ void QueuedDatabase::removeUsers(const QDateTime &_lastLogin)
 
 
 /**
- * @fn createSchema
- */
-void QueuedDatabase::createSchema(const QString &_table)
-{
-    qCDebug(LOG_LIB) << "Create schema for" << _table;
-
-    QSqlRecord record = m_database.record(_table);
-    // get column names
-    QStringList columns;
-    for (int i = 0; i < record.count(); i++)
-        columns.append(record.fieldName(i));
-
-    // check and append if any
-    QStringList schemaColumns = QueuedDB::DBSchema[_table].keys();
-    for (auto &column : schemaColumns) {
-        if (columns.contains(column))
-            continue;
-        QueuedDB::QueuedDBField field = QueuedDB::DBSchema[_table][column];
-        QSqlQuery query
-            = m_database.exec(QString("ALTER TABLE '%1' ADD `%2` %3")
-                                  .arg(_table)
-                                  .arg(column)
-                                  .arg(field.sqlDescription));
-        QSqlError error = query.lastError();
-        if (error.isValid())
-            qCCritical(LOG_LIB)
-                << "Could not insert column" << column << "to table" << _table
-                << "error:" << error.text();
-    }
-}
-
-
-/**
- * @fn createTable
- */
-void QueuedDatabase::createTable(const QString &_table)
-{
-    qCDebug(LOG_LIB) << "Create table" << _table;
-
-    QSqlQuery query = m_database.exec(
-        QString("CREATE TABLE '%1' (`_id` INTEGER PRIMARY KEY AUTOINCREMENT)")
-            .arg(_table));
-    QSqlError error = query.lastError();
-    if (error.isValid())
-        qCCritical(LOG_LIB)
-            << "Could not create table" << _table << "error:" << error.text();
-}
-
-
-/**
  * @fn getColumnsInRecord
  */
-QHash<QString, int>
-QueuedDatabase::getColumnsInRecord(const QStringList &_columns,
-                                   const QSqlRecord &_record) const
+QStringList QueuedDatabase::getColumnsInRecord(const QSqlRecord &_record) const
 {
-    qCDebug(LOG_LIB) << "Search for columns" << _columns;
+    qCDebug(LOG_LIB) << "Search for columns" << _record;
 
-    return std::accumulate(
-        _columns.begin(), _columns.end(), QHash<QString, int>(),
-        [&_record](QHash<QString, int> &map, const QString &column) {
-            map[column] = _record.indexOf(column);
-            return map;
-        });
+    QStringList output;
+    for (int i = 0; i < _record.count(); i++)
+        output += _record.fieldName(i);
+
+    return output;
 }
 
 
@@ -432,9 +428,10 @@ QueuedDatabase::getQueryPayload(const QString &_table,
     qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
 
     QHash<QString, QString> output;
-    QStringList schemaColumns = QueuedDB::DBSchema[_table].keys();
+    auto schemaColumns = QueuedDB::DBSchema[_table].keys();
     for (auto &key : _value.keys()) {
-        if (!schemaColumns.contains(key)) {
+        // we would check it only if there is data about this table
+        if (!schemaColumns.isEmpty() && !schemaColumns.contains(key)) {
             qCWarning(LOG_LIB)
                 << "No key" << key << "found in schema of" << _table;
             continue;

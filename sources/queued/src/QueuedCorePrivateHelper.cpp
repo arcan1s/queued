@@ -297,32 +297,25 @@ QueuedCorePrivateHelper::editPluginPrivate(const QString &_plugin,
  * @fn editTaskPrivate
  */
 QueuedResult<bool>
-QueuedCorePrivateHelper::editTaskPrivate(const long long _id,
+QueuedCorePrivateHelper::editTaskPrivate(QueuedProcess *_process,
                                          const QVariantHash &_taskData)
 {
-    qCDebug(LOG_LIB) << "Edit task with ID" << _id;
-
-    auto task = processes()->process(_id);
-    if (!task) {
-        qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
-        return QueuedError("Task does not exist",
-                           QueuedEnums::ReturnStatus::InvalidArgument);
-    }
+    qCDebug(LOG_LIB) << "Edit task with ID" << _process->index();
 
     // modify record in database first
-    bool status = database()->modify(QueuedDB::TASKS_TABLE, _id, _taskData);
+    bool status = database()->modify(QueuedDB::TASKS_TABLE, _process->index(), _taskData);
     if (!status) {
-        qCWarning(LOG_LIB) << "Could not modify task record" << _id
+        qCWarning(LOG_LIB) << "Could not modify task record" << _process->index()
                            << "in database, do not edit it in memory";
         return QueuedError("", QueuedEnums::ReturnStatus::Error);
     }
 
     // modify values stored in memory
     for (auto &property : _taskData.keys())
-        task->setProperty(qPrintable(property), _taskData[property]);
+        _process->setProperty(qPrintable(property), _taskData[property]);
     // notify plugins
     if (plugins())
-        emit(plugins()->interface()->onEditTask(_id, _taskData));
+        emit(plugins()->interface()->onEditTask(_process->index(), _taskData));
 
     return true;
 }

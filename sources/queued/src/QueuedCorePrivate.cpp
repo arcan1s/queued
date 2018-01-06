@@ -197,9 +197,17 @@ QueuedResult<bool> QueuedCorePrivate::editTask(const long long _id,
 
     auto task = m_processes->process(_id);
     if (!task) {
-        qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
-        return QueuedError("Task does not exist",
-                           QueuedEnums::ReturnStatus::InvalidArgument);
+        qCInfo(LOG_LIB) << "Try to get information about task" << _id
+                        << "from database";
+        auto data = m_database->get(QueuedDB::TASKS_TABLE, _id);
+        if (data.isEmpty()) {
+            qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
+            return QueuedError("Task does not exist",
+                               QueuedEnums::ReturnStatus::InvalidArgument);
+        }
+
+        auto defs = QueuedProcessManager::parseDefinitions(data);
+        task = new QueuedProcess(this, defs, _id);
     }
 
     // check permissions
@@ -248,7 +256,7 @@ QueuedResult<bool> QueuedCorePrivate::editTask(const long long _id,
         payload["nice"]
             = std::min(payload["nice"].toUInt(), authUser->priority());
 
-    return m_helper->editTaskPrivate(_id, payload);
+    return m_helper->editTaskPrivate(task, payload);
 }
 
 

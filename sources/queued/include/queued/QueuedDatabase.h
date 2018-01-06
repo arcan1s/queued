@@ -70,6 +70,18 @@ public:
      */
     void createAdministrator(const QString &_user, const QString &_password);
     /**
+     * @brief create or update actual schema in table
+     * @param _table
+     * table name
+     */
+    void createSchema(const QString &_table);
+    /**
+     * @brief create given table
+     * @param _table
+     * table name
+     */
+    void createTable(const QString &_table);
+    /**
      * @brief get all records from table
      * @param _table
      * table name
@@ -166,27 +178,12 @@ private:
      */
     QString m_path;
     /**
-     * @brief create or update actual schema in table
-     * @param _table
-     * table name
-     */
-    void createSchema(const QString &_table);
-    /**
-     * @brief create given table
-     * @param _table
-     * table name
-     */
-    void createTable(const QString &_table);
-    /**
      * @brief additional function to get column numbers from table
-     * @param _columns
-     * columns mapping
      * @param _record
      * SQL record from query
-     * @return map of column names to their numbers
+     * @return list of columns in table
      */
-    QHash<QString, int> getColumnsInRecord(const QStringList &_columns,
-                                           const QSqlRecord &_record) const;
+    QStringList getColumnsInRecord(const QSqlRecord &_record) const;
     /**
      * @brief last insertion ID
      * @param _table

@@ -59,13 +59,12 @@ QueuedProcessManager::~QueuedProcessManager()
 
 
 /**
- * @fn add
+ * @fn parseDefinitions
  */
-QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
-                                         const long long _index)
+QueuedProcess::QueuedProcessDefinitions
+QueuedProcessManager::parseDefinitions(const QVariantHash &_properties)
 {
-    qCDebug(LOG_LIB) << "Add new process" << _properties << "with index"
-                     << _index;
+    qCDebug(LOG_LIB) << "Parse definitions from" << _properties;
 
     QueuedProcess::QueuedProcessDefinitions defs;
     // parameters
@@ -84,7 +83,20 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
     defs.endTime = QDateTime::fromString(_properties["endTime"].toString(),
                                          Qt::ISODateWithMs);
 
-    return add(defs, _index);
+    return defs;
+}
+
+
+/**
+ * @fn add
+ */
+QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
+                                         const long long _index)
+{
+    qCDebug(LOG_LIB) << "Add new process" << _properties << "with index"
+                     << _index;
+
+    return add(parseDefinitions(_properties), _index);
 }
 
 

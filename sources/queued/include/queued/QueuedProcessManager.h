@@ -69,6 +69,14 @@ public:
      */
     virtual ~QueuedProcessManager();
     /**
+     * @brief parse task definitions from table data
+     * @param _properties
+     * map of task properties
+     * @return data mapped to internal format
+     */
+    static QueuedProcess::QueuedProcessDefinitions
+    parseDefinitions(const QVariantHash &_properties);
+    /**
      * @brief add task
      * @param _properties
      * task properties from database
