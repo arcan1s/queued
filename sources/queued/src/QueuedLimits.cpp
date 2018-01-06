@@ -58,20 +58,17 @@ bool QueuedLimits::limitCompare(const long long _first, const long long _second)
 /**
  * @fn minimalLimits
  */
-QueuedLimits::Limits
-QueuedLimits::minimalLimits(const QueuedLimits::Limits &_task,
-                            const QueuedLimits::Limits &_user,
-                            const QueuedLimits::Limits &_default)
+QueuedLimits::Limits QueuedLimits::minimalLimits(const QueuedLimits::Limits &_task,
+                                                 const QueuedLimits::Limits &_user,
+                                                 const QueuedLimits::Limits &_default)
 {
     QueuedLimits::Limits limits;
     limits.cpu = std::min({_task.cpu, _user.cpu, _default.cpu}, &limitCompare);
     limits.gpu = std::min({_task.gpu, _user.gpu, _default.gpu}, &limitCompare);
-    limits.memory = std::min({_task.memory, _user.memory, _default.memory},
-                             &limitCompare);
-    limits.gpumemory = std::min(
-        {_task.gpumemory, _user.gpumemory, _default.gpumemory}, &limitCompare);
-    limits.storage = std::min({_task.storage, _user.storage, _default.storage},
-                              &limitCompare);
+    limits.memory = std::min({_task.memory, _user.memory, _default.memory}, &limitCompare);
+    limits.gpumemory
+        = std::min({_task.gpumemory, _user.gpumemory, _default.gpumemory}, &limitCompare);
+    limits.storage = std::min({_task.storage, _user.storage, _default.storage}, &limitCompare);
 
     return limits;
 }

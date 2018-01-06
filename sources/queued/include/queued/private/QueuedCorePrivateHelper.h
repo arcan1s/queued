@@ -37,6 +37,7 @@ class QueuedDatabase;
 class QueuedPluginManager;
 class QueuedProcess;
 class QueuedProcessManager;
+class QueuedUser;
 class QueuedUserManager;
 
 /**
@@ -96,8 +97,7 @@ private:
      * initial database payload
      * @return payload with dropped keys
      */
-    QVariantHash dropAdminFields(const QString &_table,
-                                 const QVariantHash &_payload);
+    QVariantHash dropAdminFields(const QString &_table, const QVariantHash &_payload);
     /**
      * @brief method allows to init class if it was not created
      * @tparam T
@@ -132,10 +132,10 @@ private:
      * task defined limits
      * @return task ID or -1 if no task added
      */
-    QueuedResult<long long>
-    addTaskPrivate(const QString &_command, const QStringList &_arguments,
-                   const QString &_workingDirectory, const long long _userId,
-                   const uint _nice, const QueuedLimits::Limits &_limits);
+    QueuedResult<long long> addTaskPrivate(const QString &_command, const QStringList &_arguments,
+                                           const QString &_workingDirectory,
+                                           const long long _userId, const uint _nice,
+                                           const QueuedLimits::Limits &_limits);
     /**
      * @brief add new user
      * @param _name
@@ -152,10 +152,10 @@ private:
      * user limits
      * @return user ID or -1 if no user found
      */
-    QueuedResult<long long>
-    addUserPrivate(const QString &_name, const QString &_email,
-                   const QString &_password, const uint _permissions,
-                   const uint _priority, const QueuedLimits::Limits &_limits);
+    QueuedResult<long long> addUserPrivate(const QString &_name, const QString &_email,
+                                           const QString &_password, const uint _permissions,
+                                           const uint _priority,
+                                           const QueuedLimits::Limits &_limits);
     /**
      * @brief edit advanced settings
      * @param _key
@@ -164,8 +164,7 @@ private:
      * advanced settings value
      * @return true on successful option edition
      */
-    QueuedResult<bool> editOptionPrivate(const QString &_key,
-                                         const QVariant &_value);
+    QueuedResult<bool> editOptionPrivate(const QString &_key, const QVariant &_value);
     /**
      * @brief edit plugin list
      * @param _plugin
@@ -174,8 +173,7 @@ private:
      * true if it requires add plugin
      * @return true on successful action
      */
-    QueuedResult<bool> editPluginPrivate(const QString &_plugin,
-                                         const bool _add);
+    QueuedResult<bool> editPluginPrivate(const QString &_plugin, const bool _add);
     /**
      * @brief edit task
      * @param _process
@@ -186,8 +184,7 @@ private:
      * fields will be ignored. No need to pass all properties here
      * @return true on successful task edition
      */
-    QueuedResult<bool> editTaskPrivate(QueuedProcess *_process,
-                                       const QVariantHash &_taskData);
+    QueuedResult<bool> editTaskPrivate(QueuedProcess *_process, const QVariantHash &_taskData);
     /**
      * @brief edit user
      * @param _id
@@ -198,8 +195,7 @@ private:
      * fields will be ignored. No need to pass all properties here
      * @return true on successful user edition
      */
-    QueuedResult<bool> editUserPrivate(const long long _id,
-                                       const QVariantHash &_userData);
+    QueuedResult<bool> editUserPrivate(QueuedUser *_user, const QVariantHash &_userData);
     /**
      * @brief edit user permissions
      * @param _id
@@ -210,10 +206,23 @@ private:
      * indicates whether it should be added or removed
      * @return true on successful user permission edition
      */
-    QueuedResult<bool>
-    editUserPermissionPrivate(const long long _id,
-                              const QueuedEnums::Permission &_permission,
-                              const bool _add);
+    QueuedResult<bool> editUserPermissionPrivate(const long long _id,
+                                                 const QueuedEnums::Permission &_permission,
+                                                 const bool _add);
+    /**
+     * @brief try get task from storages
+     * @param _id
+     * task ID to search
+     * @return pointer to found task if any
+     */
+    QueuedProcess *tryGetTask(const long long _id);
+    /**
+     * @brief try get user from storages
+     * @param _id
+     * user ID to search
+     * @return pointer to found user if any
+     */
+    QueuedUser *tryGetUser(const long long _id);
 };
 
 

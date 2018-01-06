@@ -44,8 +44,8 @@ char *QueuedEmailNotifyHelper::curlString(const QString &_source)
 }
 
 
-size_t QueuedEmailNotifyHelper::curlReadCallback(char *buffer, size_t size,
-                                                 size_t nitems, void *instream)
+size_t QueuedEmailNotifyHelper::curlReadCallback(char *buffer, size_t size, size_t nitems,
+                                                 void *instream)
 {
     // FIXME not really best choice to use here
     auto text = reinterpret_cast<MailBody *>(instream);
@@ -206,16 +206,14 @@ void QueuedEmailNotifyHelper::sendEmail(const long long _id)
     curl_easy_setopt(curl, CURLOPT_MAIL_RCPT, recipients);
 
     // mail body
-    curl_easy_setopt(curl, CURLOPT_READFUNCTION,
-                     &QueuedEmailNotifyHelper::curlReadCallback);
+    curl_easy_setopt(curl, CURLOPT_READFUNCTION, &QueuedEmailNotifyHelper::curlReadCallback);
     curl_easy_setopt(curl, CURLOPT_READDATA, &text);
     curl_easy_setopt(curl, CURLOPT_UPLOAD, 1L);
 
     // send
     auto res = curl_easy_perform(curl);
     if (res != CURLE_OK)
-        qCWarning(LOG_PL) << "Could not perform curl action"
-                          << curl_easy_strerror(res);
+        qCWarning(LOG_PL) << "Could not perform curl action" << curl_easy_strerror(res);
 
     // cleanup
     curl_slist_free_all(recipients);
@@ -244,16 +242,13 @@ QString QueuedEmailNotifyHelper::getEmail(const long long _id) const
 }
 
 
-QStringList QueuedEmailNotifyHelper::getEmailText(const long long _id,
-                                                  const QString &_to) const
+QStringList QueuedEmailNotifyHelper::getEmailText(const long long _id, const QString &_to) const
 {
     qCDebug(LOG_PL) << "Get email text for user" << _to << "for task" << _id;
 
-    auto now
-        = QDateTime::currentDateTimeUtc().toString(Qt::DateFormat::RFC2822Date);
+    auto now = QDateTime::currentDateTimeUtc().toString(Qt::DateFormat::RFC2822Date);
 
-    return {QString("Date: %1\r\n").arg(now),
-            QString("To: %1\r\n").arg(curlEmail(_to)),
+    return {QString("Date: %1\r\n").arg(now), QString("To: %1\r\n").arg(curlEmail(_to)),
             QString("From: %1\r\n").arg(curlEmail(from())),
             // message-id?
             QString("Subject: %1\r\n").arg("Job %1 done").arg(_id), "\r\n",

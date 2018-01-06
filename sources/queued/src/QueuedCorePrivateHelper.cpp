@@ -102,12 +102,10 @@ QueuedUserManager *QueuedCorePrivateHelper::users()
 /**
  * @fn dropAdminFields
  */
-QVariantHash
-QueuedCorePrivateHelper::dropAdminFields(const QString &_table,
-                                         const QVariantHash &_payload)
+QVariantHash QueuedCorePrivateHelper::dropAdminFields(const QString &_table,
+                                                      const QVariantHash &_payload)
 {
-    qCDebug(LOG_LIB) << "Drop admin fields from" << _payload << "in table"
-                     << _table;
+    qCDebug(LOG_LIB) << "Drop admin fields from" << _payload << "in table" << _table;
 
     QVariantHash payload;
     for (auto &key : _payload.keys()) {
@@ -123,28 +121,25 @@ QueuedCorePrivateHelper::dropAdminFields(const QString &_table,
 /**
  * @addTaskPrivate
  */
-QueuedResult<long long> QueuedCorePrivateHelper::addTaskPrivate(
-    const QString &_command, const QStringList &_arguments,
-    const QString &_workingDirectory, const long long _userId, const uint _nice,
-    const QueuedLimits::Limits &_limits)
+QueuedResult<long long>
+QueuedCorePrivateHelper::addTaskPrivate(const QString &_command, const QStringList &_arguments,
+                                        const QString &_workingDirectory, const long long _userId,
+                                        const uint _nice, const QueuedLimits::Limits &_limits)
 {
-    qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
-                     << "from user" << _userId;
+    qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments << "from user"
+                     << _userId;
 
     // add to database
     auto ids = users()->ids(_userId);
     auto userObj = m_core->user(_userId, m_core->m_adminToken);
     if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find task user" << _userId;
-        return QueuedError("Invalid token",
-                           QueuedEnums::ReturnStatus::InvalidToken);
+        return QueuedError("Invalid token", QueuedEnums::ReturnStatus::InvalidToken);
     }
     auto taskLimits = QueuedLimits::minimalLimits(
         _limits, userObj->nativeLimits(),
         QueuedLimits::Limits(
-            advancedSettings()
-                ->get(QueuedConfig::QueuedSettings::DefaultLimits)
-                .toString()));
+            advancedSettings()->get(QueuedConfig::QueuedSettings::DefaultLimits).toString()));
     QVariantHash properties = {{"user", _userId},
                                {"command", _command},
                                {"commandArguments", _arguments},
@@ -172,18 +167,17 @@ QueuedResult<long long> QueuedCorePrivateHelper::addTaskPrivate(
 /**
  * @fn addUserPrivate
  */
-QueuedResult<long long> QueuedCorePrivateHelper::addUserPrivate(
-    const QString &_name, const QString &_email, const QString &_password,
-    const uint _permissions, const uint _priority,
-    const QueuedLimits::Limits &_limits)
+QueuedResult<long long>
+QueuedCorePrivateHelper::addUserPrivate(const QString &_name, const QString &_email,
+                                        const QString &_password, const uint _permissions,
+                                        const uint _priority, const QueuedLimits::Limits &_limits)
 {
-    qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
-                     << "and permissions" << _permissions;
+    qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email << "and permissions"
+                     << _permissions;
     // add to database
-    QVariantHash properties
-        = {{"name", _name},         {"password", _password},
-           {"email", _email},       {"permissions", _permissions},
-           {"priority", _priority}, {"limits", _limits.toString()}};
+    QVariantHash properties = {{"name", _name},         {"password", _password},
+                               {"email", _email},       {"permissions", _permissions},
+                               {"priority", _priority}, {"limits", _limits.toString()}};
     auto id = database()->add(QueuedDB::USERS_TABLE, properties);
     if (id == -1) {
         qCWarning(LOG_LIB) << "Could not add user" << _name;
@@ -203,9 +197,8 @@ QueuedResult<long long> QueuedCorePrivateHelper::addUserPrivate(
 /**
  * @fn editOptionPrivate
  */
-QueuedResult<bool>
-QueuedCorePrivateHelper::editOptionPrivate(const QString &_key,
-                                           const QVariant &_value)
+QueuedResult<bool> QueuedCorePrivateHelper::editOptionPrivate(const QString &_key,
+                                                              const QVariant &_value)
 {
     qCDebug(LOG_LIB) << "Set key" << _key << "to" << _value;
 
@@ -220,8 +213,7 @@ QueuedCorePrivateHelper::editOptionPrivate(const QString &_key,
         status = (id != -1);
     } else {
         status = database()->modify(QueuedDB::SETTINGS_TABLE, id, payload);
-        qCInfo(LOG_LIB) << "Value for" << _key
-                        << "has been modified with status" << status;
+        qCInfo(LOG_LIB) << "Value for" << _key << "has been modified with status" << status;
     }
 
     // add to child object
@@ -230,8 +222,7 @@ QueuedCorePrivateHelper::editOptionPrivate(const QString &_key,
         // notify plugins if required
         if (plugins()) {
             auto tryPluginOption = plugins()->convertOptionName(_key);
-            if ((!tryPluginOption.first.isEmpty())
-                && (!tryPluginOption.second.isEmpty()))
+            if ((!tryPluginOption.first.isEmpty()) && (!tryPluginOption.second.isEmpty()))
                 plugins()->optionChanged(_key, _value);
             // notify plugins
             emit(plugins()->interface()->onEditOption(_key, _value));
@@ -245,16 +236,13 @@ QueuedCorePrivateHelper::editOptionPrivate(const QString &_key,
 /**
  * @fn editPluginPrivate
  */
-QueuedResult<bool>
-QueuedCorePrivateHelper::editPluginPrivate(const QString &_plugin,
-                                           const bool _add)
+QueuedResult<bool> QueuedCorePrivateHelper::editPluginPrivate(const QString &_plugin,
+                                                              const bool _add)
 {
     qCDebug(LOG_LIB) << "Edit plugin" << _plugin << "add" << _add;
 
-    QStringList pluginList = advancedSettings()
-                                 ->get(QueuedConfig::QueuedSettings::Plugins)
-                                 .toString()
-                                 .split('\n');
+    QStringList pluginList
+        = advancedSettings()->get(QueuedConfig::QueuedSettings::Plugins).toString().split('\n');
 
     QueuedResult<bool> r;
     if (_add && !pluginList.contains(_plugin)) {
@@ -270,15 +258,12 @@ QueuedCorePrivateHelper::editPluginPrivate(const QString &_plugin,
             r = true;
         }
     } else {
-        qCDebug(LOG_LIB) << "Plugin" << _plugin
-                         << "not loaded or already loaded";
-        r = QueuedError("Plugin is not loaded or already loaded",
-                        QueuedEnums::ReturnStatus::Error);
+        qCDebug(LOG_LIB) << "Plugin" << _plugin << "not loaded or already loaded";
+        r = QueuedError("Plugin is not loaded or already loaded", QueuedEnums::ReturnStatus::Error);
     }
 
     if (r.type() == Result::Content::Value) {
-        editOptionPrivate(advancedSettings()->internalId(
-                              QueuedConfig::QueuedSettings::Plugins),
+        editOptionPrivate(advancedSettings()->internalId(QueuedConfig::QueuedSettings::Plugins),
                           pluginList.join('\n'));
         // notify plugins
         if (plugins()) {
@@ -296,9 +281,8 @@ QueuedCorePrivateHelper::editPluginPrivate(const QString &_plugin,
 /**
  * @fn editTaskPrivate
  */
-QueuedResult<bool>
-QueuedCorePrivateHelper::editTaskPrivate(QueuedProcess *_process,
-                                         const QVariantHash &_taskData)
+QueuedResult<bool> QueuedCorePrivateHelper::editTaskPrivate(QueuedProcess *_process,
+                                                            const QVariantHash &_taskData)
 {
     qCDebug(LOG_LIB) << "Edit task with ID" << _process->index();
 
@@ -324,33 +308,25 @@ QueuedCorePrivateHelper::editTaskPrivate(QueuedProcess *_process,
 /**
  * @fn editUserPrivate
  */
-QueuedResult<bool>
-QueuedCorePrivateHelper::editUserPrivate(const long long _id,
-                                         const QVariantHash &_userData)
+QueuedResult<bool> QueuedCorePrivateHelper::editUserPrivate(QueuedUser *_user,
+                                                            const QVariantHash &_userData)
 {
-    qCDebug(LOG_LIB) << "Edit user with ID" << _id;
-
-    auto userObj = users()->user(_id);
-    if (!userObj) {
-        qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
-        return QueuedError("User does not exist",
-                           QueuedEnums::ReturnStatus::InvalidArgument);
-    };
+    qCDebug(LOG_LIB) << "Edit user with ID" << _user->index();
 
     // modify record in database first
-    bool status = database()->modify(QueuedDB::USERS_TABLE, _id, _userData);
+    bool status = database()->modify(QueuedDB::USERS_TABLE, _user->index(), _userData);
     if (!status) {
-        qCWarning(LOG_LIB) << "Could not modify user record" << _id
+        qCWarning(LOG_LIB) << "Could not modify user record" << _user->index()
                            << "in database, do not edit it in memory";
         return QueuedError("", QueuedEnums::ReturnStatus::Error);
     }
 
     // modify values stored in memory
     for (auto &property : _userData.keys())
-        userObj->setProperty(qPrintable(property), _userData[property]);
+        _user->setProperty(qPrintable(property), _userData[property]);
     // notify plugins
     if (plugins())
-        emit(plugins()->interface()->onEditUser(_id, _userData));
+        emit(plugins()->interface()->onEditUser(_user->index(), _userData));
 
     return true;
 }
@@ -360,22 +336,20 @@ QueuedCorePrivateHelper::editUserPrivate(const long long _id,
  * @fn editUserPermissionPrivate
  */
 QueuedResult<bool> QueuedCorePrivateHelper::editUserPermissionPrivate(
-    const long long _id, const QueuedEnums::Permission &_permission,
-    const bool _add)
+    const long long _id, const QueuedEnums::Permission &_permission, const bool _add)
 {
-    qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission)
-                     << "for user" << _id << "add" << _add;
+    qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission) << "for user" << _id
+                     << "add" << _add;
 
     auto userObj = users()->user(_id);
     if (!userObj) {
         qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
-        return QueuedError("User does not exist",
-                           QueuedEnums::ReturnStatus::InvalidArgument);
+        return QueuedError("User does not exist", QueuedEnums::ReturnStatus::InvalidArgument);
     }
 
     // edit runtime permissions to get value
-    auto perms = _add ? userObj->addPermission(_permission)
-                      : userObj->removePermission(_permission);
+    auto perms
+        = _add ? userObj->addPermission(_permission) : userObj->removePermission(_permission);
     auto permissions = static_cast<uint>(perms);
     qCInfo(LOG_LIB) << "New user permissions" << perms;
 
@@ -394,4 +368,50 @@ QueuedResult<bool> QueuedCorePrivateHelper::editUserPermissionPrivate(
     }
 
     return true;
+}
+
+
+/**
+ * @fn tryGetTask
+ */
+QueuedProcess *QueuedCorePrivateHelper::tryGetTask(const long long _id)
+{
+    qCDebug(LOG_LIB) << "Search for task" << _id;
+
+    auto task = processes()->process(_id);
+    if (!task) {
+        qCInfo(LOG_LIB) << "Try to get information about task" << _id << "from database";
+        auto data = database()->get(QueuedDB::TASKS_TABLE, _id);
+        if (data.isEmpty()) {
+            qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
+            return nullptr;
+        }
+
+        auto defs = QueuedProcessManager::parseDefinitions(data);
+        task = new QueuedProcess(this, defs, _id);
+    }
+
+    return task;
+}
+
+
+/**
+ * @fn tryGetUser
+ */
+QueuedUser *QueuedCorePrivateHelper::tryGetUser(const long long _id)
+{
+    auto user = users()->user(_id);
+    if (!user) {
+        qCInfo(LOG_LIB) << "Try to get information about user" << _id << "from database";
+        auto data = database()->get(QueuedDB::USERS_TABLE, _id);
+        if (data.isEmpty()) {
+            qCWarning(LOG_LIB) << "Could not find user with ID" << _id;
+            return nullptr;
+        }
+
+        auto defs = QueuedUserManager::parseDefinitions(data);
+        user = new QueuedUser(this, defs, _id);
+    }
+
+    return user;
 }

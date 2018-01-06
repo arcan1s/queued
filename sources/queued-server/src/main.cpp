@@ -50,8 +50,7 @@ int main(int argc, char *argv[])
 
     // parser
     QCommandLineParser parser;
-    parser.setApplicationDescription(
-        "Daemon for starting jobs to queue of calculations");
+    parser.setApplicationDescription("Daemon for starting jobs to queue of calculations");
     parser.addHelpOption();
     parser.addVersionOption();
     // info

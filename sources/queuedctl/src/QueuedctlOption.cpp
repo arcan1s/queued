@@ -21,24 +21,21 @@
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlOption::editOption(const QString &_option, const QVariant &_value,
-                            const QString &_token)
+QueuedctlOption::editOption(const QString &_option, const QVariant &_value, const QString &_token)
 {
     qCDebug(LOG_APP) << "Edit option" << _option << "to" << _value;
 
     QueuedctlCommon::QueuedctlResult output;
     auto res = QueuedCoreAdaptor::sendOptionEdit(_option, _value, _token);
     res.match([&output](const bool val) { output.status = val; },
-              [&output](const QueuedError &err) {
-                  output.output = err.message().c_str();
-              });
+              [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
 
 
-QueuedctlCommon::QueuedctlResult
-QueuedctlOption::getOption(const QString &_option, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlOption::getOption(const QString &_option,
+                                                            const QString &_token)
 {
     qCDebug(LOG_APP) << "Get option" << _option;
 
@@ -49,9 +46,7 @@ QueuedctlOption::getOption(const QString &_option, const QString &_token)
             output.status = val.isValid();
             output.output = QString("%1: %2").arg(_option, val.toString());
         },
-        [&output](const QueuedError &err) {
-            output.output = err.message().c_str();
-        });
+        [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }

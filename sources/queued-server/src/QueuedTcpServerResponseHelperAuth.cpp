@@ -25,8 +25,7 @@ QVariantHash QueuedTcpServerResponseHelperAuth::auth(const QVariantHash &_data)
 
     QVariantHash output;
     if (_data.contains("user") && _data.contains("password")) {
-        auto res = QueuedCoreAdaptor::auth(_data["user"].toString(),
-                                           _data["password"].toString());
+        auto res = QueuedCoreAdaptor::auth(_data["user"].toString(), _data["password"].toString());
 
         res.match(
             [&output](const QString &val) {

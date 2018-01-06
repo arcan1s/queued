@@ -22,8 +22,7 @@
 
 namespace QueuedTcpServerResponseHelperPermissions
 {
-QVariantHash addPermission(const long long _id, const QVariantHash &_value,
-                           const QString &_token);
+QVariantHash addPermission(const long long _id, const QVariantHash &_value, const QString &_token);
 QVariantHash removePermission(const long long _id, const QVariantHash &_value,
                               const QString &_token);
 };

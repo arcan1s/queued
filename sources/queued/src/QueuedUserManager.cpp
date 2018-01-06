@@ -53,12 +53,12 @@ QueuedUserManager::~QueuedUserManager()
 
 
 /**
- * @fn add
+ * @fn parseDefinitions
  */
-QueuedUser *QueuedUserManager::add(const QVariantHash &_properties,
-                                   const long long _id)
+QueuedUser::QueuedUserDefinitions
+QueuedUserManager::parseDefinitions(const QVariantHash &_properties)
 {
-    qCDebug(LOG_LIB) << "Add user" << _properties << "with ID" << _id;
+    qCDebug(LOG_LIB) << "Parse definitions from" << _properties;
 
     QueuedUser::QueuedUserDefinitions defs;
     defs.name = _properties["name"].toString();
@@ -68,16 +68,26 @@ QueuedUser *QueuedUserManager::add(const QVariantHash &_properties,
     defs.priority = _properties["priority"].toUInt();
     defs.limits = _properties["limits"].toString();
 
-    return add(defs, _id);
+    return defs;
 }
 
 
 /**
  * @fn add
  */
-QueuedUser *
-QueuedUserManager::add(const QueuedUser::QueuedUserDefinitions &_definitions,
-                       const long long _id)
+QueuedUser *QueuedUserManager::add(const QVariantHash &_properties, const long long _id)
+{
+    qCDebug(LOG_LIB) << "Add user" << _properties << "with ID" << _id;
+
+    return add(parseDefinitions(_properties), _id);
+}
+
+
+/**
+ * @fn add
+ */
+QueuedUser *QueuedUserManager::add(const QueuedUser::QueuedUserDefinitions &_definitions,
+                                   const long long _id)
 {
     qCDebug(LOG_LIB) << "Add user" << _definitions.name << "with ID" << _id;
 
@@ -110,8 +120,7 @@ QString QueuedUserManager::authorize(const QString &_user)
 /**
  * @fn authorize
  */
-QString QueuedUserManager::authorize(const QString &_user,
-                                     const QString &_password)
+QString QueuedUserManager::authorize(const QString &_user, const QString &_password)
 {
     qCDebug(LOG_LIB) << "Authorize user" << _user;
 
@@ -137,8 +146,7 @@ QString QueuedUserManager::authorize(const QString &_user,
 /**
  * @fn authorize
  */
-bool QueuedUserManager::authorize(const QString &_token,
-                                  const QueuedEnums::Permission _service)
+bool QueuedUserManager::authorize(const QString &_token, const QueuedEnums::Permission _service)
 {
     qCDebug(LOG_LIB) << "Authorize user for" << static_cast<int>(_service);
 
@@ -161,8 +169,7 @@ bool QueuedUserManager::authorize(const QString &_token,
 /**
  * @fn checkToken
  */
-QDateTime QueuedUserManager::checkToken(const QString &_token,
-                                        bool *_valid) const
+QDateTime QueuedUserManager::checkToken(const QString &_token, bool *_valid) const
 {
     if (_valid) {
         QString user = m_tokens->isTokenValid(_token);

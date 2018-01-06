@@ -20,8 +20,8 @@
 #include <queued/Queued.h>
 
 
-QueuedctlCommon::QueuedctlResult
-QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPlugins::addPlugin(const QString &_plugin,
+                                                             const QString &_token)
 {
     qCDebug(LOG_APP) << "Add plugin" << _plugin;
 
@@ -29,16 +29,14 @@ QueuedctlPlugins::addPlugin(const QString &_plugin, const QString &_token)
 
     QueuedctlCommon::QueuedctlResult output;
     res.match([&output](const bool val) { output.status = val; },
-              [&output](const QueuedError &err) {
-                  output.output = err.message().c_str();
-              });
+              [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
 
 
-QueuedctlCommon::QueuedctlResult
-QueuedctlPlugins::getPlugin(const QString &_plugin, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPlugins::getPlugin(const QString &_plugin,
+                                                             const QString &_token)
 {
     qCDebug(LOG_APP) << "Get plugin" << _plugin;
 
@@ -57,24 +55,20 @@ QueuedctlPlugins::getPlugin(const QString &_plugin, const QString &_token)
                 text += QString("  %1").arg(opt.name);
                 text += QString("    description: %1").arg(opt.description);
                 text += QString("    type: %1").arg(opt.type);
-                text += QString("    default: %1")
-                            .arg(opt.defaultValue.toString());
+                text += QString("    default: %1").arg(opt.defaultValue.toString());
             }
 
             output.status = true;
             output.output = text.join('\n');
         },
-        [&output](const QueuedError &err) {
-            output.output = err.message().c_str();
-        });
+        [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
 
 
-QueuedctlCommon::QueuedctlResult
-QueuedctlPlugins::getPluginOptions(const QString &_plugin,
-                                   const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPlugins::getPluginOptions(const QString &_plugin,
+                                                                    const QString &_token)
 {
     qCDebug(LOG_APP) << "Get plugin options" << _plugin;
 
@@ -86,9 +80,7 @@ QueuedctlPlugins::getPluginOptions(const QString &_plugin,
             output.status = true;
             output.output = QueuedctlCommon::hashToString(val);
         },
-        [&output](const QueuedError &err) {
-            output.output = err.message().c_str();
-        });
+        [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
@@ -96,8 +88,7 @@ QueuedctlPlugins::getPluginOptions(const QString &_plugin,
 
 QueuedctlCommon::QueuedctlResult QueuedctlPlugins::listPlugins()
 {
-    auto res = QueuedCoreAdaptor::getOption(
-        QueuedConfig::QueuedSettings::Plugins, "");
+    auto res = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins, "");
 
     QueuedctlCommon::QueuedctlResult output;
     res.match(
@@ -105,16 +96,14 @@ QueuedctlCommon::QueuedctlResult QueuedctlPlugins::listPlugins()
             output.status = val.isValid();
             output.output = val.toString();
         },
-        [&output](const QueuedError &err) {
-            output.output = err.message().c_str();
-        });
+        [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
 
 
-QueuedctlCommon::QueuedctlResult
-QueuedctlPlugins::removePlugin(const QString &_plugin, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPlugins::removePlugin(const QString &_plugin,
+                                                                const QString &_token)
 {
     qCDebug(LOG_APP) << "Remove plugin" << _plugin;
 
@@ -122,9 +111,7 @@ QueuedctlPlugins::removePlugin(const QString &_plugin, const QString &_token)
 
     QueuedctlCommon::QueuedctlResult output;
     res.match([&output](const bool val) { output.status = val; },
-              [&output](const QueuedError &err) {
-                  output.output = err.message().c_str();
-              });
+              [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }

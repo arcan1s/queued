@@ -24,12 +24,9 @@
 
 namespace QueuedTcpServerResponseHelperTask
 {
-QVariantHash addOrEditTask(const long long _id, const QVariantHash &_data,
-                           const QString &_token);
-QueuedProcess::QueuedProcessDefinitions
-getDefinitions(const QVariantHash &_data);
-QVariantHash getTask(const long long _id, const QVariantHash &_data,
-                     const QString &_token);
+QVariantHash addOrEditTask(const long long _id, const QVariantHash &_data, const QString &_token);
+QueuedProcess::QueuedProcessDefinitions getDefinitions(const QVariantHash &_data);
+QVariantHash getTask(const long long _id, const QVariantHash &_data, const QString &_token);
 QVariantHash getTasks(const QVariantHash &_data, const QString &_token);
 QVariantHash startOrStopTask(const long long _id, const QString &_token);
 QVariantHash startTask(const long long _id, const QString &_token);

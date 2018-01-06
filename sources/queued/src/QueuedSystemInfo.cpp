@@ -74,8 +74,7 @@ double QueuedSystemInfo::memoryWeight(const long long _memory)
     qCDebug(LOG_LIB) << "Get memory weight for" << _memory;
 
     if ((_memory > 0) && (_memory < memoryCount()))
-        return static_cast<double>(_memory)
-               / static_cast<double>(memoryCount());
+        return static_cast<double>(_memory) / static_cast<double>(memoryCount());
     else
         return 1.0;
 }

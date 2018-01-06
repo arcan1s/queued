@@ -35,12 +35,11 @@
 /**
  * @fn updateSettings
  */
-void QueuedCorePrivate::updateSettings(const QueuedConfig::QueuedSettings _id,
-                                       const QString &_key,
+void QueuedCorePrivate::updateSettings(const QueuedConfig::QueuedSettings _id, const QString &_key,
                                        const QVariant &_value)
 {
-    qCDebug(LOG_LIB) << "Received update for" << static_cast<int>(_id) << _key
-                     << "with value" << _value;
+    qCDebug(LOG_LIB) << "Received update for" << static_cast<int>(_id) << _key << "with value"
+                     << _value;
 
     // FIXME probably there is a better way to change settings
     switch (_id) {
@@ -64,8 +63,7 @@ void QueuedCorePrivate::updateSettings(const QueuedConfig::QueuedSettings _id,
         m_databaseManager->setKeepUsers(_value.toLongLong());
         break;
     case QueuedConfig::QueuedSettings::OnExitAction:
-        m_processes->setExitAction(
-            static_cast<QueuedEnums::ExitAction>(_value.toInt()));
+        m_processes->setExitAction(static_cast<QueuedEnums::ExitAction>(_value.toInt()));
         break;
     case QueuedConfig::QueuedSettings::Plugins:
         // do nothing here
@@ -86,12 +84,10 @@ void QueuedCorePrivate::updateSettings(const QueuedConfig::QueuedSettings _id,
 /**
  * @fn updateTaskTime
  */
-void QueuedCorePrivate::updateTaskTime(const long long _id,
-                                       const QDateTime &_startTime,
+void QueuedCorePrivate::updateTaskTime(const long long _id, const QDateTime &_startTime,
                                        const QDateTime &_endTime)
 {
-    qCDebug(LOG_LIB) << "Update task" << _id << "time to" << _startTime
-                     << _endTime;
+    qCDebug(LOG_LIB) << "Update task" << _id << "time to" << _startTime << _endTime;
 
     QVariantHash record;
     if (_startTime.isValid()) {
@@ -114,8 +110,7 @@ void QueuedCorePrivate::updateTaskTime(const long long _id,
 /**
  * @fn updateUserLoginTime
  */
-void QueuedCorePrivate::updateUserLoginTime(const long long _id,
-                                            const QDateTime &_time)
+void QueuedCorePrivate::updateUserLoginTime(const long long _id, const QDateTime &_time)
 {
     qCDebug(LOG_LIB) << "Update user" << _id << "with login time" << _time;
 

@@ -41,8 +41,7 @@ extern "C" {
 /**
  * @fn QueuedProcess
  */
-QueuedProcess::QueuedProcess(QObject *_parent,
-                             const QueuedProcessDefinitions &definitions,
+QueuedProcess::QueuedProcess(QObject *_parent, const QueuedProcessDefinitions &definitions,
                              const long long index)
     : QProcess(_parent)
     , m_definitions(definitions)
@@ -98,11 +97,9 @@ void QueuedProcess::updateLimits()
 {
     auto nl = nativeLimits();
 
-    m_cgroup->setCpuLimit(
-        std::llround(QueuedSystemInfo::cpuWeight(nl.cpu) * 100.0));
+    m_cgroup->setCpuLimit(std::llround(QueuedSystemInfo::cpuWeight(nl.cpu) * 100.0));
     m_cgroup->setMemoryLimit(
-        std::llround(QueuedSystemInfo::memoryWeight(nl.memory)
-                     * QueuedSystemInfo::memoryCount()));
+        std::llround(QueuedSystemInfo::memoryWeight(nl.memory) * QueuedSystemInfo::memoryCount()));
 }
 
 
@@ -111,27 +108,27 @@ void QueuedProcess::updateLimits()
  */
 QList<Q_PID> QueuedProcess::childrenPids() const
 {
-    QStringList allDirectories = QDir("/proc").entryList(
-        QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
+    QStringList allDirectories
+        = QDir("/proc").entryList(QDir::Dirs | QDir::NoDotAndDotDot, QDir::Name);
     QStringList directories = allDirectories.filter(QRegExp("(\\d+)"));
 
-    QList<Q_PID> pids = std::accumulate(
-        directories.cbegin(), directories.cend(), QList<Q_PID>(),
-        [this](QList<Q_PID> &list, const QString &dir) {
-            QFile statFile(QString("/proc/%1/stat").arg(dir));
-            if (!statFile.open(QIODevice::ReadOnly | QIODevice::Text))
-                return list;
+    QList<Q_PID> pids
+        = std::accumulate(directories.cbegin(), directories.cend(), QList<Q_PID>(),
+                          [this](QList<Q_PID> &list, const QString &dir) {
+                              QFile statFile(QString("/proc/%1/stat").arg(dir));
+                              if (!statFile.open(QIODevice::ReadOnly | QIODevice::Text))
+                                  return list;
 
-            QString output = statFile.readAll();
-            output.remove(QRegExp("\\d+ \\(.*\\) . "));
-            Q_PID ppid = output.split(' ').first().toLongLong();
-            if (ppid == pid())
-                list.append(dir.toLongLong());
+                              QString output = statFile.readAll();
+                              output.remove(QRegExp("\\d+ \\(.*\\) . "));
+                              Q_PID ppid = output.split(' ').first().toLongLong();
+                              if (ppid == pid())
+                                  list.append(dir.toLongLong());
 
-            statFile.close();
+                              statFile.close();
 
-            return list;
-        });
+                              return list;
+                          });
 
     return pids;
 }
@@ -359,8 +356,7 @@ void QueuedProcess::setWorkDirectory(const QString &_workDirectory)
 
     m_definitions.workingDirectory
         = _workDirectory.isEmpty()
-              ? QStandardPaths::writableLocation(
-                    QStandardPaths::StandardLocation::TempLocation)
+              ? QStandardPaths::writableLocation(QStandardPaths::StandardLocation::TempLocation)
               : _workDirectory;
     setLogError("");
     setLogOutput("");

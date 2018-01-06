@@ -30,8 +30,7 @@
 /**
  * @fn QueuedDatabaseManager
  */
-QueuedDatabaseManager::QueuedDatabaseManager(QObject *_parent,
-                                             QueuedDatabase *_database)
+QueuedDatabaseManager::QueuedDatabaseManager(QObject *_parent, QueuedDatabase *_database)
     : QObject(_parent)
     , m_database(_database)
 {

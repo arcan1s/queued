@@ -20,8 +20,9 @@
 #include <queued/Queued.h>
 
 
-QueuedctlCommon::QueuedctlResult QueuedctlPermissions::addPermission(
-    const long long _id, const QString &_permission, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPermissions::addPermission(const long long _id,
+                                                                     const QString &_permission,
+                                                                     const QString &_token)
 {
     qCDebug(LOG_APP) << "Add permission" << _permission << "to" << _id;
 
@@ -31,20 +32,18 @@ QueuedctlCommon::QueuedctlResult QueuedctlPermissions::addPermission(
     if (permission == QueuedEnums::Permission::Invalid) {
         output.output = "Invalid permission";
     } else {
-        auto res
-            = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
+        auto res = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
         res.match([&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+                  [&output](const QueuedError &err) { output.output = err.message().c_str(); });
     }
 
     return output;
 }
 
 
-QueuedctlCommon::QueuedctlResult QueuedctlPermissions::removePermission(
-    const long long _id, const QString &_permission, const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlPermissions::removePermission(const long long _id,
+                                                                        const QString &_permission,
+                                                                        const QString &_token)
 {
     qCDebug(LOG_APP) << "Remove permission" << _permission << "to" << _id;
 
@@ -54,12 +53,9 @@ QueuedctlCommon::QueuedctlResult QueuedctlPermissions::removePermission(
     if (permission == QueuedEnums::Permission::Invalid) {
         output.output = "Invalid permission";
     } else {
-        auto res = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission,
-                                                               _token);
+        auto res = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission, _token);
         res.match([&output](const bool val) { output.status = val; },
-                  [&output](const QueuedError &err) {
-                      output.output = err.message().c_str();
-                  });
+                  [&output](const QueuedError &err) { output.output = err.message().c_str(); });
     }
 
     return output;
@@ -69,6 +65,5 @@ QueuedctlCommon::QueuedctlResult QueuedctlPermissions::removePermission(
 void QueuedctlPermissions::parser(QCommandLineParser &_parser)
 {
     _parser.addPositionalArgument("user", "User ID.", "<user>");
-    _parser.addPositionalArgument("permission", "Permission name.",
-                                  "<permission>");
+    _parser.addPositionalArgument("permission", "Permission name.", "<permission>");
 }

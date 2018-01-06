@@ -39,6 +39,10 @@ QueuedPropertyInterface::QueuedPropertyInterface(QueuedCore *parent)
 {
     qCDebug(LOG_DBUS) << __PRETTY_FUNCTION__;
 
+
+    qRegisterMetaType<QList<Q_PID>>("QList<Q_PID>");
+    qDBusRegisterMetaType<QList<Q_PID>>();
+
     qRegisterMetaType<QueuedResult<QVariant>>("QueuedResult<QVariant>");
     qDBusRegisterMetaType<QueuedResult<QVariant>>();
 
@@ -49,8 +53,7 @@ QueuedPropertyInterface::QueuedPropertyInterface(QueuedCore *parent)
         "QueuedPluginSpecification::PluginOption");
     qDBusRegisterMetaType<QueuedPluginSpecification::PluginOption>();
 
-    qRegisterMetaType<QueuedPluginSpecification::Plugin>(
-        "QueuedPluginSpecification::Plugin");
+    qRegisterMetaType<QueuedPluginSpecification::Plugin>("QueuedPluginSpecification::Plugin");
     qDBusRegisterMetaType<QueuedPluginSpecification::Plugin>();
 
     qRegisterMetaType<QueuedResult<QueuedPluginSpecification::Plugin>>(
@@ -71,8 +74,7 @@ QueuedPropertyInterface::~QueuedPropertyInterface()
 /**
  * @fn Plugin
  */
-QDBusVariant QueuedPropertyInterface::Plugin(const QString &plugin,
-                                             const QString &token)
+QDBusVariant QueuedPropertyInterface::Plugin(const QString &plugin, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get plugin" << plugin;
 
@@ -83,21 +85,18 @@ QDBusVariant QueuedPropertyInterface::Plugin(const QString &plugin,
 /**
  * @fn PluginOptions
  */
-QDBusVariant QueuedPropertyInterface::PluginOptions(const QString &plugin,
-                                                    const QString &token)
+QDBusVariant QueuedPropertyInterface::PluginOptions(const QString &plugin, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get plugin options" << plugin;
 
-    return QueuedCoreAdaptor::toDBusVariant(
-        m_core->pluginSettings(plugin, token));
+    return QueuedCoreAdaptor::toDBusVariant(m_core->pluginSettings(plugin, token));
 }
 
 
 /**
  * @fn Option
  */
-QDBusVariant QueuedPropertyInterface::Option(const QString &property,
-                                             const QString &token)
+QDBusVariant QueuedPropertyInterface::Option(const QString &property, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get property" << property;
 
@@ -108,8 +107,7 @@ QDBusVariant QueuedPropertyInterface::Option(const QString &property,
 /**
  * @fn Task
  */
-QDBusVariant QueuedPropertyInterface::Task(const long long id,
-                                           const QString &property,
+QDBusVariant QueuedPropertyInterface::Task(const long long id, const QString &property,
                                            const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from task" << id;
@@ -118,20 +116,17 @@ QDBusVariant QueuedPropertyInterface::Task(const long long id,
     if (!task) {
         qCWarning(LOG_DBUS) << "Could not find task" << id;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(
-            QueuedError("Task does not exist",
-                        QueuedEnums::ReturnStatus::InvalidArgument)));
+            QueuedError("Task does not exist", QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
     if (property.isEmpty()) {
         auto response = QVariant::fromValue<QVariantHash>(getProperties(task));
-        return QueuedCoreAdaptor::toDBusVariant(
-            QueuedResult<QVariant>(response));
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(response));
     } else {
         auto response = task->property(qPrintable(property));
         if (response.type() == QVariant::DateTime)
             response = response.toDateTime().toString(Qt::ISODateWithMs);
-        return QueuedCoreAdaptor::toDBusVariant(
-            QueuedResult<QVariant>(response));
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(response));
     }
 }
 
@@ -139,8 +134,7 @@ QDBusVariant QueuedPropertyInterface::Task(const long long id,
 /**
  * @fn User
  */
-QDBusVariant QueuedPropertyInterface::User(const long long id,
-                                           const QString &property,
+QDBusVariant QueuedPropertyInterface::User(const long long id, const QString &property,
                                            const QString &token)
 {
     qCDebug(LOG_DBUS) << "Get property" << property << "from user" << id;
@@ -149,20 +143,17 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << id;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(
-            QueuedError("User does not exist",
-                        QueuedEnums::ReturnStatus::InvalidArgument)));
+            QueuedError("User does not exist", QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
     if (property.isEmpty()) {
         auto response = QVariant::fromValue<QVariantHash>(getProperties(user));
-        return QueuedCoreAdaptor::toDBusVariant(
-            QueuedResult<QVariant>(response));
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(response));
     } else {
         auto response = user->property(qPrintable(property));
         if (response.type() == QVariant::DateTime)
             response = response.toDateTime().toString(Qt::ISODateWithMs);
-        return QueuedCoreAdaptor::toDBusVariant(
-            QueuedResult<QVariant>(response));
+        return QueuedCoreAdaptor::toDBusVariant(QueuedResult<QVariant>(response));
     }
 }
 
@@ -170,8 +161,7 @@ QDBusVariant QueuedPropertyInterface::User(const long long id,
 /**
  * @fn UserIdByName
  */
-QDBusVariant QueuedPropertyInterface::UserIdByName(const QString &name,
-                                                   const QString &token)
+QDBusVariant QueuedPropertyInterface::UserIdByName(const QString &name, const QString &token)
 {
     qCDebug(LOG_DBUS) << "Look for user ID" << name;
 
@@ -179,12 +169,10 @@ QDBusVariant QueuedPropertyInterface::UserIdByName(const QString &name,
     if (!user) {
         qCWarning(LOG_DBUS) << "Could not find user" << name;
         return QueuedCoreAdaptor::toDBusVariant(QueuedResult<long long>(
-            QueuedError("User does not exist",
-                        QueuedEnums::ReturnStatus::InvalidArgument)));
+            QueuedError("User does not exist", QueuedEnums::ReturnStatus::InvalidArgument)));
     }
 
-    return QueuedCoreAdaptor::toDBusVariant(
-        QueuedResult<long long>(user->index()));
+    return QueuedCoreAdaptor::toDBusVariant(QueuedResult<long long>(user->index()));
 }
 
 
@@ -206,8 +194,7 @@ QVariantHash QueuedPropertyInterface::getProperties(const QObject *_object)
             continue;
         result[name] = _object->property(name);
         if (result[name].type() == QVariant::DateTime)
-            result[name]
-                = result[name].toDateTime().toString(Qt::ISODateWithMs);
+            result[name] = result[name].toDateTime().toString(Qt::ISODateWithMs);
     }
 
     return result;

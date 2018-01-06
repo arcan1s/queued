@@ -60,12 +60,10 @@ struct PluginOption {
  * input variant object
  * @return appended argument body
  */
-inline QDBusArgument &operator<<(QDBusArgument &_argument,
-                                 const PluginOption &_arg)
+inline QDBusArgument &operator<<(QDBusArgument &_argument, const PluginOption &_arg)
 {
     _argument.beginStructure();
-    _argument << QDBusVariant(_arg.defaultValue.isValid() ? _arg.defaultValue
-                                                          : "");
+    _argument << QDBusVariant(_arg.defaultValue.isValid() ? _arg.defaultValue : "");
     _argument << _arg.description;
     _argument << _arg.name;
     _argument << _arg.type;
@@ -81,8 +79,7 @@ inline QDBusArgument &operator<<(QDBusArgument &_argument,
  * output variant object
  * @return source DBus argument
  */
-inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
-                                       PluginOption &_arg)
+inline const QDBusArgument &operator>>(const QDBusArgument &_argument, PluginOption &_arg)
 {
     QDBusVariant variant;
 
@@ -145,8 +142,7 @@ inline QDBusArgument &operator<<(QDBusArgument &_argument, const Plugin &_arg)
  * output variant object
  * @return source DBus argument
  */
-inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
-                                       Plugin &_arg)
+inline const QDBusArgument &operator>>(const QDBusArgument &_argument, Plugin &_arg)
 {
     _argument.beginStructure();
     _argument >> _arg.author;

@@ -39,9 +39,8 @@ QVariantHash QueuedPluginSpecification::dumpSpecification(const Plugin &_plugin)
 
     QVariantHash options;
     for (auto opt : _plugin.options)
-        options[opt.name] = QVariantHash({{"default", opt.defaultValue},
-                                          {"description", opt.description},
-                                          {"type", opt.type}});
+        options[opt.name] = QVariantHash(
+            {{"default", opt.defaultValue}, {"description", opt.description}, {"type", opt.type}});
     output["options"] = options;
 
     return output;
@@ -51,8 +50,7 @@ QVariantHash QueuedPluginSpecification::dumpSpecification(const Plugin &_plugin)
 /**
  * @fn readSpecification
  */
-QueuedPluginSpecification::Plugin
-QueuedPluginSpecification::readSpecification(const QString &_path)
+QueuedPluginSpecification::Plugin QueuedPluginSpecification::readSpecification(const QString &_path)
 {
     qCDebug(LOG_PL) << "Read specification from" << _path;
 

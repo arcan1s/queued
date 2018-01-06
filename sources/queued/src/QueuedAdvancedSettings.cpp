@@ -54,8 +54,7 @@ bool QueuedAdvancedSettings::checkDatabaseVersion() const
 {
     QString key = internalId(QueuedConfig::QueuedSettings::DatabaseVersion);
 
-    return m_values.contains(key.toLower())
-           && (get(key).toInt() == QueuedConfig::DATABASE_VERSION);
+    return m_values.contains(key.toLower()) && (get(key).toInt() == QueuedConfig::DATABASE_VERSION);
 }
 
 
@@ -70,16 +69,14 @@ QVariant QueuedAdvancedSettings::get(const QString &_key) const
     if (m_values.contains(key))
         return m_values.value(key);
     else
-        return QueuedConfig::QueuedSettingsDefaults[internalId(_key)]
-            .defaultValue;
+        return QueuedConfig::QueuedSettingsDefaults[internalId(_key)].defaultValue;
 }
 
 
 /**
  * @fn get
  */
-QVariant
-QueuedAdvancedSettings::get(const QueuedConfig::QueuedSettings _key) const
+QVariant QueuedAdvancedSettings::get(const QueuedConfig::QueuedSettings _key) const
 {
     qCDebug(LOG_LIB) << "Looking for key" << static_cast<int>(_key);
 
@@ -125,8 +122,7 @@ QString QueuedAdvancedSettings::internalId(const QString &_key)
 /**
  * @fn internalId
  */
-QString
-QueuedAdvancedSettings::internalId(const QueuedConfig::QueuedSettings _key)
+QString QueuedAdvancedSettings::internalId(const QueuedConfig::QueuedSettings _key)
 {
     qCDebug(LOG_LIB) << "Looking for key" << static_cast<int>(_key);
 
@@ -157,8 +153,7 @@ bool QueuedAdvancedSettings::isAdmin(const QString &_key) const
 /**
  * @fn isAdmin
  */
-bool QueuedAdvancedSettings::isAdmin(
-    const QueuedConfig::QueuedSettings &_key) const
+bool QueuedAdvancedSettings::isAdmin(const QueuedConfig::QueuedSettings &_key) const
 {
     qCDebug(LOG_LIB) << "Check if admin option" << static_cast<int>(_key);
 

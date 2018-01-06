@@ -91,8 +91,7 @@ public slots:
      * @remark if property is empty it return map of all properties
      * @return property value or empty if task or property not found
      */
-    QDBusVariant Task(const long long id, const QString &property,
-                      const QString &token);
+    QDBusVariant Task(const long long id, const QString &property, const QString &token);
     /**
      * @brief get user property
      * @param id
@@ -104,8 +103,7 @@ public slots:
      * @remark if property is empty it return map of all properties
      * @return property value or empty if user or property not found
      */
-    QDBusVariant User(const long long id, const QString &property,
-                      const QString &token);
+    QDBusVariant User(const long long id, const QString &property, const QString &token);
     /**
      * @brief get user ID by name
      * @param name

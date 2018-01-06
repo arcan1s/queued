@@ -20,8 +20,9 @@
 #include <queued/QueuedUser.h>
 
 
-QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(
-    const QString &_user, const QVariantHash &_data, const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperUser::addOrEditUser(const QString &_user,
+                                                              const QVariantHash &_data,
+                                                              const QString &_token)
 {
     qCDebug(LOG_SERV) << "Add user" << _user << "with data" << _data;
 
@@ -68,10 +69,8 @@ QueuedTcpServerResponseHelperUser::getDefinitions(const QVariantHash &_data)
 
     QueuedUser::QueuedUserDefinitions defs;
     defs.email = _data["email"].toString();
-    auto res
-        = QueuedCoreAdaptor::sendPasswordHash(_data["password"].toString());
-    res.match([&defs](const QString &val) { defs.password = val; },
-              [](const QueuedError &) {});
+    auto res = QueuedCoreAdaptor::sendPasswordHash(_data["password"].toString());
+    res.match([&defs](const QString &val) { defs.password = val; }, [](const QueuedError &) {});
     defs.permissions = _data["permissions"].toUInt();
     defs.priority = _data["priority"].toUInt();
     // limits
@@ -87,16 +86,13 @@ QueuedTcpServerResponseHelperUser::getDefinitions(const QVariantHash &_data)
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperUser::getReport(const QVariantHash &_data,
-                                             const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperUser::getReport(const QVariantHash &_data,
+                                                          const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get report using payload" << _data;
 
-    QDateTime stop
-        = QDateTime::fromString(_data["stop"].toString(), Qt::ISODateWithMs);
-    QDateTime start
-        = QDateTime::fromString(_data["start"].toString(), Qt::ISODateWithMs);
+    QDateTime stop = QDateTime::fromString(_data["stop"].toString(), Qt::ISODateWithMs);
+    QDateTime start = QDateTime::fromString(_data["start"].toString(), Qt::ISODateWithMs);
 
     QVariantHash output = {{"code", 200}};
     // some conversion magic
@@ -116,15 +112,15 @@ QueuedTcpServerResponseHelperUser::getReport(const QVariantHash &_data,
 }
 
 
-QVariantHash QueuedTcpServerResponseHelperUser::getUser(
-    const QString &_user, const QVariantHash &_data, const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperUser::getUser(const QString &_user,
+                                                        const QVariantHash &_data,
+                                                        const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get user data for" << _user << _data;
 
     auto userIdRes = QueuedCoreAdaptor::getUserId(_user, _token);
     long long userId = -1;
-    userIdRes.match([&userId](const long long val) { userId = val; },
-                    [](const QueuedError &) {});
+    userIdRes.match([&userId](const long long val) { userId = val; }, [](const QueuedError &) {});
     if (userId == -1)
         return {{"code", 500}};
 
@@ -133,11 +129,10 @@ QVariantHash QueuedTcpServerResponseHelperUser::getUser(
     QVariantHash output = {{"code", 200}};
     if (property.isEmpty()) {
         auto res = QueuedCoreAdaptor::getUser(userId, _token);
-        res.match(
-            [&output](const QVariantHash &val) { output["properties"] = val; },
-            [&output](const QueuedError &err) {
-                output = {{"code", 500}, {"message", err.message().c_str()}};
-            });
+        res.match([&output](const QVariantHash &val) { output["properties"] = val; },
+                  [&output](const QueuedError &err) {
+                      output = {{"code", 500}, {"message", err.message().c_str()}};
+                  });
     } else {
         auto res = QueuedCoreAdaptor::getUser(userId, property);
         res.match(
@@ -153,16 +148,13 @@ QVariantHash QueuedTcpServerResponseHelperUser::getUser(
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperUser::getUsers(const QVariantHash &_data,
-                                            const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperUser::getUsers(const QVariantHash &_data,
+                                                         const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get users" << _data;
 
-    QDateTime lastLogin = QDateTime::fromString(_data["lastLogged"].toString(),
-                                                Qt::ISODateWithMs);
-    auto permission
-        = QueuedEnums::stringToPermission(_data["permission"].toString());
+    QDateTime lastLogin = QDateTime::fromString(_data["lastLogged"].toString(), Qt::ISODateWithMs);
+    auto permission = QueuedEnums::stringToPermission(_data["permission"].toString());
 
     QVariantHash output = {{"code", 200}};
     // some conversion magic

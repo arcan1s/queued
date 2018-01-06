@@ -62,8 +62,7 @@ QueuedPluginManager::~QueuedPluginManager()
 /**
  * @fn convertOptionName
  */
-QPair<QString, QString>
-QueuedPluginManager::convertOptionName(const QString &_key)
+QPair<QString, QString> QueuedPluginManager::convertOptionName(const QString &_key)
 {
     qCDebug(LOG_PL) << "Convert option name" << _key;
 
@@ -94,8 +93,7 @@ QueuedPluginManagerInterface *QueuedPluginManager::interface()
 /**
  * @fn loadPlugin
  */
-bool QueuedPluginManager::loadPlugin(const QString &_name,
-                                     const QVariantHash &_settings)
+bool QueuedPluginManager::loadPlugin(const QString &_name, const QVariantHash &_settings)
 {
     qCDebug(LOG_PL) << "Load plugin" << _name << "with settings" << _settings;
 
@@ -125,8 +123,8 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
         if (loader.isLoaded())
             item = qobject_cast<QueuedPluginInterface *>(plugin);
         else
-            qCCritical(LOG_PL) << "Could not load the library for" << _name
-                               << "error" << loader.errorString();
+            qCCritical(LOG_PL) << "Could not load the library for" << _name << "error"
+                               << loader.errorString();
         if (item) {
             m_plugins[_name] = item;
             item->init(pluginSettings);
@@ -143,8 +141,7 @@ bool QueuedPluginManager::loadPlugin(const QString &_name,
 }
 
 
-QueuedPluginSpecification::Plugin
-QueuedPluginManager::loadSpecification(const QString &_name)
+QueuedPluginSpecification::Plugin QueuedPluginManager::loadSpecification(const QString &_name)
 {
     qCDebug(LOG_PL) << "Load specification for" << _name;
 
@@ -171,8 +168,7 @@ QueuedPluginManager::loadSpecification(const QString &_name)
  */
 QStringList QueuedPluginManager::pluginLocations()
 {
-    QStringList locations = QStandardPaths::standardLocations(
-        QStandardPaths::GenericDataLocation);
+    QStringList locations = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation);
     for (auto &loc : locations)
         loc = QString("%1/%2/%3")
                   .arg(loc)
@@ -205,15 +201,13 @@ bool QueuedPluginManager::unloadPlugin(const QString &_name)
 /**
  * @fn optionChanged
  */
-void QueuedPluginManager::optionChanged(const QString &_key,
-                                        const QVariant &_value)
+void QueuedPluginManager::optionChanged(const QString &_key, const QVariant &_value)
 {
     qCDebug(LOG_PL) << "Option" << _key << "changed to" << _value;
 
     auto option = convertOptionName(_key);
     if (!m_plugins.contains(option.first)) {
-        qCWarning(LOG_PL) << "Plugin" << option.first << "not found for"
-                          << _key;
+        qCWarning(LOG_PL) << "Plugin" << option.first << "not found for" << _key;
         return;
     }
 

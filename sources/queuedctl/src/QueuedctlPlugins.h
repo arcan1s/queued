@@ -24,15 +24,11 @@
 
 namespace QueuedctlPlugins
 {
-QueuedctlCommon::QueuedctlResult addPlugin(const QString &_plugin,
-                                           const QString &_token);
-QueuedctlCommon::QueuedctlResult getPlugin(const QString &_plugin,
-                                           const QString &_token);
-QueuedctlCommon::QueuedctlResult getPluginOptions(const QString &_plugin,
-                                                  const QString &_token);
+QueuedctlCommon::QueuedctlResult addPlugin(const QString &_plugin, const QString &_token);
+QueuedctlCommon::QueuedctlResult getPlugin(const QString &_plugin, const QString &_token);
+QueuedctlCommon::QueuedctlResult getPluginOptions(const QString &_plugin, const QString &_token);
 QueuedctlCommon::QueuedctlResult listPlugins();
-QueuedctlCommon::QueuedctlResult removePlugin(const QString &_plugin,
-                                              const QString &_token);
+QueuedctlCommon::QueuedctlResult removePlugin(const QString &_plugin, const QString &_token);
 void parser(QCommandLineParser &_parser);
 };
 

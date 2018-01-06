@@ -55,8 +55,7 @@ public:
      * @typedef QueuedProcessConnectionMap
      * map of indices to related QMetaObject::Connection
      */
-    typedef QHash<long long, QMetaObject::Connection>
-        QueuedProcessConnectionMap;
+    typedef QHash<long long, QMetaObject::Connection> QueuedProcessConnectionMap;
 
     /**
      * @brief QueuedProcessManager class constructor
@@ -93,9 +92,8 @@ public:
      * task index
      * @return pointer to created task
      */
-    QueuedProcess *
-    add(const QueuedProcess::QueuedProcessDefinitions &_definitions,
-        const long long _index);
+    QueuedProcess *add(const QueuedProcess::QueuedProcessDefinitions &_definitions,
+                       const long long _index);
     /**
      * @brief add tasks from database
      * @param _processes
@@ -182,8 +180,7 @@ private slots:
      * @param _index
      * index of finished task
      */
-    void taskFinished(const int _exitCode,
-                      const QProcess::ExitStatus _exitStatus,
+    void taskFinished(const int _exitCode, const QProcess::ExitStatus _exitStatus,
                       const long long _index);
 
 private:

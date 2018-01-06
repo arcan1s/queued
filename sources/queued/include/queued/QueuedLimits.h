@@ -163,8 +163,7 @@ bool limitCompare(const long long _first, const long long _second);
  * default limits if anu
  * @return minimal limits from given
  */
-Limits minimalLimits(const Limits &_task, const Limits &_user,
-                     const Limits &_default);
+Limits minimalLimits(const Limits &_task, const Limits &_user, const Limits &_default);
 };
 
 

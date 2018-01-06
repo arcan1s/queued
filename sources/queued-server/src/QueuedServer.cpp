@@ -46,33 +46,26 @@ QueuedServer::~QueuedServer()
 void QueuedServer::init()
 {
     while (QueuedCoreAdaptor::getStatus().type() != Result::Content::Value) {
-        qCWarning(LOG_SERV)
-            << "Daemon seems to be unavailable wait" << WAIT_FOR_DAEMON;
+        qCWarning(LOG_SERV) << "Daemon seems to be unavailable wait" << WAIT_FOR_DAEMON;
 
         QTime timer = QTime::currentTime().addMSecs(WAIT_FOR_DAEMON);
         while (QTime::currentTime() < timer)
             QCoreApplication::processEvents(QEventLoop::AllEvents, 100);
     }
 
-    m_server->init(QueuedCoreAdaptor::getOption(
-                       QueuedConfig::QueuedSettings::ServerTimeout, "")
+    m_server->init(QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::ServerTimeout, "")
                        .get()
                        .toInt());
-    QString address = QueuedCoreAdaptor::getOption(
-                          QueuedConfig::QueuedSettings::ServerAddress, "")
+    QString address = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::ServerAddress, "")
                           .get()
                           .toString();
-    ushort port = QueuedCoreAdaptor::getOption(
-                      QueuedConfig::QueuedSettings::ServerPort, "")
-                      .get()
-                      .toUInt();
+    ushort port
+        = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::ServerPort, "").get().toUInt();
     m_server->listen(QHostAddress(address), port);
     m_server->setMaxPendingConnections(
-        QueuedCoreAdaptor::getOption(
-            QueuedConfig::QueuedSettings::ServerMaxConnections, "")
+        QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::ServerMaxConnections, "")
             .get()
             .toInt());
 
-    qCInfo(LOG_SERV) << "Server listen on" << m_server->serverAddress()
-                     << m_server->serverPort();
+    qCInfo(LOG_SERV) << "Server listen on" << m_server->serverAddress() << m_server->serverPort();
 }

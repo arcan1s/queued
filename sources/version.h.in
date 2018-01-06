@@ -22,13 +22,10 @@ static const char SPECIAL_THANKS[] = "";
 // links
 static const char HOMEPAGE[] = "https://arcanis.me/projects/queued";
 static const char REPOSITORY[] = "https://github.com/arcan1s/queued";
-static const char RELEASES[]
-    = "https://github.com/arcan1s/queued/releases/tag/V.";
-static const char VERSION_API[]
-    = "https://api.github.com/repos/arcan1s/queued/releases";
+static const char RELEASES[] = "https://github.com/arcan1s/queued/releases/tag/V.";
+static const char VERSION_API[] = "https://api.github.com/repos/arcan1s/queued/releases";
 static const char BUGTRACKER[] = "https://github.com/arcan1s/queued/issues";
-static const char BUGTRACKER_API[]
-    = "https://arcanis.me/repos/arcan1s/queued/issues";
+static const char BUGTRACKER_API[] = "https://arcanis.me/repos/arcan1s/queued/issues";
 
 // build information
 static const char BUILD_DATE[] = "@CURRENT_DATE@";
@@ -39,8 +36,7 @@ static const char CMAKE_CXX_COMPILER[] = "@CMAKE_CXX_COMPILER@";
 static const char CMAKE_CXX_FLAGS[] = "@CMAKE_CXX_FLAGS@";
 static const char CMAKE_CXX_FLAGS_DEBUG[] = "@CMAKE_CXX_FLAGS_DEBUG@";
 static const char CMAKE_CXX_FLAGS_RELEASE[] = "@CMAKE_CXX_FLAGS_RELEASE@";
-static const char CMAKE_CXX_FLAGS_OPTIMIZATION[]
-    = "@CMAKE_CXX_FLAGS_OPTIMIZATION@";
+static const char CMAKE_CXX_FLAGS_OPTIMIZATION[] = "@CMAKE_CXX_FLAGS_OPTIMIZATION@";
 static const char CMAKE_DEFINITIONS[] = "@CMAKE_DEFINITIONS@";
 static const char CMAKE_INSTALL_PREFIX[] = "@CMAKE_INSTALL_PREFIX@";
 static const char CMAKE_MODULE_LINKER_FLAGS[] = "@CMAKE_MODULE_LINKER_FLAGS@";

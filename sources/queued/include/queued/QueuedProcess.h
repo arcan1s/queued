@@ -102,8 +102,7 @@ public:
      * @param index
      * index of process
      */
-    explicit QueuedProcess(QObject *_parent,
-                           const QueuedProcessDefinitions &definitions,
+    explicit QueuedProcess(QObject *_parent, const QueuedProcessDefinitions &definitions,
                            const long long index);
     /**
      * @brief QueuedProcess class destructor

@@ -55,8 +55,7 @@ QString QueuedTokenManager::isTokenValid(const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Check token on validity" << _token;
 
-    if (m_tokens.contains(_token)
-        && (tokenExpiration(_token) > QDateTime::currentDateTimeUtc()))
+    if (m_tokens.contains(_token) && (tokenExpiration(_token) > QDateTime::currentDateTimeUtc()))
         return m_tokens[_token].user;
     else
         return "";
@@ -66,18 +65,16 @@ QString QueuedTokenManager::isTokenValid(const QString &_token) const
 /**
  * @brief loadToken
  */
-void QueuedTokenManager::loadToken(
-    const QueuedTokenManager::QueuedTokenDefinitions &_definitions)
+void QueuedTokenManager::loadToken(const QueuedTokenManager::QueuedTokenDefinitions &_definitions)
 {
-    qCDebug(LOG_LIB) << "Add token for user" << _definitions.user
-                     << "valid until" << _definitions.validUntil;
+    qCDebug(LOG_LIB) << "Add token for user" << _definitions.user << "valid until"
+                     << _definitions.validUntil;
 
     m_tokens[_definitions.token] = _definitions;
 
     // register expiry timer
-    std::chrono::milliseconds duration(
-        _definitions.validUntil.toMSecsSinceEpoch()
-        - QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
+    std::chrono::milliseconds duration(_definitions.validUntil.toMSecsSinceEpoch()
+                                       - QDateTime::currentDateTimeUtc().toMSecsSinceEpoch());
     QTimer timer;
     timer.setSingleShot(true);
     timer.setInterval(duration);
@@ -94,10 +91,9 @@ void QueuedTokenManager::loadTokens(const QList<QVariantHash> &_values)
     qCDebug(LOG_LIB) << "Set values from" << _values;
 
     for (auto &token : _values) {
-        QDateTime validUntil = QDateTime::fromString(
-            token["validUntil"].toString(), Qt::ISODateWithMs);
-        loadToken(
-            {token["token"].toString(), token["user"].toString(), validUntil});
+        QDateTime validUntil
+            = QDateTime::fromString(token["validUntil"].toString(), Qt::ISODateWithMs);
+        loadToken({token["token"].toString(), token["user"].toString(), validUntil});
     }
 }
 
@@ -105,13 +101,11 @@ void QueuedTokenManager::loadTokens(const QList<QVariantHash> &_values)
 /**
  * @fn registerToken
  */
-QString QueuedTokenManager::registerToken(const QString &_user,
-                                          const QDateTime &_validUntil)
+QString QueuedTokenManager::registerToken(const QString &_user, const QDateTime &_validUntil)
 {
     // generate from uuid
     QString token = QUuid::createUuid().toString().remove('{').remove('}');
-    qCInfo(LOG_LIB) << "Registered token" << token << "valid until"
-                    << _validUntil;
+    qCInfo(LOG_LIB) << "Registered token" << token << "valid until" << _validUntil;
 
     // append to internal storage
     loadToken({token, _user, _validUntil});

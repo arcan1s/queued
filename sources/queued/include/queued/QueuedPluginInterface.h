@@ -69,8 +69,7 @@ public:
      * @param _value
      * option value
      */
-    virtual void updateSettings(const QString &_key, const QVariant &_value)
-        = 0;
+    virtual void updateSettings(const QString &_key, const QVariant &_value) = 0;
 };
 
 Q_DECLARE_INTERFACE(QueuedPluginInterface, PLUGIN_INTERFACE_NAME)

@@ -32,8 +32,7 @@
 /**
  * @fn QueuedReportManager
  */
-QueuedReportManager::QueuedReportManager(QObject *_parent,
-                                         QueuedDatabase *_database,
+QueuedReportManager::QueuedReportManager(QObject *_parent, QueuedDatabase *_database,
                                          const QString &_token)
     : QObject(_parent)
     , m_database(_database)
@@ -72,17 +71,14 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
                           .arg(_to.toString(Qt::ISODateWithMs));
 
     QString condition
-        = conditions.isEmpty()
-              ? ""
-              : QString("WHERE (%1)").arg(conditions.join(" AND "));
+        = conditions.isEmpty() ? "" : QString("WHERE (%1)").arg(conditions.join(" AND "));
     qCInfo(LOG_LIB) << "Task condition select" << condition;
     auto tasks = m_database->get(QueuedDB::TASKS_TABLE, condition);
 
     // build hash first
     QHash<long long, QVariantHash> hashOutput;
     for (auto &task : tasks) {
-        QueuedLimits::Limits limits
-            = QueuedLimits::Limits(task["limits"].toString());
+        QueuedLimits::Limits limits = QueuedLimits::Limits(task["limits"].toString());
         // update values to system ones if empty
         if (limits.cpu == 0)
             limits.cpu = QueuedSystemInfo::cpuCount();
@@ -90,11 +86,9 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
             limits.memory = QueuedSystemInfo::memoryCount();
         // calculate usage stats
         long long taskTime
-            = QDateTime::fromString(task["endTime"].toString(),
-                                    Qt::ISODateWithMs)
+            = QDateTime::fromString(task["endTime"].toString(), Qt::ISODateWithMs)
                   .toMSecsSinceEpoch()
-              - QDateTime::fromString(task["startTime"].toString(),
-                                      Qt::ISODateWithMs)
+              - QDateTime::fromString(task["startTime"].toString(), Qt::ISODateWithMs)
                     .toMSecsSinceEpoch();
         limits *= taskTime / 1000;
 
@@ -102,16 +96,12 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
         long long userId = task.value("user").toLongLong();
         auto userObj = _core->user(userId, m_token);
         QVariantHash currentData = hashOutput[userId];
-        currentData["cpu"]
-            = currentData.value("cpu", 0).toLongLong() + limits.cpu;
-        currentData["memory"]
-            = currentData.value("memory", 0).toLongLong() + limits.memory;
-        currentData["gpu"]
-            = currentData.value("gpu", 0).toLongLong() + limits.gpu;
+        currentData["cpu"] = currentData.value("cpu", 0).toLongLong() + limits.cpu;
+        currentData["memory"] = currentData.value("memory", 0).toLongLong() + limits.memory;
+        currentData["gpu"] = currentData.value("gpu", 0).toLongLong() + limits.gpu;
         currentData["gpumemory"]
             = currentData.value("gpumemory", 0).toLongLong() + limits.gpumemory;
-        currentData["storage"]
-            = currentData.value("storage", 0).toLongLong() + limits.storage;
+        currentData["storage"] = currentData.value("storage", 0).toLongLong() + limits.storage;
         currentData["count"] = currentData.value("count", 0).toLongLong() + 1;
         // internal fields
         currentData["user"] = userObj ? userObj->name() : "";
@@ -124,9 +114,7 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
     // append output data
     auto userList = hashOutput.keys();
     std::sort(userList.begin(), userList.end(),
-              [](const long long first, const long long second) {
-                  return first < second;
-              });
+              [](const long long first, const long long second) { return first < second; });
     QList<QVariantHash> output;
     for (auto userId : userList)
         output.append(hashOutput[userId]);
@@ -138,8 +126,7 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
 /**
  * @fn tasks
  */
-QList<QVariantHash> QueuedReportManager::tasks(const long long _user,
-                                               const QDateTime &_from,
+QList<QVariantHash> QueuedReportManager::tasks(const long long _user, const QDateTime &_from,
                                                const QDateTime &_to) const
 {
     qCDebug(LOG_LIB) << "Search for tasks in" << _user << _from << _to;
@@ -157,9 +144,7 @@ QList<QVariantHash> QueuedReportManager::tasks(const long long _user,
                           .arg(_to.toString(Qt::ISODateWithMs));
 
     QString condition
-        = conditions.isEmpty()
-              ? ""
-              : QString("WHERE (%1)").arg(conditions.join(" AND "));
+        = conditions.isEmpty() ? "" : QString("WHERE (%1)").arg(conditions.join(" AND "));
     qCInfo(LOG_LIB) << "Task condition select" << condition;
 
     return m_database->get(QueuedDB::TASKS_TABLE, condition);
@@ -169,12 +154,10 @@ QList<QVariantHash> QueuedReportManager::tasks(const long long _user,
 /**
  * @fn users
  */
-QList<QVariantHash>
-QueuedReportManager::users(const QDateTime &_lastLogged,
-                           const QueuedEnums::Permission _permission) const
+QList<QVariantHash> QueuedReportManager::users(const QDateTime &_lastLogged,
+                                               const QueuedEnums::Permission _permission) const
 {
-    qCDebug(LOG_LIB) << "Search for users in" << _lastLogged
-                     << static_cast<uint>(_permission);
+    qCDebug(LOG_LIB) << "Search for users in" << _lastLogged << static_cast<uint>(_permission);
 
     QStringList conditions;
     if (_lastLogged.isValid())
@@ -182,13 +165,11 @@ QueuedReportManager::users(const QDateTime &_lastLogged,
                               "(lastLogin NOT NULL))")
                           .arg(_lastLogged.toString(Qt::ISODateWithMs));
     if (_permission != QueuedEnums::Permission::Invalid)
-        conditions += QString("((permissions & ~%1) != permissions)")
-                          .arg(static_cast<uint>(_permission));
+        conditions
+            += QString("((permissions & ~%1) != permissions)").arg(static_cast<uint>(_permission));
 
     QString condition
-        = conditions.isEmpty()
-              ? ""
-              : QString("WHERE (%1)").arg(conditions.join(" AND "));
+        = conditions.isEmpty() ? "" : QString("WHERE (%1)").arg(conditions.join(" AND "));
     qCInfo(LOG_LIB) << "User condition select" << condition;
 
     return m_database->get(QueuedDB::USERS_TABLE, condition);

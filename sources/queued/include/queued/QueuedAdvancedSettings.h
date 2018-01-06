@@ -130,8 +130,8 @@ signals:
      * @param _value
      * changed value
      */
-    void valueUpdated(const QueuedConfig::QueuedSettings _id,
-                      const QString &_key, const QVariant &_value);
+    void valueUpdated(const QueuedConfig::QueuedSettings _id, const QString &_key,
+                      const QVariant &_value);
 
 private:
     /**

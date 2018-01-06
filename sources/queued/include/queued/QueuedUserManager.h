@@ -39,8 +39,7 @@ class QueuedUserManager : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString salt READ salt WRITE setSalt)
-    Q_PROPERTY(
-        long long tokenExpiration READ tokenExpiration WRITE setTokenExpiration)
+    Q_PROPERTY(long long tokenExpiration READ tokenExpiration WRITE setTokenExpiration)
 
 public:
     /**
@@ -53,6 +52,13 @@ public:
      * @brief QueuedUserManager class destructor
      */
     virtual ~QueuedUserManager();
+    /**
+     * @brief parse user definitions from table data
+     * @param _properties
+     * map of usr properties
+     * @return data mapped to internal format
+     */
+    static QueuedUser::QueuedUserDefinitions parseDefinitions(const QVariantHash &_properties);
     /**
      * @brief add user
      * @param _properties
@@ -70,8 +76,7 @@ public:
      * user ID
      * @return pointer to created user
      */
-    QueuedUser *add(const QueuedUser::QueuedUserDefinitions &_definitions,
-                    const long long _id);
+    QueuedUser *add(const QueuedUser::QueuedUserDefinitions &_definitions, const long long _id);
     /**
      * @brief authorize user manually
      * @remark it ignores password input and creates unlimited token
@@ -97,8 +102,7 @@ public:
      * service to authorize
      * @return true if user allowed to do it otherwise return false
      */
-    bool authorize(const QString &_token,
-                   const QueuedEnums::Permission _service);
+    bool authorize(const QString &_token, const QueuedEnums::Permission _service);
     /**
      * @brief check token expiration
      * @param _token

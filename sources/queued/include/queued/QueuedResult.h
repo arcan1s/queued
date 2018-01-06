@@ -50,8 +50,7 @@ typedef Result::Error<QueuedEnums::ReturnStatus> QueuedError;
  * input error class
  * @return appended argument body
  */
-inline QDBusArgument &operator<<(QDBusArgument &_argument,
-                                 const QueuedError &_arg)
+inline QDBusArgument &operator<<(QDBusArgument &_argument, const QueuedError &_arg)
 {
     _argument.beginStructure();
     _argument << QString(_arg.message().c_str());
@@ -68,8 +67,7 @@ inline QDBusArgument &operator<<(QDBusArgument &_argument,
  * output object
  * @return source DBus argument
  */
-inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
-                                       QueuedError &_arg)
+inline const QDBusArgument &operator>>(const QDBusArgument &_argument, QueuedError &_arg)
 {
     QString message;
     long long code;
@@ -79,8 +77,7 @@ inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
     _argument >> code;
     _argument.endStructure();
 
-    _arg = QueuedError(message.toStdString(),
-                       static_cast<QueuedEnums::ReturnStatus>(code));
+    _arg = QueuedError(message.toStdString(), static_cast<QueuedEnums::ReturnStatus>(code));
     return _argument;
 };
 /**
@@ -94,8 +91,7 @@ typedef QHash<QString, QHash<QString, QString>> QueuedStatusMap;
  * result value payload class
  * custom Result<T, E> implementation
  */
-template <class T>
-using QueuedResult = Result::Result<T, QueuedEnums::ReturnStatus>;
+template <class T> using QueuedResult = Result::Result<T, QueuedEnums::ReturnStatus>;
 Q_DECLARE_METATYPE(QueuedResult<bool>)
 Q_DECLARE_METATYPE(QueuedResult<long long>)
 Q_DECLARE_METATYPE(QueuedResult<QString>)
@@ -128,8 +124,7 @@ inline QDBusArgument &operator<<(QDBusArgument &_argument, const QVariant &_arg)
  * output variant object
  * @return source DBus argument
  */
-inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
-                                       QVariant &_arg)
+inline const QDBusArgument &operator>>(const QDBusArgument &_argument, QVariant &_arg)
 {
     QDBusVariant variant;
 
@@ -149,8 +144,7 @@ inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
  * @return appended argument body
  */
 template <class T>
-inline QDBusArgument &operator<<(QDBusArgument &_argument,
-                                 const QueuedResult<T> &_arg)
+inline QDBusArgument &operator<<(QDBusArgument &_argument, const QueuedResult<T> &_arg)
 {
     // HACK we are using explicit cast to QString here to make sure of valid
     // marshalling
@@ -187,8 +181,7 @@ inline QDBusArgument &operator<<(QDBusArgument &_argument,
  * @return source DBus argument
  */
 template <class T>
-inline const QDBusArgument &operator>>(const QDBusArgument &_argument,
-                                       QueuedResult<T> &_arg)
+inline const QDBusArgument &operator>>(const QDBusArgument &_argument, QueuedResult<T> &_arg)
 {
     QString type;
     T value;

@@ -145,8 +145,7 @@ typedef QHash<QString, QueuedSettingsField> QueuedSettingsDefaultMap;
 static const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
     {"", {QueuedSettings::Invalid, QVariant(), false}},
     {"DatabaseInterval", {QueuedSettings::DatabaseInterval, 86400000, true}},
-    {"DatabaseVersion",
-     {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION, true}},
+    {"DatabaseVersion", {QueuedSettings::DatabaseVersion, QueuedConfig::DATABASE_VERSION, true}},
     {"DefaultLimits", {QueuedSettings::DefaultLimits, "0\n0\n0\n0\n0", false}},
     {"KeepTasks", {QueuedSettings::KeepTasks, 0, false}},
     {"KeepUsers", {QueuedSettings::KeepUsers, 0, false}},

@@ -90,18 +90,16 @@ QHash<QString, QHash<QString, QString>> QueuedDebug::getBuildMetaData()
             // api
             {"API",
              {
-                 {"DATABASE_VERSION",
-                  QString::number(QueuedConfig::DATABASE_VERSION)},
+                 {"DATABASE_VERSION", QString::number(QueuedConfig::DATABASE_VERSION)},
                  {"PLUGIN_INTERFACE", QueuedConfig::PLUGIN_INTERFACE},
                  {"WEBAPI_TOKEN_HEADER", QueuedConfig::WEBAPI_TOKEN_HEADER},
                  {"WEBAPI_VERSIONS",
-                  std::accumulate(
-                      std::next(std::begin(QueuedConfig::WEBAPI_VERSIONS)),
-                      std::end(QueuedConfig::WEBAPI_VERSIONS),
-                      QString::number(QueuedConfig::WEBAPI_VERSIONS[0]),
-                      [](const QString str, const int version) {
-                          return QString("%1,%2").arg(str).arg(version);
-                      })},
+                  std::accumulate(std::next(std::begin(QueuedConfig::WEBAPI_VERSIONS)),
+                                  std::end(QueuedConfig::WEBAPI_VERSIONS),
+                                  QString::number(QueuedConfig::WEBAPI_VERSIONS[0]),
+                                  [](const QString str, const int version) {
+                                      return QString("%1,%2").arg(str).arg(version);
+                                  })},
              }},
             // paths
             {"Paths",

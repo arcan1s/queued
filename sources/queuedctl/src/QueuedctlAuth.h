@@ -24,12 +24,10 @@
 
 namespace QueuedctlAuth
 {
-QueuedctlCommon::QueuedctlResult auth(const QString &_user,
-                                      const QString &_cache);
+QueuedctlCommon::QueuedctlResult auth(const QString &_user, const QString &_cache);
 QString getToken(const QString &_cache, const QString &_user);
 void parser(QCommandLineParser &_parser);
-void setToken(const QString &_token, const QString &_user,
-              const QString &_cache);
+void setToken(const QString &_token, const QString &_user, const QString &_cache);
 QString token(const QString &_user, const QString &_cache);
 bool tryAuth(const QString &_token);
 };

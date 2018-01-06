@@ -19,9 +19,8 @@
 #include <queued/Queued.h>
 
 
-QVariantHash
-QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
-                                                const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
+                                                             const QString &_token)
 {
     qCDebug(LOG_SERV) << "Add plugin" << _name;
 
@@ -40,9 +39,8 @@ QueuedTcpServerResponseHelperPlugins::addPlugin(const QString &_name,
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperPlugins::getPlugin(const QString &_name,
-                                                const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperPlugins::getPlugin(const QString &_name,
+                                                             const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get plugin" << _name;
 
@@ -65,8 +63,7 @@ QueuedTcpServerResponseHelperPlugins::getPlugin(const QString &_name,
 
 QVariantHash QueuedTcpServerResponseHelperPlugins::listPlugins()
 {
-    auto res = QueuedCoreAdaptor::getOption(
-        QueuedConfig::QueuedSettings::Plugins, "");
+    auto res = QueuedCoreAdaptor::getOption(QueuedConfig::QueuedSettings::Plugins, "");
 
     QVariantHash output;
     res.match(
@@ -81,9 +78,8 @@ QVariantHash QueuedTcpServerResponseHelperPlugins::listPlugins()
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperPlugins::removePlugin(const QString &_name,
-                                                   const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperPlugins::removePlugin(const QString &_name,
+                                                                const QString &_token)
 {
     qCDebug(LOG_SERV) << "Remove plugin" << _name;
 

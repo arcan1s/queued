@@ -114,8 +114,7 @@ static const char CG_FS_PATH[] = "/sys/fs/cgroup";
  * @brief plugin interface name
  * @remark required by Qt macro
  */
-#define PLUGIN_INTERFACE_NAME                                                  \
-    "org.queued.plugin/@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@"
+#define PLUGIN_INTERFACE_NAME "org.queued.plugin/@PROJECT_VERSION_MAJOR@.@PROJECT_VERSION_MINOR@"
 /**
  * @brief plugin interface name
  */

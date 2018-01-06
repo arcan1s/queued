@@ -56,8 +56,7 @@ QueuedCore::~QueuedCore()
 /**
  * @fn addPlugin
  */
-QueuedResult<bool> QueuedCore::addPlugin(const QString &_plugin,
-                                         const QString &_token)
+QueuedResult<bool> QueuedCore::addPlugin(const QString &_plugin, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Add plugin" << _plugin;
 
@@ -68,34 +67,33 @@ QueuedResult<bool> QueuedCore::addPlugin(const QString &_plugin,
 /**
  * @addTask
  */
-QueuedResult<long long>
-QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
-                    const QString &_workingDirectory, const long long _userId,
-                    const uint _nice, const QueuedLimits::Limits &_limits,
-                    const QString &_token)
+QueuedResult<long long> QueuedCore::addTask(const QString &_command, const QStringList &_arguments,
+                                            const QString &_workingDirectory,
+                                            const long long _userId, const uint _nice,
+                                            const QueuedLimits::Limits &_limits,
+                                            const QString &_token)
 {
-    qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments
-                     << "from user" << _userId;
+    qCDebug(LOG_LIB) << "Add task" << _command << "with arguments" << _arguments << "from user"
+                     << _userId;
 
-    return m_impl->addTask(_command, _arguments, _workingDirectory, _userId,
-                           _nice, _limits, _token);
+    return m_impl->addTask(_command, _arguments, _workingDirectory, _userId, _nice, _limits,
+                           _token);
 }
 
 
 /**
  * @fn addUser
  */
-QueuedResult<long long>
-QueuedCore::addUser(const QString &_name, const QString &_email,
-                    const QString &_password, const uint _permissions,
-                    const uint _priority, const QueuedLimits::Limits &_limits,
-                    const QString &_token)
+QueuedResult<long long> QueuedCore::addUser(const QString &_name, const QString &_email,
+                                            const QString &_password, const uint _permissions,
+                                            const uint _priority,
+                                            const QueuedLimits::Limits &_limits,
+                                            const QString &_token)
 {
-    qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email
-                     << "and permissions" << _permissions;
+    qCDebug(LOG_LIB) << "Add user" << _name << "with email" << _email << "and permissions"
+                     << _permissions;
 
-    return m_impl->addUser(_name, _email, _password, _permissions, _priority,
-                           _limits, _token);
+    return m_impl->addUser(_name, _email, _password, _permissions, _priority, _limits, _token);
 }
 
 
@@ -111,8 +109,7 @@ QueuedResult<bool> QueuedCore::authorization(const QString &_token)
 /**
  * @fn authorization
  */
-QueuedResult<QString> QueuedCore::authorization(const QString &_name,
-                                                const QString &_password)
+QueuedResult<QString> QueuedCore::authorization(const QString &_name, const QString &_password)
 {
     qCDebug(LOG_LIB) << "Authorize user" << _name;
 
@@ -123,8 +120,7 @@ QueuedResult<QString> QueuedCore::authorization(const QString &_name,
 /**
  * @fn editOption
  */
-QueuedResult<bool> QueuedCore::editOption(const QString &_key,
-                                          const QVariant &_value,
+QueuedResult<bool> QueuedCore::editOption(const QString &_key, const QVariant &_value,
                                           const QString &_token)
 {
     qCDebug(LOG_LIB) << "Set key" << _key << "to" << _value;
@@ -136,8 +132,7 @@ QueuedResult<bool> QueuedCore::editOption(const QString &_key,
 /**
  * @fn editTask
  */
-QueuedResult<bool> QueuedCore::editTask(const long long _id,
-                                        const QVariantHash &_taskData,
+QueuedResult<bool> QueuedCore::editTask(const long long _id, const QVariantHash &_taskData,
                                         const QString &_token)
 {
     qCDebug(LOG_LIB) << "Edit task with ID" << _id;
@@ -149,8 +144,7 @@ QueuedResult<bool> QueuedCore::editTask(const long long _id,
 /**
  * @fn editUser
  */
-QueuedResult<bool> QueuedCore::editUser(const long long _id,
-                                        const QVariantHash &_userData,
+QueuedResult<bool> QueuedCore::editUser(const long long _id, const QVariantHash &_userData,
                                         const QString &_token)
 {
     qCDebug(LOG_LIB) << "Edit user with ID" << _id;
@@ -162,13 +156,12 @@ QueuedResult<bool> QueuedCore::editUser(const long long _id,
 /**
  * @fn editUserPermission
  */
-QueuedResult<bool>
-QueuedCore::editUserPermission(const long long _id,
-                               const QueuedEnums::Permission &_permission,
-                               const bool _add, const QString &_token)
+QueuedResult<bool> QueuedCore::editUserPermission(const long long _id,
+                                                  const QueuedEnums::Permission &_permission,
+                                                  const bool _add, const QString &_token)
 {
-    qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission)
-                     << "for user" << _id << "add" << _add;
+    qCDebug(LOG_LIB) << "Edit permissions" << static_cast<int>(_permission) << "for user" << _id
+                     << "add" << _add;
 
     return m_impl->editUserPermission(_id, _permission, _add, _token);
 }
@@ -186,8 +179,7 @@ QueuedResult<QString> QueuedCore::hashFromPassword(const QString &_password)
 /**
  * @fn option
  */
-QueuedResult<QVariant> QueuedCore::option(const QString &_key,
-                                          const QString &_token)
+QueuedResult<QVariant> QueuedCore::option(const QString &_key, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Look for option" << _key;
 
@@ -198,9 +190,9 @@ QueuedResult<QVariant> QueuedCore::option(const QString &_key,
 /**
  * @fn performanceReport
  */
-QueuedResult<QList<QVariantHash>>
-QueuedCore::performanceReport(const QDateTime &_from, const QDateTime &_to,
-                              const QString &_token) const
+QueuedResult<QList<QVariantHash>> QueuedCore::performanceReport(const QDateTime &_from,
+                                                                const QDateTime &_to,
+                                                                const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get performance report for" << _from << _to;
 
@@ -211,8 +203,8 @@ QueuedCore::performanceReport(const QDateTime &_from, const QDateTime &_to,
 /**
  * @fn plugin
  */
-QueuedResult<QueuedPluginSpecification::Plugin>
-QueuedCore::plugin(const QString &_plugin, const QString &_token)
+QueuedResult<QueuedPluginSpecification::Plugin> QueuedCore::plugin(const QString &_plugin,
+                                                                   const QString &_token)
 {
     qCDebug(LOG_LIB) << "Get data for plugin" << _plugin;
 
@@ -223,8 +215,7 @@ QueuedCore::plugin(const QString &_plugin, const QString &_token)
 /**
  * @fn pluginSettings
  */
-QueuedResult<QVariantHash> QueuedCore::pluginSettings(const QString &_plugin,
-                                                      const QString &_token)
+QueuedResult<QVariantHash> QueuedCore::pluginSettings(const QString &_plugin, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Get plugin settings for" << _plugin;
 
@@ -235,8 +226,7 @@ QueuedResult<QVariantHash> QueuedCore::pluginSettings(const QString &_plugin,
 /**
  * @fn removePlugin
  */
-QueuedResult<bool> QueuedCore::removePlugin(const QString &_plugin,
-                                            const QString &_token)
+QueuedResult<bool> QueuedCore::removePlugin(const QString &_plugin, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Remove plugin" << _plugin;
 
@@ -247,8 +237,7 @@ QueuedResult<bool> QueuedCore::removePlugin(const QString &_plugin,
 /**
  * @fn startTask
  */
-QueuedResult<bool> QueuedCore::startTask(const long long _id,
-                                         const QString &_token)
+QueuedResult<bool> QueuedCore::startTask(const long long _id, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Force start task with ID" << _id;
 
@@ -259,8 +248,7 @@ QueuedResult<bool> QueuedCore::startTask(const long long _id,
 /**
  * @fn stopTask
  */
-QueuedResult<bool> QueuedCore::stopTask(const long long _id,
-                                        const QString &_token)
+QueuedResult<bool> QueuedCore::stopTask(const long long _id, const QString &_token)
 {
     qCDebug(LOG_LIB) << "Force stop task with ID" << _id;
 
@@ -271,8 +259,7 @@ QueuedResult<bool> QueuedCore::stopTask(const long long _id,
 /**
  * @fn task
  */
-const QueuedProcess *QueuedCore::task(const long long _id,
-                                      const QString &_token) const
+const QueuedProcess *QueuedCore::task(const long long _id, const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get task by ID" << _id;
 
@@ -283,9 +270,10 @@ const QueuedProcess *QueuedCore::task(const long long _id,
 /**
  * @fn taskReport
  */
-QueuedResult<QList<QVariantHash>>
-QueuedCore::taskReport(const long long _user, const QDateTime &_from,
-                       const QDateTime &_to, const QString &_token) const
+QueuedResult<QList<QVariantHash>> QueuedCore::taskReport(const long long _user,
+                                                         const QDateTime &_from,
+                                                         const QDateTime &_to,
+                                                         const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get tasks table by" << _user << _from << _to;
 
@@ -296,8 +284,7 @@ QueuedCore::taskReport(const long long _user, const QDateTime &_from,
 /**
  * @fn user
  */
-const QueuedUser *QueuedCore::user(const long long _id,
-                                   const QString &_token) const
+const QueuedUser *QueuedCore::user(const long long _id, const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get user by ID" << _id;
 
@@ -308,8 +295,7 @@ const QueuedUser *QueuedCore::user(const long long _id,
 /**
  * @fn user
  */
-const QueuedUser *QueuedCore::user(const QString &_name,
-                                   const QString &_token) const
+const QueuedUser *QueuedCore::user(const QString &_name, const QString &_token) const
 {
     qCDebug(LOG_LIB) << "Get user by name" << _name;
 
@@ -320,13 +306,11 @@ const QueuedUser *QueuedCore::user(const QString &_name,
 /**
  * @fn userReport
  */
-QueuedResult<QList<QVariantHash>>
-QueuedCore::userReport(const QDateTime &_lastLogged,
-                       const QueuedEnums::Permission _permission,
-                       const QString &_token) const
+QueuedResult<QList<QVariantHash>> QueuedCore::userReport(const QDateTime &_lastLogged,
+                                                         const QueuedEnums::Permission _permission,
+                                                         const QString &_token) const
 {
-    qCDebug(LOG_LIB) << "Get users table by" << _lastLogged
-                     << static_cast<int>(_permission);
+    qCDebug(LOG_LIB) << "Get users table by" << _lastLogged << static_cast<int>(_permission);
 
     return m_impl->userReport(_lastLogged, _permission, _token);
 }
@@ -340,12 +324,9 @@ void QueuedCore::deinit()
     m_impl->deinit();
 
     // dbus cleanup
-    QDBusConnection::systemBus().unregisterObject(
-        QueuedConfig::DBUS_OBJECT_PATH);
-    QDBusConnection::systemBus().unregisterObject(
-        QueuedConfig::DBUS_PROPERTY_PATH);
-    QDBusConnection::systemBus().unregisterObject(
-        QueuedConfig::DBUS_REPORTS_PATH);
+    QDBusConnection::systemBus().unregisterObject(QueuedConfig::DBUS_OBJECT_PATH);
+    QDBusConnection::systemBus().unregisterObject(QueuedConfig::DBUS_PROPERTY_PATH);
+    QDBusConnection::systemBus().unregisterObject(QueuedConfig::DBUS_REPORTS_PATH);
     QDBusConnection::systemBus().unregisterService(QueuedConfig::DBUS_SERVICE);
 }
 
@@ -372,33 +353,29 @@ void QueuedCore::initDBus()
     QDBusConnection bus = QDBusConnection::systemBus();
 
     if (!bus.registerService(QueuedConfig::DBUS_SERVICE)) {
-        QString message = QString("Could not register service %1")
-                              .arg(bus.lastError().message());
+        QString message = QString("Could not register service %1").arg(bus.lastError().message());
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
     }
 
-    if (!bus.registerObject(QueuedConfig::DBUS_OBJECT_PATH,
-                            new QueuedCoreInterface(this),
+    if (!bus.registerObject(QueuedConfig::DBUS_OBJECT_PATH, new QueuedCoreInterface(this),
                             QDBusConnection::ExportAllContents)) {
-        QString message = QString("Could not register core object %1")
-                              .arg(bus.lastError().message());
+        QString message
+            = QString("Could not register core object %1").arg(bus.lastError().message());
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
     }
-    if (!bus.registerObject(QueuedConfig::DBUS_PROPERTY_PATH,
-                            new QueuedPropertyInterface(this),
+    if (!bus.registerObject(QueuedConfig::DBUS_PROPERTY_PATH, new QueuedPropertyInterface(this),
                             QDBusConnection::ExportAllContents)) {
-        QString message = QString("Could not register properties object %1")
-                              .arg(bus.lastError().message());
+        QString message
+            = QString("Could not register properties object %1").arg(bus.lastError().message());
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
     }
-    if (!bus.registerObject(QueuedConfig::DBUS_REPORTS_PATH,
-                            new QueuedReportInterface(this),
+    if (!bus.registerObject(QueuedConfig::DBUS_REPORTS_PATH, new QueuedReportInterface(this),
                             QDBusConnection::ExportAllContents)) {
-        QString message = QString("Could not register reports object %1")
-                              .arg(bus.lastError().message());
+        QString message
+            = QString("Could not register reports object %1").arg(bus.lastError().message());
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
     }

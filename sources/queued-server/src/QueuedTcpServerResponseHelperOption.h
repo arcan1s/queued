@@ -23,8 +23,7 @@
 namespace QueuedTcpServerResponseHelperOption
 {
 QVariantHash getOption(const QString &_option, const QString &_token);
-QVariantHash setOption(const QString &_option, const QVariantHash &_value,
-                       const QString &_token);
+QVariantHash setOption(const QString &_option, const QVariantHash &_value, const QString &_token);
 };
 
 

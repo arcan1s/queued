@@ -72,8 +72,7 @@ public slots:
      * auth user token
      * @return true on successful option edition
      */
-    QDBusVariant OptionEdit(const QString &key, const QDBusVariant &value,
-                            const QString &token);
+    QDBusVariant OptionEdit(const QString &key, const QDBusVariant &value, const QString &token);
     /**
      * @brief get password hash
      * @param password
@@ -126,11 +125,9 @@ public slots:
      * @return task ID or -1 if no task added
      */
     QDBusVariant TaskAdd(const QString &command, const QStringList &arguments,
-                         const QString &workingDirectory, const qlonglong user,
-                         const uint nice, const qlonglong cpu,
-                         const qlonglong gpu, const qlonglong memory,
-                         const qlonglong gpumemory, const qlonglong storage,
-                         const QString &token);
+                         const QString &workingDirectory, const qlonglong user, const uint nice,
+                         const qlonglong cpu, const qlonglong gpu, const qlonglong memory,
+                         const qlonglong gpumemory, const qlonglong storage, const QString &token);
     /**
      * @brief edit task
      * @param id
@@ -163,11 +160,9 @@ public slots:
      * auth user token
      * @return true on successful task edition
      */
-    QDBusVariant TaskEdit(const qlonglong id, const QString &command,
-                          const QStringList &arguments,
-                          const QString &directory, const uint nice,
-                          const uint uid, const uint gid, const qlonglong user,
-                          const qlonglong cpu, const qlonglong gpu,
+    QDBusVariant TaskEdit(const qlonglong id, const QString &command, const QStringList &arguments,
+                          const QString &directory, const uint nice, const uint uid, const uint gid,
+                          const qlonglong user, const qlonglong cpu, const qlonglong gpu,
                           const qlonglong memory, const qlonglong gpumemory,
                           const qlonglong storage, const QString &token);
     /**
@@ -221,12 +216,10 @@ public slots:
      * auth user token
      * @return user ID or -1 if no user found
      */
-    QDBusVariant UserAdd(const QString &name, const QString &email,
-                         const QString &password, const uint permissions,
-                         const uint priority, const qlonglong cpu,
-                         const qlonglong gpu, const qlonglong memory,
-                         const qlonglong gpumemory, const qlonglong storage,
-                         const QString &token);
+    QDBusVariant UserAdd(const QString &name, const QString &email, const QString &password,
+                         const uint permissions, const uint priority, const qlonglong cpu,
+                         const qlonglong gpu, const qlonglong memory, const qlonglong gpumemory,
+                         const qlonglong storage, const QString &token);
     /**
      * @brief edit user
      * @param id
@@ -251,9 +244,8 @@ public slots:
      * auth user token
      * @return true on successful user edition
      */
-    QDBusVariant UserEdit(const qlonglong id, const QString &name,
-                          const QString &password, const QString &email,
-                          const qlonglong cpu, const qlonglong gpu,
+    QDBusVariant UserEdit(const qlonglong id, const QString &name, const QString &password,
+                          const QString &email, const qlonglong cpu, const qlonglong gpu,
                           const qlonglong memory, const qlonglong gpumemory,
                           const qlonglong storage, const QString &token);
     /**
@@ -266,8 +258,7 @@ public slots:
      * auth user token
      * @return true on successful permission addition
      */
-    QDBusVariant UserPermissionAdd(const qlonglong id, const uint permission,
-                                   const QString &token);
+    QDBusVariant UserPermissionAdd(const qlonglong id, const uint permission, const QString &token);
     /**
      * @brief remove permission from user
      * @param id

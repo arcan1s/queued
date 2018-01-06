@@ -48,15 +48,13 @@ QString QueuedctlCommon::commandsHelp()
     commands.sort();
     for (auto &cmd : commands)
         // align like default help message
-        cmdList += QString("  %1%2").arg(cmd, -21).arg(
-            QueuedctlArguments[cmd].description);
+        cmdList += QString("  %1%2").arg(cmd, -21).arg(QueuedctlArguments[cmd].description);
 
     return cmdList.join('\n');
 }
 
 
-QString QueuedctlCommon::hashHashToString(
-    const QHash<QString, QHash<QString, QString>> &_hash)
+QString QueuedctlCommon::hashHashToString(const QHash<QString, QHash<QString, QString>> &_hash)
 {
     qCDebug(LOG_APP) << "Convert hash to string" << _hash;
 
@@ -84,8 +82,7 @@ QString QueuedctlCommon::hashToString(const QVariantHash &_hash)
     QStringList keys = _hash.keys();
     keys.sort();
     for (auto &key : keys)
-        output += QString("%1: %2").arg(key).arg(
-            _hash[key].toString().replace('\n', ' '));
+        output += QString("%1: %2").arg(key).arg(_hash[key].toString().replace('\n', ' '));
 
     return output.join('\n');
 }
@@ -106,10 +103,9 @@ QString QueuedctlCommon::hashListToString(const QList<QVariantHash> &_list)
     // append rows
     for (auto &hash : _list) {
         QStringList row;
-        std::for_each(header.cbegin(), header.cend(),
-                      [&hash, &row](const QString &column) {
-                          row += hash[column].toString().replace('\n', ' ');
-                      });
+        std::for_each(header.cbegin(), header.cend(), [&hash, &row](const QString &column) {
+            row += hash[column].toString().replace('\n', ' ');
+        });
         output += row.join(',');
     }
 
@@ -117,18 +113,15 @@ QString QueuedctlCommon::hashListToString(const QList<QVariantHash> &_list)
 }
 
 
-void QueuedctlCommon::preprocess(const QStringList &_args,
-                                 QCommandLineParser &_parser)
+void QueuedctlCommon::preprocess(const QStringList &_args, QCommandLineParser &_parser)
 {
     qCDebug(LOG_APP) << "Preprocess command" << _args;
 
     QString command = _args.isEmpty() ? "" : _args.first();
     // HACK: workaround to show valid help message
-    auto id = QueuedctlArguments.contains(command)
-                  ? QueuedctlArguments[command].id
-                  : QueuedctlArgument::Invalid;
-    _parser.addPositionalArgument(id == QueuedctlArgument::Invalid ? "command"
-                                                                   : command,
+    auto id = QueuedctlArguments.contains(command) ? QueuedctlArguments[command].id
+                                                   : QueuedctlArgument::Invalid;
+    _parser.addPositionalArgument(id == QueuedctlArgument::Invalid ? "command" : command,
                                   "Command to execute.");
 
     if (command.isEmpty())
@@ -206,8 +199,7 @@ void QueuedctlCommon::print(const QueuedctlResult &_result)
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
-                         const QString &_user)
+QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache, const QString &_user)
 {
     qCDebug(LOG_APP) << "Process command with args"
                      << "using auth" << _cache << _user;
@@ -216,14 +208,11 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     QStringList args = _parser.positionalArguments();
     QString command = args.isEmpty() ? "" : args.first();
 
-    auto id = QueuedctlArguments.contains(command)
-                  ? QueuedctlArguments[command].id
-                  : QueuedctlArgument::Invalid;
+    auto id = QueuedctlArguments.contains(command) ? QueuedctlArguments[command].id
+                                                   : QueuedctlArgument::Invalid;
     checkArgs(args, QueuedctlArguments[command].positionalArgsCount, _parser);
 
-    QString token = (id == QueuedctlArgument::Auth)
-                        ? ""
-                        : QueuedctlAuth::getToken(_cache, _user);
+    QString token = (id == QueuedctlArgument::Auth) ? "" : QueuedctlAuth::getToken(_cache, _user);
 
     switch (id) {
     case QueuedctlArgument::Auth: {
@@ -241,10 +230,9 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::PermissionAdd: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
-        userIdRes.match([&userId](const long long val) { userId = val; },
-                        [&result](const QueuedError &err) {
-                            result.output = err.message().c_str();
-                        });
+        userIdRes.match(
+            [&userId](const long long val) { userId = val; },
+            [&result](const QueuedError &err) { result.output = err.message().c_str(); });
         if (userId == -1)
             break;
         result = QueuedctlPermissions::addPermission(userId, args.at(2), token);
@@ -253,14 +241,12 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::PermissionRemove: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
-        userIdRes.match([&userId](const long long val) { userId = val; },
-                        [&result](const QueuedError &err) {
-                            result.output = err.message().c_str();
-                        });
+        userIdRes.match(
+            [&userId](const long long val) { userId = val; },
+            [&result](const QueuedError &err) { result.output = err.message().c_str(); });
         if (userId == -1)
             break;
-        result
-            = QueuedctlPermissions::removePermission(userId, args.at(2), token);
+        result = QueuedctlPermissions::removePermission(userId, args.at(2), token);
         break;
     }
     case QueuedctlArgument::PluginAdd: {
@@ -294,9 +280,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
                 result.status = true;
                 result.output = hashHashToString(val);
             },
-            [&result](const QueuedError &err) {
-                result.output = err.message().c_str();
-            });
+            [&result](const QueuedError &err) { result.output = err.message().c_str(); });
         break;
     }
     case QueuedctlArgument::TaskAdd: {
@@ -305,8 +289,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
         break;
     }
     case QueuedctlArgument::TaskGet: {
-        result = QueuedctlTask::getTask(args.at(1).toLongLong(), args.at(2),
-                                        token);
+        result = QueuedctlTask::getTask(args.at(1).toLongLong(), args.at(2), token);
         break;
     }
     case QueuedctlArgument::TaskList: {
@@ -315,8 +298,7 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     }
     case QueuedctlArgument::TaskSet: {
         auto definitions = QueuedctlTask::getDefinitions(_parser, true, token);
-        result = QueuedctlTask::setTask(args.at(1).toLongLong(), definitions,
-                                        token);
+        result = QueuedctlTask::setTask(args.at(1).toLongLong(), definitions, token);
         break;
     }
     case QueuedctlArgument::TaskStart: {
@@ -335,10 +317,9 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::UserGet: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
-        userIdRes.match([&userId](const long long val) { userId = val; },
-                        [&result](const QueuedError &err) {
-                            result.output = err.message().c_str();
-                        });
+        userIdRes.match(
+            [&userId](const long long val) { userId = val; },
+            [&result](const QueuedError &err) { result.output = err.message().c_str(); });
         if (userId == -1)
             break;
         result = QueuedctlUser::getUser(userId, args.at(2), token);
@@ -351,10 +332,9 @@ QueuedctlCommon::process(QCommandLineParser &_parser, const QString &_cache,
     case QueuedctlArgument::UserSet: {
         auto userIdRes = QueuedCoreAdaptor::getUserId(args.at(1), token);
         long long userId = -1;
-        userIdRes.match([&userId](const long long val) { userId = val; },
-                        [&result](const QueuedError &err) {
-                            result.output = err.message().c_str();
-                        });
+        userIdRes.match(
+            [&userId](const long long val) { userId = val; },
+            [&result](const QueuedError &err) { result.output = err.message().c_str(); });
         if (userId == -1)
             break;
         auto definitions = QueuedctlUser::getDefinitions(_parser, true);

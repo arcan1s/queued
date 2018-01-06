@@ -46,10 +46,7 @@ public:
     /**
      * @brief clone QueuedException
      */
-    QueuedException *clone() const override
-    {
-        return new QueuedException(*this);
-    };
+    QueuedException *clone() const override { return new QueuedException(*this); };
     /**
      * @brief message of this exception
      * @return message for logging, etc

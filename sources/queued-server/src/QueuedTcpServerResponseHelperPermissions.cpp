@@ -19,21 +19,20 @@
 #include <queued/Queued.h>
 
 
-QVariantHash QueuedTcpServerResponseHelperPermissions::addPermission(
-    const long long _id, const QVariantHash &_value, const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperPermissions::addPermission(const long long _id,
+                                                                     const QVariantHash &_value,
+                                                                     const QString &_token)
 {
     qCDebug(LOG_SERV) << "Add permission for" << _id << _value;
 
     if (!_value.contains("permission"))
         return {{"code", 400}, {"message", "No required fields found"}};
 
-    auto permission
-        = QueuedEnums::stringToPermission(_value["permission"].toString());
+    auto permission = QueuedEnums::stringToPermission(_value["permission"].toString());
     if (permission == QueuedEnums::Permission::Invalid)
         return {{"code", 400}, {"message", "Invalid permission"}};
 
-    auto res
-        = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
+    auto res = QueuedCoreAdaptor::sendUserPermissionAdd(_id, permission, _token);
 
     QVariantHash output;
     res.match(
@@ -48,21 +47,20 @@ QVariantHash QueuedTcpServerResponseHelperPermissions::addPermission(
 }
 
 
-QVariantHash QueuedTcpServerResponseHelperPermissions::removePermission(
-    const long long _id, const QVariantHash &_value, const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperPermissions::removePermission(const long long _id,
+                                                                        const QVariantHash &_value,
+                                                                        const QString &_token)
 {
     qCDebug(LOG_SERV) << "Remove permission for" << _id << _value;
 
     if (!_value.contains("permission"))
         return {{"code", 400}, {"message", "No required fields found"}};
 
-    auto permission
-        = QueuedEnums::stringToPermission(_value["permission"].toString());
+    auto permission = QueuedEnums::stringToPermission(_value["permission"].toString());
     if (permission == QueuedEnums::Permission::Invalid)
         return {{"code", 400}, {"message", "Invalid permission"}};
 
-    auto res
-        = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission, _token);
+    auto res = QueuedCoreAdaptor::sendUserPermissionRemove(_id, permission, _token);
 
     QVariantHash output;
     res.match(

@@ -19,8 +19,9 @@
 #include <queued/Queued.h>
 
 
-QVariantHash QueuedTcpServerResponseHelperTask::addOrEditTask(
-    const long long _id, const QVariantHash &_data, const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperTask::addOrEditTask(const long long _id,
+                                                              const QVariantHash &_data,
+                                                              const QString &_token)
 {
     qCDebug(LOG_SERV) << "Add or edit task" << _id << "with data" << _data;
 
@@ -63,12 +64,10 @@ QueuedTcpServerResponseHelperTask::getDefinitions(const QVariantHash &_data)
     for (auto &arg : args)
         defs.arguments.append(arg.toString());
     defs.command = _data["command"].toString();
-    defs.endTime
-        = QDateTime::fromString(_data["end"].toString(), Qt::ISODateWithMs);
+    defs.endTime = QDateTime::fromString(_data["end"].toString(), Qt::ISODateWithMs);
     defs.gid = _data["gid"].toUInt();
     defs.nice = _data["nice"].toUInt();
-    defs.startTime
-        = QDateTime::fromString(_data["start"].toString(), Qt::ISODateWithMs);
+    defs.startTime = QDateTime::fromString(_data["start"].toString(), Qt::ISODateWithMs);
     defs.uid = _data["uid"].toUInt();
     defs.user = _data["user"].toLongLong();
     defs.workingDirectory = _data["workingDirectory"].toString();
@@ -85,8 +84,9 @@ QueuedTcpServerResponseHelperTask::getDefinitions(const QVariantHash &_data)
 }
 
 
-QVariantHash QueuedTcpServerResponseHelperTask::getTask(
-    const long long _id, const QVariantHash &_data, const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperTask::getTask(const long long _id,
+                                                        const QVariantHash &_data,
+                                                        const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get task" << _id << _data;
 
@@ -95,11 +95,10 @@ QVariantHash QueuedTcpServerResponseHelperTask::getTask(
     QVariantHash output = {{"code", 200}};
     if (property.isEmpty()) {
         auto res = QueuedCoreAdaptor::getTask(_id, _token);
-        res.match(
-            [&output](const QVariantHash &val) { output["properties"] = val; },
-            [&output](const QueuedError &err) {
-                output = {{"code", 500}, {"message", err.message().c_str()}};
-            });
+        res.match([&output](const QVariantHash &val) { output["properties"] = val; },
+                  [&output](const QueuedError &err) {
+                      output = {{"code", 500}, {"message", err.message().c_str()}};
+                  });
     } else {
         auto res = QueuedCoreAdaptor::getTask(_id, property);
         res.match(
@@ -115,17 +114,14 @@ QVariantHash QueuedTcpServerResponseHelperTask::getTask(
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperTask::getTasks(const QVariantHash &_data,
-                                            const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperTask::getTasks(const QVariantHash &_data,
+                                                         const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get tasks" << _data;
 
     long long userId = _data.value("userId").toLongLong();
-    QDateTime start
-        = QDateTime::fromString(_data["start"].toString(), Qt::ISODateWithMs);
-    QDateTime stop
-        = QDateTime::fromString(_data["stop"].toString(), Qt::ISODateWithMs);
+    QDateTime start = QDateTime::fromString(_data["start"].toString(), Qt::ISODateWithMs);
+    QDateTime stop = QDateTime::fromString(_data["stop"].toString(), Qt::ISODateWithMs);
 
     QVariantHash output;
     // some conversion magic
@@ -145,9 +141,8 @@ QueuedTcpServerResponseHelperTask::getTasks(const QVariantHash &_data,
 }
 
 
-QVariantHash
-QueuedTcpServerResponseHelperTask::startOrStopTask(const long long _id,
-                                                   const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperTask::startOrStopTask(const long long _id,
+                                                                const QString &_token)
 {
     qCDebug(LOG_SERV) << "Change task state" << _id;
 
@@ -156,8 +151,7 @@ QueuedTcpServerResponseHelperTask::startOrStopTask(const long long _id,
     QVariantHash output;
     res.match(
         [&output, &_id, &_token](const QVariantHash &val) {
-            if (val["startTime"].toString().isEmpty()
-                || !val["endTime"].toString().isEmpty())
+            if (val["startTime"].toString().isEmpty() || !val["endTime"].toString().isEmpty())
                 output = startTask(_id, _token);
             else
                 output = stopTask(_id, _token);
@@ -190,8 +184,7 @@ QVariantHash QueuedTcpServerResponseHelperTask::startTask(const long long _id,
 }
 
 
-QVariantHash QueuedTcpServerResponseHelperTask::stopTask(const long long _id,
-                                                         const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperTask::stopTask(const long long _id, const QString &_token)
 {
     qCDebug(LOG_SERV) << "Stop task" << _id;
 

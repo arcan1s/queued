@@ -95,8 +95,7 @@ QueuedResult<bool> sendPluginAdd(const QString &_plugin, const QString &_token);
  * auth user token
  * @return true on successful plugin removal
  */
-QueuedResult<bool> sendPluginRemove(const QString &_plugin,
-                                    const QString &_token);
+QueuedResult<bool> sendPluginRemove(const QString &_plugin, const QString &_token);
 /**
  * @brief send TaskAdd
  * @param _definitions
@@ -105,9 +104,8 @@ QueuedResult<bool> sendPluginRemove(const QString &_plugin,
  * auth user token
  * @return task ID or {0, -1} if no task added
  */
-QueuedResult<long long>
-sendTaskAdd(const QueuedProcess::QueuedProcessDefinitions &_definitions,
-            const QString &_token);
+QueuedResult<long long> sendTaskAdd(const QueuedProcess::QueuedProcessDefinitions &_definitions,
+                                    const QString &_token);
 /**
  * @brief send TaskEdit
  * @param _id
@@ -118,10 +116,9 @@ sendTaskAdd(const QueuedProcess::QueuedProcessDefinitions &_definitions,
  * auth user token
  * @return true on successful task edition
  */
-QueuedResult<bool>
-sendTaskEdit(const long long _id,
-             const QueuedProcess::QueuedProcessDefinitions &_definitions,
-             const QString &_token);
+QueuedResult<bool> sendTaskEdit(const long long _id,
+                                const QueuedProcess::QueuedProcessDefinitions &_definitions,
+                                const QString &_token);
 /**
  * @brief send TaskStart
  * @param _id
@@ -148,9 +145,8 @@ QueuedResult<bool> sendTaskStop(const long long _id, const QString &_token);
  * auth user token
  * @return user ID or -1 if no user added
  */
-QueuedResult<long long>
-sendUserAdd(const QueuedUser::QueuedUserDefinitions &_definitions,
-            const QString &_token);
+QueuedResult<long long> sendUserAdd(const QueuedUser::QueuedUserDefinitions &_definitions,
+                                    const QString &_token);
 /**
  * @brief send UserEdit
  * @param _id
@@ -161,10 +157,9 @@ sendUserAdd(const QueuedUser::QueuedUserDefinitions &_definitions,
  * auth user token
  * @return true on successful user edition
  */
-QueuedResult<bool>
-sendUserEdit(const long long _id,
-             const QueuedUser::QueuedUserDefinitions &_definitions,
-             const QString &_token);
+QueuedResult<bool> sendUserEdit(const long long _id,
+                                const QueuedUser::QueuedUserDefinitions &_definitions,
+                                const QString &_token);
 /**
  * @brief send UserPermissionsAdd
  * @param _id
@@ -175,10 +170,9 @@ sendUserEdit(const long long _id,
  * auth user token
  * @return true on successful permission addition
  */
-QueuedResult<bool>
-sendUserPermissionAdd(const long long _id,
-                      const QueuedEnums::Permission _permission,
-                      const QString &_token);
+QueuedResult<bool> sendUserPermissionAdd(const long long _id,
+                                         const QueuedEnums::Permission _permission,
+                                         const QString &_token);
 /**
  * @brief send sendUserPermissionRemove
  * @param _id
@@ -189,10 +183,9 @@ sendUserPermissionAdd(const long long _id,
  * auth user token
  * @return true on successful permission removal
  */
-QueuedResult<bool>
-sendUserPermissionRemove(const long long _id,
-                         const QueuedEnums::Permission _permission,
-                         const QString &_token);
+QueuedResult<bool> sendUserPermissionRemove(const long long _id,
+                                            const QueuedEnums::Permission _permission,
+                                            const QString &_token);
 // specific methods for properties
 /**
  * @brief get plugin
@@ -202,8 +195,8 @@ sendUserPermissionRemove(const long long _id,
  * user auth token
  * @return plugin specification body
  */
-QueuedResult<QueuedPluginSpecification::Plugin>
-getPlugin(const QString &_plugin, const QString &_token);
+QueuedResult<QueuedPluginSpecification::Plugin> getPlugin(const QString &_plugin,
+                                                          const QString &_token);
 /**
  * @brief get plugin options
  * @param _plugin
@@ -212,8 +205,7 @@ getPlugin(const QString &_plugin, const QString &_token);
  * user auth token
  * @return plugin options dictionary
  */
-QueuedResult<QVariantHash> getPluginOptions(const QString &_plugin,
-                                            const QString &_token);
+QueuedResult<QVariantHash> getPluginOptions(const QString &_plugin, const QString &_token);
 /**
  * @brief get option
  * @param _property
@@ -222,8 +214,7 @@ QueuedResult<QVariantHash> getPluginOptions(const QString &_plugin,
  * user auth token
  * @return option value
  */
-QueuedResult<QVariant> getOption(const QString &_property,
-                                 const QString &_token);
+QueuedResult<QVariant> getOption(const QString &_property, const QString &_token);
 /**
  * @brief get option
  * @param _property
@@ -244,8 +235,7 @@ QueuedResult<QVariant> getOption(const QueuedConfig::QueuedSettings _property,
  * user auth token
  * @return list of user with used resources
  */
-QueuedResult<QList<QVariantHash>> getPerformance(const QDateTime &_from,
-                                                 const QDateTime &_to,
+QueuedResult<QList<QVariantHash>> getPerformance(const QDateTime &_from, const QDateTime &_to,
                                                  const QString &_token);
 /**
  * @brief server status
@@ -285,10 +275,8 @@ QueuedResult<QVariant> getTask(const long long _id, const QString &_property,
  * user auth token
  * @return list of task in database representation
  */
-QueuedResult<QList<QVariantHash>> getTasks(const long long _user,
-                                           const QDateTime &_from,
-                                           const QDateTime &_to,
-                                           const QString &_token);
+QueuedResult<QList<QVariantHash>> getTasks(const long long _user, const QDateTime &_from,
+                                           const QDateTime &_to, const QString &_token);
 /**
  * @brief get user properties
  * @param _id
@@ -330,9 +318,9 @@ QueuedResult<long long> getUserId(const QString &_name, const QString &_token);
  * user auth token
  * @return list of users in database representation
  */
-QueuedResult<QList<QVariantHash>>
-getUsers(const QDateTime &_lastLogged,
-         const QueuedEnums::Permission _permission, const QString &_token);
+QueuedResult<QList<QVariantHash>> getUsers(const QDateTime &_lastLogged,
+                                           const QueuedEnums::Permission _permission,
+                                           const QString &_token);
 // common methods
 /**
  * @brief additional method to avoid conversion from QueuedResult to
@@ -380,13 +368,11 @@ QueuedResult<T> sendRequest(const QString &_service, const QString &_path,
                             const QVariantList &_args)
 {
     QDBusConnection bus = QDBusConnection::systemBus();
-    QDBusMessage request
-        = QDBusMessage::createMethodCall(_service, _path, _interface, _cmd);
+    QDBusMessage request = QDBusMessage::createMethodCall(_service, _path, _interface, _cmd);
     if (!_args.isEmpty())
         request.setArguments(_args);
 
-    QDBusReply<QDBusVariant> dbusResponse
-        = bus.call(request, QDBus::BlockWithGui);
+    QDBusReply<QDBusVariant> dbusResponse = bus.call(request, QDBus::BlockWithGui);
 
     if (dbusResponse.isValid()) {
         auto response = dbusResponse.value();

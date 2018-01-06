@@ -84,8 +84,7 @@ public:
      * @param index
      * index of process
      */
-    explicit QueuedUser(QObject *_parent,
-                        const QueuedUserDefinitions &definitions,
+    explicit QueuedUser(QObject *_parent, const QueuedUserDefinitions &definitions,
                         const long long index);
     /**
      * @brief QueuedUser class destructor
@@ -98,8 +97,7 @@ public:
      * new user permission
      * @return current user permissions
      */
-    QueuedEnums::Permissions
-    addPermission(const QueuedEnums::Permission _permission);
+    QueuedEnums::Permissions addPermission(const QueuedEnums::Permission _permission);
     /**
      * @brief generates SHA512 hash from given password
      * @param _password
@@ -108,8 +106,7 @@ public:
      * password salt if any
      * @return SHA512 of password
      */
-    static QString hashFromPassword(const QString &_password,
-                                    const QString &_salt);
+    static QString hashFromPassword(const QString &_password, const QString &_salt);
     /**
      * @brief test user permissions
      * @param _permission
@@ -137,8 +134,7 @@ public:
      * permission to remove
      * @return current user permissions
      */
-    QueuedEnums::Permissions
-    removePermission(const QueuedEnums::Permission _permission);
+    QueuedEnums::Permissions removePermission(const QueuedEnums::Permission _permission);
     // main properties
     /**
      * @brief user email

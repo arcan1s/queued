@@ -29,8 +29,7 @@ void QueuedEmailNotify::init(const QVariantHash &_settings)
     m_helper->setInsecureCurl(_settings.value("InsecureCurl", false).toBool());
     m_helper->setPassword(_settings.value("Password", "").toString());
     m_helper->setPort(_settings.value("Port", 465).toInt());
-    m_helper->setServer(
-        _settings.value("Server", "smtp://smtp.example.com").toString());
+    m_helper->setServer(_settings.value("Server", "smtp://smtp.example.com").toString());
     m_helper->setSslEnabled(_settings.value("UseSSL", false).toBool());
     m_helper->setUsername(_settings.value("Username", "").toString());
 }
@@ -50,14 +49,12 @@ void QueuedEmailNotify::setup(const QueuedPluginManagerInterface *_manager)
 }
 
 
-void QueuedEmailNotify::updateSettings(const QString &_key,
-                                       const QVariant &_value)
+void QueuedEmailNotify::updateSettings(const QString &_key, const QVariant &_value)
 {
     qCDebug(LOG_PL) << "Update settings for" << _key;
 
     if (!m_helper) {
-        qCWarning(LOG_PL)
-            << "Helper is not initialized. Did you forget to call ::init()?";
+        qCWarning(LOG_PL) << "Helper is not initialized. Did you forget to call ::init()?";
         return;
     }
 

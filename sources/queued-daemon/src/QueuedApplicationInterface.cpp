@@ -28,8 +28,7 @@ extern "C" {
 }
 
 
-QueuedApplicationInterface::QueuedApplicationInterface(
-    QueuedApplication *parent)
+QueuedApplicationInterface::QueuedApplicationInterface(QueuedApplication *parent)
     : QDBusAbstractAdaptor(parent)
     , m_application(parent)
 {

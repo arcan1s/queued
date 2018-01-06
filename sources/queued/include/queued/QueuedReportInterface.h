@@ -63,8 +63,7 @@ public slots:
      * user auth token
      * @return
      */
-    QDBusVariant Performance(const QString &from, const QString &to,
-                             const QString &token);
+    QDBusVariant Performance(const QString &from, const QString &to, const QString &token);
     /**
      * @brief server status
      * @return server status
@@ -82,8 +81,8 @@ public slots:
      * user auth token
      * @return list of tasks match to query
      */
-    QDBusVariant Tasks(const qlonglong user, const QString &from,
-                       const QString &to, const QString &token);
+    QDBusVariant Tasks(const qlonglong user, const QString &from, const QString &to,
+                       const QString &token);
     /**
      * @brief users list
      * @param lastLogged
@@ -94,8 +93,7 @@ public slots:
      * user auth token
      * @return list of users match to query
      */
-    QDBusVariant Users(const QString &lastLogged, const uint permission,
-                       const QString &token);
+    QDBusVariant Users(const QString &lastLogged, const uint permission, const QString &token);
 
 private:
     /**

@@ -23,8 +23,7 @@
 #include "QueuedctlUser.h"
 
 
-QueuedctlCommon::QueuedctlResult QueuedctlAuth::auth(const QString &_user,
-                                                     const QString &_cache)
+QueuedctlCommon::QueuedctlResult QueuedctlAuth::auth(const QString &_user, const QString &_cache)
 {
     qCDebug(LOG_APP) << "Auth as user" << _user;
 
@@ -47,8 +46,7 @@ QueuedctlCommon::QueuedctlResult QueuedctlAuth::auth(const QString &_user,
 
 QString QueuedctlAuth::getToken(const QString &_cache, const QString &_user)
 {
-    qCDebug(LOG_APP) << "Get token using cache" << _cache << "and user"
-                     << _user;
+    qCDebug(LOG_APP) << "Get token using cache" << _cache << "and user" << _user;
 
     QString tokenId = token(_user, _cache);
     if (tryAuth(tokenId)) {
@@ -63,8 +61,7 @@ QString QueuedctlAuth::getToken(const QString &_cache, const QString &_user)
 void QueuedctlAuth::parser(QCommandLineParser &_parser) {}
 
 
-void QueuedctlAuth::setToken(const QString &_token, const QString &_user,
-                             const QString &_cache)
+void QueuedctlAuth::setToken(const QString &_token, const QString &_user, const QString &_cache)
 {
     qCDebug(LOG_APP) << "Save token to" << _cache << "from user" << _user;
 

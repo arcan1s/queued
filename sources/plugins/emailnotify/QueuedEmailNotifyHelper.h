@@ -42,8 +42,7 @@ public:
     virtual ~QueuedEmailNotifyHelper() = default;
     static QString curlEmail(const QString &_from);
     static char *curlString(const QString &_source);
-    static size_t curlReadCallback(char *buffer, size_t size, size_t nitems,
-                                   void *instream);
+    static size_t curlReadCallback(char *buffer, size_t size, size_t nitems, void *instream);
     // properties
     QString from() const;
     bool isInsecureCurl() const;

@@ -44,16 +44,13 @@ public:
         QVariantHash data;
     } QueuedTcpServerResponse;
 
-    explicit QueuedTcpServerThread(int socketDescriptor, const int timeout,
-                                   QObject *parent);
+    explicit QueuedTcpServerThread(int socketDescriptor, const int timeout, QObject *parent);
     virtual ~QueuedTcpServerThread();
-    static QByteArrayList defaultResponse(const int code,
-                                          const QVariantHash &json);
+    static QByteArrayList defaultResponse(const int code, const QVariantHash &json);
     static QueuedTcpServerHeaders getHeaders(const QStringList &headers);
-    static QueuedTcpServerRequest
-    getRequest(const QByteArray &body, const QueuedTcpServerHeaders &headers);
-    QueuedTcpServerResponse
-    response(const QueuedTcpServerRequest &request) const;
+    static QueuedTcpServerRequest getRequest(const QByteArray &body,
+                                             const QueuedTcpServerHeaders &headers);
+    QueuedTcpServerResponse response(const QueuedTcpServerRequest &request) const;
     void run() override;
 
 private slots:

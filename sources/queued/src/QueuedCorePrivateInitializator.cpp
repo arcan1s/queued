@@ -88,13 +88,12 @@ void QueuedCorePrivate::init(const QString &_configuration)
     initReports();
 
     // settings update notifier
-    m_connections
-        += connect(m_advancedSettings,
-                   SIGNAL(valueUpdated(const QueuedConfig::QueuedSettings,
-                                       const QString &, const QVariant &)),
-                   this,
-                   SLOT(updateSettings(const QueuedConfig::QueuedSettings,
-                                       const QString &, const QVariant &)));
+    m_connections += connect(
+        m_advancedSettings,
+        SIGNAL(valueUpdated(const QueuedConfig::QueuedSettings, const QString &, const QVariant &)),
+        this,
+        SLOT(
+            updateSettings(const QueuedConfig::QueuedSettings, const QString &, const QVariant &)));
 
     // run!
     m_processes->start();
@@ -107,17 +106,13 @@ void QueuedCorePrivate::init(const QString &_configuration)
 void QueuedCorePrivate::initPlugins()
 {
     QStringList pluginList
-        = m_advancedSettings->get(QueuedConfig::QueuedSettings::Plugins)
-              .toString()
-              .split('\n');
+        = m_advancedSettings->get(QueuedConfig::QueuedSettings::Plugins).toString().split('\n');
 
     m_plugins = m_helper->initObject(m_plugins, m_adminToken);
     for (auto &plugin : pluginList) {
         auto settings = pluginSettings(plugin, m_adminToken);
         settings.match(
-            [this, &plugin](const QVariantHash &opts) {
-                m_plugins->loadPlugin(plugin, opts);
-            },
+            [this, &plugin](const QVariantHash &opts) { m_plugins->loadPlugin(plugin, opts); },
             [&plugin](const QueuedError &) {
                 qCWarning(LOG_LIB) << "Could not load settings for" << plugin;
             });
@@ -132,25 +127,21 @@ void QueuedCorePrivate::initProcesses()
 {
     // init processes
     auto onExitAction = static_cast<QueuedEnums::ExitAction>(
-        m_advancedSettings->get(QueuedConfig::QueuedSettings::OnExitAction)
-            .toInt());
+        m_advancedSettings->get(QueuedConfig::QueuedSettings::OnExitAction).toInt());
 
     m_processes = m_helper->initObject(m_processes);
     m_processes->setExitAction(onExitAction);
-    auto dbProcesses
-        = m_database->get(QueuedDB::TASKS_TABLE, "WHERE endTime IS NULL");
+    auto dbProcesses = m_database->get(QueuedDB::TASKS_TABLE, "WHERE endTime IS NULL");
     m_processes->loadProcesses(dbProcesses);
 
-    m_connections
-        += connect(m_processes, &QueuedProcessManager::taskStartTimeReceived,
-                   [this](const long long _index, const QDateTime &_time) {
-                       return updateTaskTime(_index, _time, QDateTime());
-                   });
-    m_connections
-        += connect(m_processes, &QueuedProcessManager::taskStopTimeReceived,
-                   [this](const long long _index, const QDateTime &_time) {
-                       return updateTaskTime(_index, QDateTime(), _time);
-                   });
+    m_connections += connect(m_processes, &QueuedProcessManager::taskStartTimeReceived,
+                             [this](const long long _index, const QDateTime &_time) {
+                                 return updateTaskTime(_index, _time, QDateTime());
+                             });
+    m_connections += connect(m_processes, &QueuedProcessManager::taskStopTimeReceived,
+                             [this](const long long _index, const QDateTime &_time) {
+                                 return updateTaskTime(_index, QDateTime(), _time);
+                             });
 }
 
 
@@ -176,8 +167,8 @@ void QueuedCorePrivate::initSettings(const QString &_configuration)
     auto dbSetup = m_settings->db();
     m_database = m_helper->initObject(m_database, dbSetup.path, dbSetup.driver);
     m_database->close();
-    bool status = m_database->open(dbSetup.hostname, dbSetup.port,
-                                   dbSetup.username, dbSetup.password);
+    bool status
+        = m_database->open(dbSetup.hostname, dbSetup.port, dbSetup.username, dbSetup.password);
     if (!status) {
         QString message = "Could not open database";
         qCCritical(LOG_LIB) << message;
@@ -192,11 +183,9 @@ void QueuedCorePrivate::initSettings(const QString &_configuration)
     m_advancedSettings = m_helper->initObject(m_advancedSettings);
     m_advancedSettings->set(m_database->get(QueuedDB::SETTINGS_TABLE));
     if (!m_advancedSettings->checkDatabaseVersion()) {
-        qCInfo(LOG_LIB) << "Bump database version to"
-                        << QueuedConfig::DATABASE_VERSION;
+        qCInfo(LOG_LIB) << "Bump database version to" << QueuedConfig::DATABASE_VERSION;
         m_helper->editOptionPrivate(
-            m_advancedSettings->internalId(
-                QueuedConfig::QueuedSettings::DatabaseVersion),
+            m_advancedSettings->internalId(QueuedConfig::QueuedSettings::DatabaseVersion),
             QueuedConfig::DATABASE_VERSION);
     }
 
@@ -212,21 +201,18 @@ void QueuedCorePrivate::initUsers()
 {
     // load users and tokens
     auto expiry
-        = m_advancedSettings->get(QueuedConfig::QueuedSettings::TokenExpiration)
-              .toLongLong();
+        = m_advancedSettings->get(QueuedConfig::QueuedSettings::TokenExpiration).toLongLong();
 
     m_users = m_helper->initObject(m_users);
     m_users->setSalt(m_settings->admin().salt);
     m_users->setTokenExpiration(expiry);
     QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
     auto dbTokens = m_database->get(
-        QueuedDB::TOKENS_TABLE,
-        QString("WHERE datetime(validUntil) > datetime('%1')").arg(now));
+        QueuedDB::TOKENS_TABLE, QString("WHERE datetime(validUntil) > datetime('%1')").arg(now));
     m_users->loadTokens(dbTokens);
     auto dbUsers = m_database->get(QueuedDB::USERS_TABLE);
     m_users->loadUsers(dbUsers);
 
-    m_connections += connect(
-        m_users, SIGNAL(userLoggedIn(const long long, const QDateTime &)), this,
-        SLOT(updateUserLoginTime(const long long, const QDateTime &)));
+    m_connections += connect(m_users, SIGNAL(userLoggedIn(const long long, const QDateTime &)),
+                             this, SLOT(updateUserLoginTime(const long long, const QDateTime &)));
 }

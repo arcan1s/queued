@@ -19,9 +19,8 @@
 #include <queued/Queued.h>
 
 
-QVariantHash
-QueuedTcpServerResponseHelperOption::getOption(const QString &_option,
-                                               const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperOption::getOption(const QString &_option,
+                                                            const QString &_token)
 {
     qCDebug(LOG_SERV) << "Get option" << _option;
 
@@ -41,16 +40,16 @@ QueuedTcpServerResponseHelperOption::getOption(const QString &_option,
 }
 
 
-QVariantHash QueuedTcpServerResponseHelperOption::setOption(
-    const QString &_option, const QVariantHash &_value, const QString &_token)
+QVariantHash QueuedTcpServerResponseHelperOption::setOption(const QString &_option,
+                                                            const QVariantHash &_value,
+                                                            const QString &_token)
 {
     qCDebug(LOG_SERV) << "Set option" << _option << "to" << _value;
 
     if (!_value.contains("value"))
         return {{"code", 400}, {"message", "No required fields found"}};
 
-    auto res
-        = QueuedCoreAdaptor::sendOptionEdit(_option, _value["value"], _token);
+    auto res = QueuedCoreAdaptor::sendOptionEdit(_option, _value["value"], _token);
 
     QVariantHash output;
     res.match(

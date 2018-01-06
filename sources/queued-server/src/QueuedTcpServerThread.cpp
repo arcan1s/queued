@@ -27,8 +27,8 @@
 #include "QueuedTcpServerResponseHelper.h"
 
 
-QueuedTcpServerThread::QueuedTcpServerThread(int socketDescriptor,
-                                             const int timeout, QObject *parent)
+QueuedTcpServerThread::QueuedTcpServerThread(int socketDescriptor, const int timeout,
+                                             QObject *parent)
     : QThread(parent)
     , m_socketDescriptor(socketDescriptor)
     , m_timeout(timeout)
@@ -46,11 +46,9 @@ QueuedTcpServerThread::~QueuedTcpServerThread()
 }
 
 
-QByteArrayList QueuedTcpServerThread::defaultResponse(const int code,
-                                                      const QVariantHash &json)
+QByteArrayList QueuedTcpServerThread::defaultResponse(const int code, const QVariantHash &json)
 {
-    qCDebug(LOG_SERV) << "Build server response with code" << code
-                      << "and json";
+    qCDebug(LOG_SERV) << "Build server response with code" << code << "and json";
 
     QList<QByteArray> output;
     output += "HTTP/1.1 " + QByteArray::number(code) + " "
@@ -58,8 +56,7 @@ QByteArrayList QueuedTcpServerThread::defaultResponse(const int code,
     output += "Server: QueuedServer/Qt" + QByteArray(qVersion()) + "\r\n";
     output += "Date: "
               + QLocale::c()
-                    .toString(QDateTime::currentDateTimeUtc(),
-                              "ddd, d MMM yyyy HH:mm:dd t")
+                    .toString(QDateTime::currentDateTimeUtc(), "ddd, d MMM yyyy HH:mm:dd t")
                     .toUtf8()
               + "\r\n";
     output += "Content-Type: application/json\r\n";
@@ -68,8 +65,7 @@ QByteArrayList QueuedTcpServerThread::defaultResponse(const int code,
     // json response
     if (!json.isEmpty()) {
         auto jsonObj = QJsonObject::fromVariantHash(json);
-        auto jsonByte
-            = QJsonDocument(jsonObj).toJson(QJsonDocument::JsonFormat::Compact);
+        auto jsonByte = QJsonDocument(jsonObj).toJson(QJsonDocument::JsonFormat::Compact);
         output += jsonByte;
     }
 
@@ -97,17 +93,16 @@ QueuedTcpServerThread::getHeaders(const QStringList &headers)
         if (parsed.count() < 2)
             continue;
         headersObj.headers += QPair<QByteArray, QByteArray>(
-            {parsed.first().toUtf8().toLower(),
-             parsed.mid(1).join(": ").toUtf8()});
+            {parsed.first().toUtf8().toLower(), parsed.mid(1).join(": ").toUtf8()});
     }
 
     return headersObj;
 }
 
 
-QueuedTcpServerThread::QueuedTcpServerRequest QueuedTcpServerThread::getRequest(
-    const QByteArray &body,
-    const QueuedTcpServerThread::QueuedTcpServerHeaders &headers)
+QueuedTcpServerThread::QueuedTcpServerRequest
+QueuedTcpServerThread::getRequest(const QByteArray &body,
+                                  const QueuedTcpServerThread::QueuedTcpServerHeaders &headers)
 {
     qCDebug(LOG_SERV) << "Get request object from body" << body;
 
@@ -159,8 +154,7 @@ QueuedTcpServerThread::response(const QueuedTcpServerRequest &request) const
         netRequest.setRawHeader(headers.first, headers.second);
 
     // prepend code
-    if (netRequest.header(QNetworkRequest::KnownHeaders::ContentTypeHeader)
-            .toString()
+    if (netRequest.header(QNetworkRequest::KnownHeaders::ContentTypeHeader).toString()
         != "application/json")
         response.code = 415;
     else
@@ -169,12 +163,10 @@ QueuedTcpServerThread::response(const QueuedTcpServerRequest &request) const
 
     // json data
     if (response.code == 200) {
-        auto req = QueuedTcpServerResponseHelper::parsePath(
-            request.headers.query.path());
+        auto req = QueuedTcpServerResponseHelper::parsePath(request.headers.query.path());
         req.type = request.headers.request;
         if (req.valid) {
-            response.data = QueuedTcpServerResponseHelper::getData(
-                req, request.data, token);
+            response.data = QueuedTcpServerResponseHelper::getData(req, request.data, token);
             response.code = response.data["code"].toInt();
         } else {
             response.code = 404;
@@ -193,8 +185,7 @@ void QueuedTcpServerThread::run()
         return;
     }
 
-    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()),
-            Qt::DirectConnection);
+    connect(m_socket, SIGNAL(readyRead()), this, SLOT(readyRead()), Qt::DirectConnection);
 
     exec();
 }

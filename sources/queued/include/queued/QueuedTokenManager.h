@@ -74,8 +74,7 @@ public:
      * @param _definitions
      * token definitions
      */
-    void
-    loadToken(const QueuedTokenManager::QueuedTokenDefinitions &_definitions);
+    void loadToken(const QueuedTokenManager::QueuedTokenDefinitions &_definitions);
     /**
      * @brief upload tokens from database
      * @param _values

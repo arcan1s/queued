@@ -41,8 +41,7 @@ QueuedApplication::~QueuedApplication()
 {
     qCDebug(LOG_APP) << __PRETTY_FUNCTION__;
 
-    QDBusConnection::sessionBus().unregisterObject(
-        QueuedConfig::DBUS_APPLICATION_PATH);
+    QDBusConnection::sessionBus().unregisterObject(QueuedConfig::DBUS_APPLICATION_PATH);
     m_core->deleteLater();
 }
 
@@ -61,8 +60,8 @@ void QueuedApplication::initDBus()
     if (!bus.registerObject(QueuedConfig::DBUS_APPLICATION_PATH,
                             new QueuedApplicationInterface(this),
                             QDBusConnection::ExportAllContents)) {
-        QString message = QString("Could not register application object %1")
-                              .arg(bus.lastError().message());
+        QString message
+            = QString("Could not register application object %1").arg(bus.lastError().message());
         qCCritical(LOG_DBUS) << message;
         throw QueuedDBusException(message);
     }

@@ -38,8 +38,7 @@ int main(int argc, char *argv[])
 
     // parser
     QCommandLineParser parser;
-    parser.setApplicationDescription(
-        "Daemon for starting jobs to queue of calculations");
+    parser.setApplicationDescription("Daemon for starting jobs to queue of calculations");
     parser.addHelpOption();
     parser.addVersionOption();
     // info
@@ -51,12 +50,11 @@ int main(int argc, char *argv[])
     parser.addOption(debugOption);
 
     // configuration option
-    QCommandLineOption tokenOption({"t", "token"}, "Path to cached token.",
-                                   "token", QueuedSettings::defaultTokenPath());
+    QCommandLineOption tokenOption({"t", "token"}, "Path to cached token.", "token",
+                                   QueuedSettings::defaultTokenPath());
     parser.addOption(tokenOption);
-    QCommandLineOption userOption({"u", "user"},
-                                  "User to login instead of current one.",
-                                  "user", ::getlogin());
+    QCommandLineOption userOption({"u", "user"}, "User to login instead of current one.", "user",
+                                  ::getlogin());
     parser.addOption(userOption);
 
     // additional help option
@@ -91,8 +89,8 @@ int main(int argc, char *argv[])
         QueuedDebug::enableDebug();
 
     // process
-    auto result = QueuedctlCommon::process(parser, parser.value(tokenOption),
-                                           parser.value(userOption));
+    auto result
+        = QueuedctlCommon::process(parser, parser.value(tokenOption), parser.value(userOption));
     QueuedctlCommon::print(result);
 
     return result.status ? 0 : 1;

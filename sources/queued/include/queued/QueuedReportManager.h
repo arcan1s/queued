@@ -66,8 +66,7 @@ public:
      * pointer to core object
      * @return performance table
      */
-    QList<QVariantHash> performance(const QueuedCore *_core,
-                                    const QDateTime &_from = QDateTime(),
+    QList<QVariantHash> performance(const QueuedCore *_core, const QDateTime &_from = QDateTime(),
                                     const QDateTime &_to = QDateTime()) const;
     /**
      * list of tasks which match criteria
@@ -79,8 +78,7 @@ public:
      * maximal end time
      * @return list of tasks in database format
      */
-    QList<QVariantHash> tasks(const long long _user = -1,
-                              const QDateTime &_from = QDateTime(),
+    QList<QVariantHash> tasks(const long long _user = -1, const QDateTime &_from = QDateTime(),
                               const QDateTime &_to = QDateTime()) const;
     /**
      * list of users which match criteria

@@ -27,14 +27,13 @@ QVariantHash QueuedTcpServerResponseHelper::getData(const Request &_request,
                                                     const QVariantHash &_data,
                                                     const QString &_token)
 {
-    qCDebug(LOG_SERV) << "Get data for request"
-                      << static_cast<int>(_request.path) << _request.apiVersion
-                      << _request.arg << "with data" << _data;
+    qCDebug(LOG_SERV) << "Get data for request" << static_cast<int>(_request.path)
+                      << _request.apiVersion << _request.arg << "with data" << _data;
 
     QVariantHash output;
     if (_request.apiVersion == 1)
-        output = QueuedTcpServerResponseHelperApi1::getData(
-            _request.path, _request.arg, _request.type, _data, _token);
+        output = QueuedTcpServerResponseHelperApi1::getData(_request.path, _request.arg,
+                                                            _request.type, _data, _token);
 
     return output;
 }
@@ -64,8 +63,7 @@ QueuedTcpServerResponseHelper::parsePath(const QString &_path)
         // check if request is valid
         request.valid = (request.path != RequestPath::Unknown)
                         && (std::find(std::begin(QueuedConfig::WEBAPI_VERSIONS),
-                                      std::end(QueuedConfig::WEBAPI_VERSIONS),
-                                      request.apiVersion)
+                                      std::end(QueuedConfig::WEBAPI_VERSIONS), request.apiVersion)
                             != std::end(QueuedConfig::WEBAPI_VERSIONS));
     }
 

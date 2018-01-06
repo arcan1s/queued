@@ -36,8 +36,8 @@ QueuedApplication *instance = nullptr;
 bool existingSessionOperation(const QString &operation)
 {
     auto res = QueuedCoreAdaptor::sendRequest<bool>(
-        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_APPLICATION_PATH,
-        QueuedConfig::DBUS_SERVICE, operation, QVariantList());
+        QueuedConfig::DBUS_SERVICE, QueuedConfig::DBUS_APPLICATION_PATH, QueuedConfig::DBUS_SERVICE,
+        operation, QVariantList());
 
     return ((res.type() == Result::Content::Value) && res.get());
 }
@@ -60,8 +60,7 @@ int main(int argc, char *argv[])
 
     // parser
     QCommandLineParser parser;
-    parser.setApplicationDescription(
-        "Daemon for starting jobs to queue of calculations");
+    parser.setApplicationDescription("Daemon for starting jobs to queue of calculations");
     parser.addHelpOption();
     parser.addVersionOption();
     // info
@@ -69,8 +68,7 @@ int main(int argc, char *argv[])
     parser.addOption(infoOption);
 
     // configuration option
-    QCommandLineOption configOption({"c", "config"},
-                                    "Read initial configuration from file.",
+    QCommandLineOption configOption({"c", "config"}, "Read initial configuration from file.",
                                     "config", QueuedSettings::defaultPath());
     parser.addOption(configOption);
 

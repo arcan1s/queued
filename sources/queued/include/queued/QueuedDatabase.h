@@ -47,8 +47,7 @@ public:
      * @param driver
      * database driver
      */
-    explicit QueuedDatabase(QObject *parent, const QString path,
-                            const QString driver);
+    explicit QueuedDatabase(QObject *parent, const QString path, const QString driver);
     /**
      * @brief QueuedDatabase class destructor
      */
@@ -89,8 +88,7 @@ public:
      * optional condition string
      * @return list of records from table
      */
-    QList<QVariantHash> get(const QString &_table,
-                            const QString &_condition = "");
+    QList<QVariantHash> get(const QString &_table, const QString &_condition = "");
     /**
      * @brief get record from table with given id
      * @param _table
@@ -112,8 +110,8 @@ public:
      * password to connect, will be ignored if _username is empty
      * @return true on successful opening
      */
-    bool open(const QString &_hostname, const int _port,
-              const QString &_username, const QString &_password);
+    bool open(const QString &_hostname, const int _port, const QString &_username,
+              const QString &_password);
     /**
      * @brief path to database
      * @return path to used database
@@ -140,8 +138,7 @@ public slots:
      * value to update
      * @return true on successfully modification
      */
-    bool modify(const QString &_table, const long long _id,
-                const QVariantHash &_value);
+    bool modify(const QString &_table, const long long _id, const QVariantHash &_value);
     /**
      * @brief remove record in table by ID
      * @param _table

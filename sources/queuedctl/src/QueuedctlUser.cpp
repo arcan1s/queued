@@ -29,8 +29,7 @@ extern "C" {
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlUser::addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
-                       const QString &_token)
+QueuedctlUser::addUser(const QueuedUser::QueuedUserDefinitions &_definitions, const QString &_token)
 {
     qCDebug(LOG_APP) << "Add user" << _definitions.name;
 
@@ -42,24 +41,19 @@ QueuedctlUser::addUser(const QueuedUser::QueuedUserDefinitions &_definitions,
             output.status = (val > 0);
             output.output = QString::number(val);
         },
-        [&output](const QueuedError &err) {
-            output.output = err.message().c_str();
-        });
+        [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
 
 
-QueuedctlCommon::QueuedctlResult
-QueuedctlUser::getReport(const QCommandLineParser &_parser,
-                         const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlUser::getReport(const QCommandLineParser &_parser,
+                                                          const QString &_token)
 {
     qCDebug(LOG_APP) << "Get usage report";
 
-    QDateTime stop
-        = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
-    QDateTime start
-        = QDateTime::fromString(_parser.value("start"), Qt::ISODateWithMs);
+    QDateTime stop = QDateTime::fromString(_parser.value("stop"), Qt::ISODateWithMs);
+    QDateTime start = QDateTime::fromString(_parser.value("start"), Qt::ISODateWithMs);
 
     auto res = QueuedCoreAdaptor::getPerformance(start, stop, _token);
 
@@ -69,41 +63,34 @@ QueuedctlUser::getReport(const QCommandLineParser &_parser,
             output.status = true;
             output.output = QueuedctlCommon::hashListToString(val);
         },
-        [&output](const QueuedError &err) {
-            output.output = err.message().c_str();
-        });
+        [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
 
 
-QueuedUser::QueuedUserDefinitions
-QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
-                              const bool _expandAll)
+QueuedUser::QueuedUserDefinitions QueuedctlUser::getDefinitions(const QCommandLineParser &_parser,
+                                                                const bool _expandAll)
 {
-    qCDebug(LOG_APP) << "Parse user definitions from parser, expand all"
-                     << _expandAll;
+    qCDebug(LOG_APP) << "Parse user definitions from parser, expand all" << _expandAll;
 
     QueuedUser::QueuedUserDefinitions definitions;
 
     // define password first
-    definitions.password = _parser.isSet("stdin-password")
-                               ? getPassword()
-                               : _parser.value("password");
+    definitions.password
+        = _parser.isSet("stdin-password") ? getPassword() : _parser.value("password");
     auto res = QueuedCoreAdaptor::sendPasswordHash(definitions.password);
-    res.match(
-        [&definitions](const QString &val) { definitions.password = val; },
-        [&definitions](const QueuedError &) { definitions.password = ""; });
+    res.match([&definitions](const QString &val) { definitions.password = val; },
+              [&definitions](const QueuedError &) { definitions.password = ""; });
 
     definitions.email = _parser.value("email");
     definitions.priority = _parser.value("priority").toUInt();
     // limits now
-    QueuedLimits::Limits limits(
-        _parser.value("limit-cpu").toLongLong(),
-        _parser.value("limit-gpu").toLongLong(),
-        QueuedLimits::convertMemory(_parser.value("limit-memory")),
-        QueuedLimits::convertMemory(_parser.value("limit-gpumemory")),
-        QueuedLimits::convertMemory(_parser.value("limit-storage")));
+    QueuedLimits::Limits limits(_parser.value("limit-cpu").toLongLong(),
+                                _parser.value("limit-gpu").toLongLong(),
+                                QueuedLimits::convertMemory(_parser.value("limit-memory")),
+                                QueuedLimits::convertMemory(_parser.value("limit-gpumemory")),
+                                QueuedLimits::convertMemory(_parser.value("limit-storage")));
     definitions.limits = limits.toString();
 
     // all options
@@ -137,8 +124,7 @@ QString QueuedctlUser::getPassword()
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlUser::getUser(const long long _id, const QString &_property,
-                       const QString &_token)
+QueuedctlUser::getUser(const long long _id, const QString &_property, const QString &_token)
 {
     qCDebug(LOG_APP) << "Get property" << _property << "from user" << _id;
 
@@ -151,9 +137,7 @@ QueuedctlUser::getUser(const long long _id, const QString &_property,
                 output.status = true;
                 output.output = QueuedctlCommon::hashToString(val);
             },
-            [&output](const QueuedError &err) {
-                output.output = err.message().c_str();
-            });
+            [&output](const QueuedError &err) { output.output = err.message().c_str(); });
     } else {
         auto res = QueuedCoreAdaptor::getUser(_id, _property);
         res.match(
@@ -161,25 +145,20 @@ QueuedctlUser::getUser(const long long _id, const QString &_property,
                 output.status = val.isValid();
                 output.output = val.toString();
             },
-            [&output](const QueuedError &err) {
-                output.output = err.message().c_str();
-            });
+            [&output](const QueuedError &err) { output.output = err.message().c_str(); });
     }
 
     return output;
 }
 
 
-QueuedctlCommon::QueuedctlResult
-QueuedctlUser::getUsers(const QCommandLineParser &_parser,
-                        const QString &_token)
+QueuedctlCommon::QueuedctlResult QueuedctlUser::getUsers(const QCommandLineParser &_parser,
+                                                         const QString &_token)
 {
-    QDateTime lastLogin = QDateTime::fromString(_parser.value("last-logged"),
-                                                Qt::ISODateWithMs);
-    auto permission
-        = _parser.value("access").isEmpty()
-              ? QueuedEnums::Permission::Invalid
-              : QueuedEnums::Permission(_parser.value("access").toInt());
+    QDateTime lastLogin = QDateTime::fromString(_parser.value("last-logged"), Qt::ISODateWithMs);
+    auto permission = _parser.value("access").isEmpty()
+                          ? QueuedEnums::Permission::Invalid
+                          : QueuedEnums::Permission(_parser.value("access").toInt());
 
     auto res = QueuedCoreAdaptor::getUsers(lastLogin, permission, _token);
 
@@ -189,9 +168,7 @@ QueuedctlUser::getUsers(const QCommandLineParser &_parser,
             output.status = true;
             output.output = QueuedctlCommon::hashListToString(val);
         },
-        [&output](const QueuedError &err) {
-            output.output = err.message().c_str();
-        });
+        [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }
@@ -202,43 +179,35 @@ void QueuedctlUser::parserAdd(QCommandLineParser &_parser)
     _parser.addPositionalArgument("name", "User name.", "<name>");
 
     // permissions
-    QCommandLineOption accessOption({"a", "access"}, "User permission.",
-                                    "access", "0");
+    QCommandLineOption accessOption({"a", "access"}, "User permission.", "access", "0");
     _parser.addOption(accessOption);
     // email
     QCommandLineOption emailOption({"e", "email"}, "User email.", "email", "");
     _parser.addOption(emailOption);
     // priority
-    QCommandLineOption priorityOption({"p", "priority"}, "User priority.",
-                                      "priority", "0");
+    QCommandLineOption priorityOption({"p", "priority"}, "User priority.", "priority", "0");
     _parser.addOption(priorityOption);
     // password
-    QCommandLineOption passwordOption("password", "User password.", "password",
-                                      "");
+    QCommandLineOption passwordOption("password", "User password.", "password", "");
     _parser.addOption(passwordOption);
     // password
-    QCommandLineOption stdinPasswordOption("stdin-password",
-                                           "User password from stdin.");
+    QCommandLineOption stdinPasswordOption("stdin-password", "User password from stdin.");
     _parser.addOption(stdinPasswordOption);
     // cpu limit
-    QCommandLineOption cpuOption("limit-cpu", "User CPU limit.", "limit-cpu",
-                                 "0");
+    QCommandLineOption cpuOption("limit-cpu", "User CPU limit.", "limit-cpu", "0");
     _parser.addOption(cpuOption);
     // gpu limit
-    QCommandLineOption gpuOption("limit-gpu", "User GPU limit.", "limit-gpu",
-                                 "0");
+    QCommandLineOption gpuOption("limit-gpu", "User GPU limit.", "limit-gpu", "0");
     _parser.addOption(gpuOption);
     // memory limit
-    QCommandLineOption memoryOption("limit-memory", "User memory limit.",
-                                    "limit-memory", "0");
+    QCommandLineOption memoryOption("limit-memory", "User memory limit.", "limit-memory", "0");
     _parser.addOption(memoryOption);
     // gpu memory limit
-    QCommandLineOption gpumemoryOption(
-        "limit-gpumemory", "User GPU memory limit.", "limit-gpumemory", "0");
+    QCommandLineOption gpumemoryOption("limit-gpumemory", "User GPU memory limit.",
+                                       "limit-gpumemory", "0");
     _parser.addOption(gpumemoryOption);
     // storage limit
-    QCommandLineOption storageOption("limit-storage", "User storage limit.",
-                                     "limit-storage", "0");
+    QCommandLineOption storageOption("limit-storage", "User storage limit.", "limit-storage", "0");
     _parser.addOption(storageOption);
 }
 
@@ -246,16 +215,14 @@ void QueuedctlUser::parserAdd(QCommandLineParser &_parser)
 void QueuedctlUser::parserGet(QCommandLineParser &_parser)
 {
     _parser.addPositionalArgument("id", "User ID.", "<id>");
-    _parser.addPositionalArgument("property", "User property name.",
-                                  "<property>");
+    _parser.addPositionalArgument("property", "User property name.", "<property>");
 }
 
 
 void QueuedctlUser::parserList(QCommandLineParser &_parser)
 {
     // last logged in
-    QCommandLineOption loggedOption("last-logged", "User last logged time.",
-                                    "last-logged", "");
+    QCommandLineOption loggedOption("last-logged", "User last logged time.", "last-logged", "");
     _parser.addOption(loggedOption);
     // permissions
     QCommandLineOption accessOption("access", "User permission.", "access", "");
@@ -285,43 +252,35 @@ void QueuedctlUser::parserSet(QCommandLineParser &_parser)
     QCommandLineOption nameOption({"n", "name"}, "User name.", "name", "");
     _parser.addOption(nameOption);
     // priority
-    QCommandLineOption priorityOption({"p", "priority"}, "User priority.",
-                                      "priority", "0");
+    QCommandLineOption priorityOption({"p", "priority"}, "User priority.", "priority", "0");
     _parser.addOption(priorityOption);
     // password
-    QCommandLineOption passwordOption("password", "User password.", "password",
-                                      "");
+    QCommandLineOption passwordOption("password", "User password.", "password", "");
     _parser.addOption(passwordOption);
     // password
-    QCommandLineOption stdinPasswordOption("stdin-password",
-                                           "User password from stdin.");
+    QCommandLineOption stdinPasswordOption("stdin-password", "User password from stdin.");
     _parser.addOption(stdinPasswordOption);
     // cpu limit
-    QCommandLineOption cpuOption("limit-cpu", "User CPU limit.", "limit-cpu",
-                                 "0");
+    QCommandLineOption cpuOption("limit-cpu", "User CPU limit.", "limit-cpu", "0");
     _parser.addOption(cpuOption);
     // gpu limit
-    QCommandLineOption gpuOption("limit-gpu", "User GPU limit.", "limit-gpu",
-                                 "0");
+    QCommandLineOption gpuOption("limit-gpu", "User GPU limit.", "limit-gpu", "0");
     _parser.addOption(gpuOption);
     // memory limit
-    QCommandLineOption memoryOption("limit-memory", "User memory limit.",
-                                    "limit-memory", "0");
+    QCommandLineOption memoryOption("limit-memory", "User memory limit.", "limit-memory", "0");
     _parser.addOption(memoryOption);
     // gpu memory limit
-    QCommandLineOption gpumemoryOption(
-        "limit-gpumemory", "User GPU memory limit.", "limit-gpumemory", "0");
+    QCommandLineOption gpumemoryOption("limit-gpumemory", "User GPU memory limit.",
+                                       "limit-gpumemory", "0");
     _parser.addOption(gpumemoryOption);
     // storage limit
-    QCommandLineOption storageOption("limit-storage", "User storage limit.",
-                                     "limit-storage", "0");
+    QCommandLineOption storageOption("limit-storage", "User storage limit.", "limit-storage", "0");
     _parser.addOption(storageOption);
 }
 
 
 QueuedctlCommon::QueuedctlResult
-QueuedctlUser::setUser(const long long _id,
-                       const QueuedUser::QueuedUserDefinitions &_definitions,
+QueuedctlUser::setUser(const long long _id, const QueuedUser::QueuedUserDefinitions &_definitions,
                        const QString &_token)
 {
     qCDebug(LOG_APP) << "Edit user" << _id;
@@ -330,9 +289,7 @@ QueuedctlUser::setUser(const long long _id,
 
     QueuedctlCommon::QueuedctlResult output;
     res.match([&output](const bool val) { output.status = val; },
-              [&output](const QueuedError &err) {
-                  output.output = err.message().c_str();
-              });
+              [&output](const QueuedError &err) { output.output = err.message().c_str(); });
 
     return output;
 }

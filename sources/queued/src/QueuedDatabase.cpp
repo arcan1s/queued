@@ -33,8 +33,7 @@
 /**
  * @fn QueuedDatabase
  */
-QueuedDatabase::QueuedDatabase(QObject *parent, const QString path,
-                               const QString driver)
+QueuedDatabase::QueuedDatabase(QObject *parent, const QString path, const QString driver)
     : QObject(parent)
     , m_path(path)
 {
@@ -85,28 +84,23 @@ void QueuedDatabase::close()
 /**
  * @fn createAdministrator
  */
-void QueuedDatabase::createAdministrator(const QString &_user,
-                                         const QString &_password)
+void QueuedDatabase::createAdministrator(const QString &_user, const QString &_password)
 {
     qCDebug(LOG_LIB) << "Check for user" << _user;
 
-    QSqlQuery query
-        = m_database.exec(QString("SELECT * FROM '%1' WHERE name='%2'")
-                              .arg(QueuedDB::USERS_TABLE)
-                              .arg(_user));
+    QSqlQuery query = m_database.exec(
+        QString("SELECT * FROM '%1' WHERE name='%2'").arg(QueuedDB::USERS_TABLE).arg(_user));
     QSqlError error = query.lastError();
     if (error.isValid())
-        qCWarning(LOG_LIB) << "Could not get record" << _user << "from"
-                           << QueuedDB::USERS_TABLE << "message"
-                           << error.text();
+        qCWarning(LOG_LIB) << "Could not get record" << _user << "from" << QueuedDB::USERS_TABLE
+                           << "message" << error.text();
     else if (query.next())
         return;
 
     qCInfo(LOG_LIB) << "Create administrator user" << _user;
-    QVariantHash payload = {
-        {"name", _user},
-        {"password", _password},
-        {"permissions", static_cast<int>(QueuedEnums::Permission::SuperAdmin)}};
+    QVariantHash payload = {{"name", _user},
+                            {"password", _password},
+                            {"permissions", static_cast<int>(QueuedEnums::Permission::SuperAdmin)}};
 
     if (!add(QueuedDB::USERS_TABLE, payload))
         qCCritical(LOG_LIB) << "Could not create administrator";
@@ -132,16 +126,14 @@ void QueuedDatabase::createSchema(const QString &_table)
         if (columns.contains(column))
             continue;
         QueuedDB::QueuedDBField field = QueuedDB::DBSchema[_table][column];
-        QSqlQuery query
-            = m_database.exec(QString("ALTER TABLE '%1' ADD `%2` %3")
-                                  .arg(_table)
-                                  .arg(column)
-                                  .arg(field.sqlDescription));
+        QSqlQuery query = m_database.exec(QString("ALTER TABLE '%1' ADD `%2` %3")
+                                              .arg(_table)
+                                              .arg(column)
+                                              .arg(field.sqlDescription));
         QSqlError error = query.lastError();
         if (error.isValid())
-            qCCritical(LOG_LIB)
-                << "Could not insert column" << column << "to table" << _table
-                << "error:" << error.text();
+            qCCritical(LOG_LIB) << "Could not insert column" << column << "to table" << _table
+                                << "error:" << error.text();
     }
 }
 
@@ -154,34 +146,27 @@ void QueuedDatabase::createTable(const QString &_table)
     qCDebug(LOG_LIB) << "Create table" << _table;
 
     QSqlQuery query = m_database.exec(
-        QString("CREATE TABLE '%1' (`_id` INTEGER PRIMARY KEY AUTOINCREMENT)")
-            .arg(_table));
+        QString("CREATE TABLE '%1' (`_id` INTEGER PRIMARY KEY AUTOINCREMENT)").arg(_table));
     QSqlError error = query.lastError();
     if (error.isValid())
-        qCCritical(LOG_LIB)
-            << "Could not create table" << _table << "error:" << error.text();
+        qCCritical(LOG_LIB) << "Could not create table" << _table << "error:" << error.text();
 }
 
 
 /**
  * @fn get
  */
-QList<QVariantHash> QueuedDatabase::get(const QString &_table,
-                                        const QString &_condition)
+QList<QVariantHash> QueuedDatabase::get(const QString &_table, const QString &_condition)
 {
-    qCDebug(LOG_LIB) << "Get records in table" << _table << "with condition"
-                     << _condition;
+    qCDebug(LOG_LIB) << "Get records in table" << _table << "with condition" << _condition;
 
     QList<QVariantHash> output;
-    QSqlQuery query
-        = m_database.exec(QString("SELECT * FROM '%1' %2 ORDER BY _id ASC")
-                              .arg(_table)
-                              .arg(_condition));
+    QSqlQuery query = m_database.exec(
+        QString("SELECT * FROM '%1' %2 ORDER BY _id ASC").arg(_table).arg(_condition));
 
     QSqlError error = query.lastError();
     if (error.isValid()) {
-        qCWarning(LOG_LIB) << "Could not get records from" << _table
-                           << "message" << error.text();
+        qCWarning(LOG_LIB) << "Could not get records from" << _table << "message" << error.text();
         return output;
     }
     QSqlRecord record = query.record();
@@ -221,18 +206,16 @@ QVariantHash QueuedDatabase::get(const QString &_table, const long long _id)
 /**
  * @fn open
  */
-bool QueuedDatabase::open(const QString &_hostname, const int _port,
-                          const QString &_username, const QString &_password)
+bool QueuedDatabase::open(const QString &_hostname, const int _port, const QString &_username,
+                          const QString &_password)
 {
-    qCDebug(LOG_LIB) << "Open database at" << _hostname << _port << "as user"
-                     << _username;
+    qCDebug(LOG_LIB) << "Open database at" << _hostname << _port << "as user" << _username;
 
     if (!_hostname.isEmpty())
         m_database.setHostName(_hostname);
     if (_port > 0)
         m_database.setPort(_port);
-    bool status = _username.isEmpty() ? m_database.open()
-                                      : m_database.open(_username, _password);
+    bool status = _username.isEmpty() ? m_database.open() : m_database.open(_username, _password);
 
     qCDebug(LOG_LIB) << "Open database status" << status;
     if (status)
@@ -265,8 +248,8 @@ long long QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
                                           .arg(payload.values().join(',')));
     QSqlError error = query.lastError();
     if (error.isValid()) {
-        qCCritical(LOG_LIB) << "Could not add record" << _value << "to table"
-                            << _table << "message" << error.text();
+        qCCritical(LOG_LIB) << "Could not add record" << _value << "to table" << _table << "message"
+                            << error.text();
         return -1;
     }
 
@@ -277,25 +260,21 @@ long long QueuedDatabase::add(const QString &_table, const QVariantHash &_value)
 /**
  * @fn modify
  */
-bool QueuedDatabase::modify(const QString &_table, const long long _id,
-                            const QVariantHash &_value)
+bool QueuedDatabase::modify(const QString &_table, const long long _id, const QVariantHash &_value)
 {
-    qCDebug(LOG_LIB) << "Modify record" << _id << "in table" << _table
-                     << "with value" << _value;
+    qCDebug(LOG_LIB) << "Modify record" << _id << "in table" << _table << "with value" << _value;
 
     auto payload = getQueryPayload(_table, _value);
     QStringList stringPayload;
     for (auto &key : payload.keys())
         stringPayload.append(QString("%1=%2").arg(key).arg(payload[key]));
     // build query
-    QSqlQuery query = m_database.exec(QString("UPDATE %1 SET %2 WHERE _id=%3")
-                                          .arg(_table)
-                                          .arg(stringPayload.join(','))
-                                          .arg(_id));
+    QSqlQuery query = m_database.exec(
+        QString("UPDATE %1 SET %2 WHERE _id=%3").arg(_table).arg(stringPayload.join(',')).arg(_id));
     QSqlError error = query.lastError();
     if (error.isValid()) {
-        qCCritical(LOG_LIB) << "Could not modify record" << _value << "in table"
-                            << _table << "message" << error.text();
+        qCCritical(LOG_LIB) << "Could not modify record" << _value << "in table" << _table
+                            << "message" << error.text();
         return false;
     }
 
@@ -310,12 +289,11 @@ bool QueuedDatabase::remove(const QString &_table, const long long _id)
 {
     qCDebug(LOG_LIB) << "Remove row" << _id << "from" << _table;
 
-    QSqlQuery query = m_database.exec(
-        QString("DELETE FROM %1 WHERE _id=%2").arg(_table).arg(_id));
+    QSqlQuery query = m_database.exec(QString("DELETE FROM %1 WHERE _id=%2").arg(_table).arg(_id));
     QSqlError error = query.lastError();
     if (error.isValid()) {
-        qCCritical(LOG_LIB) << "Could not remove record" << _id << "in table"
-                            << _table << "message" << error.text();
+        qCCritical(LOG_LIB) << "Could not remove record" << _id << "in table" << _table << "message"
+                            << error.text();
         return false;
     }
 
@@ -330,10 +308,10 @@ void QueuedDatabase::removeTasks(const QDateTime &_endTime)
 {
     qCDebug(LOG_LIB) << "Remove all tasks which are older than" << _endTime;
 
-    QSqlQuery query = m_database.exec(
-        QString("DELETE FROM %1 WHERE datetime(endTime) < datetime('%2')")
-            .arg(QueuedDB::TASKS_TABLE)
-            .arg(_endTime.toString(Qt::ISODateWithMs)));
+    QSqlQuery query
+        = m_database.exec(QString("DELETE FROM %1 WHERE datetime(endTime) < datetime('%2')")
+                              .arg(QueuedDB::TASKS_TABLE)
+                              .arg(_endTime.toString(Qt::ISODateWithMs)));
 
     QSqlError error = query.lastError();
     if (error.isValid())
@@ -348,10 +326,10 @@ void QueuedDatabase::removeTasks(const QDateTime &_endTime)
 void QueuedDatabase::removeTokens()
 {
     QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-    QSqlQuery query = m_database.exec(
-        QString("DELETE FROM %1 WHERE datetime(validUntil) > datetime('%2')")
-            .arg(QueuedDB::TOKENS_TABLE)
-            .arg(now));
+    QSqlQuery query
+        = m_database.exec(QString("DELETE FROM %1 WHERE datetime(validUntil) > datetime('%2')")
+                              .arg(QueuedDB::TOKENS_TABLE)
+                              .arg(now));
 
     QSqlError error = query.lastError();
     if (error.isValid())
@@ -365,13 +343,12 @@ void QueuedDatabase::removeTokens()
  */
 void QueuedDatabase::removeUsers(const QDateTime &_lastLogin)
 {
-    qCDebug(LOG_LIB) << "Remove all users which logged older than"
-                     << _lastLogin;
+    qCDebug(LOG_LIB) << "Remove all users which logged older than" << _lastLogin;
 
-    QSqlQuery query = m_database.exec(
-        QString("DELETE FROM %1 WHERE datetime(lastLogin) < datetime('%2')")
-            .arg(QueuedDB::USERS_TABLE)
-            .arg(_lastLogin.toString(Qt::ISODateWithMs)));
+    QSqlQuery query
+        = m_database.exec(QString("DELETE FROM %1 WHERE datetime(lastLogin) < datetime('%2')")
+                              .arg(QueuedDB::USERS_TABLE)
+                              .arg(_lastLogin.toString(Qt::ISODateWithMs)));
 
     QSqlError error = query.lastError();
     if (error.isValid())
@@ -402,8 +379,7 @@ long long QueuedDatabase::lastInsertionId(const QString &_table) const
 {
     qCDebug(LOG_LIB) << "Get last row ID from" << _table;
 
-    QSqlQuery query
-        = m_database.exec(QString("SELECT max(_id) FROM '%1'").arg(_table));
+    QSqlQuery query = m_database.exec(QString("SELECT max(_id) FROM '%1'").arg(_table));
     QSqlError error = query.lastError();
     if (error.isValid()) {
         qCCritical(LOG_LIB) << "Could not get last insertion ID";
@@ -421,9 +397,8 @@ long long QueuedDatabase::lastInsertionId(const QString &_table) const
 /**
  * @fn getQueryPayload
  */
-QHash<QString, QString>
-QueuedDatabase::getQueryPayload(const QString &_table,
-                                const QVariantHash &_value) const
+QHash<QString, QString> QueuedDatabase::getQueryPayload(const QString &_table,
+                                                        const QVariantHash &_value) const
 {
     qCDebug(LOG_LIB) << "Add record" << _value << "to table" << _table;
 
@@ -432,8 +407,7 @@ QueuedDatabase::getQueryPayload(const QString &_table,
     for (auto &key : _value.keys()) {
         // we would check it only if there is data about this table
         if (!schemaColumns.isEmpty() && !schemaColumns.contains(key)) {
-            qCWarning(LOG_LIB)
-                << "No key" << key << "found in schema of" << _table;
+            qCWarning(LOG_LIB) << "No key" << key << "found in schema of" << _table;
             continue;
         }
         if (key == "_id") {

@@ -36,8 +36,7 @@ extern "C" {
 /**
  * @fn QueuedUser
  */
-QueuedUser::QueuedUser(QObject *_parent,
-                       const QueuedUserDefinitions &definitions,
+QueuedUser::QueuedUser(QObject *_parent, const QueuedUserDefinitions &definitions,
                        const long long index)
     : QObject(_parent)
     , m_definitions(definitions)
@@ -61,14 +60,11 @@ QueuedUser::~QueuedUser()
 /**
  * @fn addPermissions
  */
-QueuedEnums::Permissions
-QueuedUser::addPermission(const QueuedEnums::Permission _permission)
+QueuedEnums::Permissions QueuedUser::addPermission(const QueuedEnums::Permission _permission)
 {
     qCDebug(LOG_LIB) << "Add user permission" << static_cast<uint>(_permission);
 
-    setPermissions(
-        static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
-        | _permission);
+    setPermissions(static_cast<QueuedEnums::Permissions>(m_definitions.permissions) | _permission);
 
     return static_cast<QueuedEnums::Permissions>(m_definitions.permissions);
 }
@@ -77,11 +73,9 @@ QueuedUser::addPermission(const QueuedEnums::Permission _permission)
 /**
  * @fn hashFromPassword
  */
-QString QueuedUser::hashFromPassword(const QString &_password,
-                                     const QString &_salt)
+QString QueuedUser::hashFromPassword(const QString &_password, const QString &_salt)
 {
-    return QCryptographicHash::hash(_salt.toUtf8() + _password.toUtf8(),
-                                    QCryptographicHash::Sha512)
+    return QCryptographicHash::hash(_salt.toUtf8() + _password.toUtf8(), QCryptographicHash::Sha512)
         .toHex();
 }
 
@@ -121,24 +115,19 @@ QPair<uint, uint> QueuedUser::ids()
 /**
  * @fn isPasswordValid
  */
-bool QueuedUser::isPasswordValid(const QString &_password,
-                                 const QString &_salt) const
+bool QueuedUser::isPasswordValid(const QString &_password, const QString &_salt) const
 {
-    return (m_definitions.password.toUtf8()
-            == hashFromPassword(_password, _salt));
+    return (m_definitions.password.toUtf8() == hashFromPassword(_password, _salt));
 }
 
 
-QueuedEnums::Permissions
-QueuedUser::removePermission(const QueuedEnums::Permission _permission)
+QueuedEnums::Permissions QueuedUser::removePermission(const QueuedEnums::Permission _permission)
 {
-    qCDebug(LOG_LIB) << "Remove user permission"
-                     << static_cast<uint>(_permission);
+    qCDebug(LOG_LIB) << "Remove user permission" << static_cast<uint>(_permission);
 
     if (hasPermission(_permission))
-        setPermissions(
-            static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
-            ^ _permission);
+        setPermissions(static_cast<QueuedEnums::Permissions>(m_definitions.permissions)
+                       ^ _permission);
 
     return static_cast<QueuedEnums::Permissions>(m_definitions.permissions);
 }

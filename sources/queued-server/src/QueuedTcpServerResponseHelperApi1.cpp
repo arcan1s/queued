@@ -27,12 +27,11 @@
 
 
 QVariantHash QueuedTcpServerResponseHelperApi1::getData(
-    const QueuedTcpServerResponseHelper::RequestPath _request,
-    const QString &_arg, const QString &_type, const QVariantHash &_data,
-    const QString &_token)
+    const QueuedTcpServerResponseHelper::RequestPath _request, const QString &_arg,
+    const QString &_type, const QVariantHash &_data, const QString &_token)
 {
-    qCDebug(LOG_SERV) << "Get data for" << static_cast<int>(_request)
-                      << "with arg" << _arg << "with data" << _data;
+    qCDebug(LOG_SERV) << "Get data for" << static_cast<int>(_request) << "with arg" << _arg
+                      << "with data" << _data;
 
     QVariantHash output;
     if ((_request != QueuedTcpServerResponseHelper::RequestPath::Auth)
@@ -50,47 +49,41 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         break;
     case QueuedTcpServerResponseHelper::RequestPath::Option:
         if (_type == "GET")
-            output
-                = QueuedTcpServerResponseHelperOption::getOption(_arg, _token);
+            output = QueuedTcpServerResponseHelperOption::getOption(_arg, _token);
         else if (_type == "POST")
-            output = QueuedTcpServerResponseHelperOption::setOption(_arg, _data,
-                                                                    _token);
+            output = QueuedTcpServerResponseHelperOption::setOption(_arg, _data, _token);
         else
             output = {{"code", 405}};
         break;
     case QueuedTcpServerResponseHelper::RequestPath::Permissions:
         if (_type == "DELETE")
-            output = QueuedTcpServerResponseHelperPermissions::removePermission(
-                _arg.toLongLong(), _data, _token);
+            output = QueuedTcpServerResponseHelperPermissions::removePermission(_arg.toLongLong(),
+                                                                                _data, _token);
         else if (_type == "POST")
-            output = QueuedTcpServerResponseHelperPermissions::addPermission(
-                _arg.toLongLong(), _data, _token);
+            output = QueuedTcpServerResponseHelperPermissions::addPermission(_arg.toLongLong(),
+                                                                             _data, _token);
         else
             output = {{"code", 405}};
         break;
     case QueuedTcpServerResponseHelper::RequestPath::Plugin:
         if (_type == "GET")
-            output
-                = QueuedTcpServerResponseHelperPlugins::getPlugin(_arg, _token);
+            output = QueuedTcpServerResponseHelperPlugins::getPlugin(_arg, _token);
         else
             output = {{"code", 405}};
         break;
     case QueuedTcpServerResponseHelper::RequestPath::Plugins:
         if (_type == "DELETE")
-            output = QueuedTcpServerResponseHelperPlugins::removePlugin(_arg,
-                                                                        _token);
+            output = QueuedTcpServerResponseHelperPlugins::removePlugin(_arg, _token);
         else if (_type == "GET")
             output = QueuedTcpServerResponseHelperPlugins::listPlugins();
         else if (_type == "POST")
-            output
-                = QueuedTcpServerResponseHelperPlugins::addPlugin(_arg, _token);
+            output = QueuedTcpServerResponseHelperPlugins::addPlugin(_arg, _token);
         else
             output = {{"code", 405}};
         break;
     case QueuedTcpServerResponseHelper::RequestPath::Reports:
         if (_type == "GET")
-            output
-                = QueuedTcpServerResponseHelperUser::getReport(_data, _token);
+            output = QueuedTcpServerResponseHelperUser::getReport(_data, _token);
         else
             output = {{"code", 405}};
         break;
@@ -102,14 +95,12 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         break;
     case QueuedTcpServerResponseHelper::RequestPath::Task:
         if (_type == "GET")
-            output = QueuedTcpServerResponseHelperTask::getTask(
-                _arg.toLongLong(), _data, _token);
+            output = QueuedTcpServerResponseHelperTask::getTask(_arg.toLongLong(), _data, _token);
         else if (_type == "POST")
-            output = QueuedTcpServerResponseHelperTask::addOrEditTask(
-                _arg.toLongLong(), _data, _token);
+            output = QueuedTcpServerResponseHelperTask::addOrEditTask(_arg.toLongLong(), _data,
+                                                                      _token);
         else if (_type == "PUT")
-            output = QueuedTcpServerResponseHelperTask::startOrStopTask(
-                _arg.toLongLong(), _token);
+            output = QueuedTcpServerResponseHelperTask::startOrStopTask(_arg.toLongLong(), _token);
         else
             output = {{"code", 405}};
         break;
@@ -121,11 +112,9 @@ QVariantHash QueuedTcpServerResponseHelperApi1::getData(
         break;
     case QueuedTcpServerResponseHelper::RequestPath::User:
         if (_type == "GET")
-            output = QueuedTcpServerResponseHelperUser::getUser(_arg, _data,
-                                                                _token);
+            output = QueuedTcpServerResponseHelperUser::getUser(_arg, _data, _token);
         else if (_type == "POST")
-            output = QueuedTcpServerResponseHelperUser::addOrEditUser(
-                _arg, _data, _token);
+            output = QueuedTcpServerResponseHelperUser::addOrEditUser(_arg, _data, _token);
         else
             output = {{"code", 405}};
         break;

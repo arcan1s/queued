@@ -78,10 +78,8 @@ QueuedProcessManager::parseDefinitions(const QVariantHash &_properties)
     defs.gid = _properties["gid"].toUInt();
     defs.user = _properties["user"].toLongLong();
     // metadata
-    defs.startTime = QDateTime::fromString(_properties["startTime"].toString(),
-                                           Qt::ISODateWithMs);
-    defs.endTime = QDateTime::fromString(_properties["endTime"].toString(),
-                                         Qt::ISODateWithMs);
+    defs.startTime = QDateTime::fromString(_properties["startTime"].toString(), Qt::ISODateWithMs);
+    defs.endTime = QDateTime::fromString(_properties["endTime"].toString(), Qt::ISODateWithMs);
 
     return defs;
 }
@@ -90,11 +88,9 @@ QueuedProcessManager::parseDefinitions(const QVariantHash &_properties)
 /**
  * @fn add
  */
-QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
-                                         const long long _index)
+QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties, const long long _index)
 {
-    qCDebug(LOG_LIB) << "Add new process" << _properties << "with index"
-                     << _index;
+    qCDebug(LOG_LIB) << "Add new process" << _properties << "with index" << _index;
 
     return add(parseDefinitions(_properties), _index);
 }
@@ -103,12 +99,11 @@ QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
 /**
  * @fn add
  */
-QueuedProcess *QueuedProcessManager::add(
-    const QueuedProcess::QueuedProcessDefinitions &_definitions,
-    const long long _index)
+QueuedProcess *
+QueuedProcessManager::add(const QueuedProcess::QueuedProcessDefinitions &_definitions,
+                          const long long _index)
 {
-    qCDebug(LOG_LIB) << "Add new process" << _definitions.command
-                     << "with index" << _index;
+    qCDebug(LOG_LIB) << "Add new process" << _definitions.command << "with index" << _index;
 
     if (processes().contains(_index))
         return process(_index);
@@ -117,9 +112,7 @@ QueuedProcess *QueuedProcessManager::add(
     m_processes[_index] = process;
     // connect to signal
     m_connections[_index] = connect(
-        process,
-        static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
-            &QProcess::finished),
+        process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
         [=](const int exitCode, const QProcess::ExitStatus exitStatus) {
             return taskFinished(exitCode, exitStatus, _index);
         });
@@ -199,11 +192,9 @@ void QueuedProcessManager::start()
     long long index = -1;
     // gather used resources
     QueuedLimits::Limits limits = usedLimits();
-    double weightedCpu
-        = limits.cpu == 0 ? 0.0 : QueuedSystemInfo::cpuWeight(limits.cpu);
-    double weightedMemory = limits.memory == 0
-                                ? 0.0
-                                : QueuedSystemInfo::memoryWeight(limits.memory);
+    double weightedCpu = limits.cpu == 0 ? 0.0 : QueuedSystemInfo::cpuWeight(limits.cpu);
+    double weightedMemory
+        = limits.memory == 0 ? 0.0 : QueuedSystemInfo::memoryWeight(limits.memory);
 
     auto tasks = processes().values();
     for (auto pr : tasks) {
@@ -211,10 +202,8 @@ void QueuedProcessManager::start()
         if (pr->state() != QProcess::ProcessState::NotRunning)
             continue;
         // check limits first
-        if (((1.0 - weightedCpu)
-             < QueuedSystemInfo::cpuWeight(pr->nativeLimits().cpu))
-            && ((1.0 - weightedMemory)
-                < QueuedSystemInfo::memoryWeight(pr->nativeLimits().memory)))
+        if (((1.0 - weightedCpu) < QueuedSystemInfo::cpuWeight(pr->nativeLimits().cpu))
+            && ((1.0 - weightedMemory) < QueuedSystemInfo::memoryWeight(pr->nativeLimits().memory)))
             continue;
         // now check nice level
         if ((index > -1) && (pr->nice() < process(index)->nice()))
@@ -314,28 +303,19 @@ QueuedLimits::Limits QueuedProcessManager::usedLimits()
 {
     auto tasks = processes().values();
     long long cpu = std::accumulate(
-        tasks.cbegin(), tasks.cend(), 0,
-        [](long long value, QueuedProcess *process) {
-            auto limit = process->nativeLimits().cpu == 0
-                             ? QueuedSystemInfo::cpuCount()
-                             : process->nativeLimits().cpu;
-            return process->state() == QProcess::ProcessState::Running
-                       ? value + limit
-                       : value;
+        tasks.cbegin(), tasks.cend(), 0, [](long long value, QueuedProcess *process) {
+            auto limit = process->nativeLimits().cpu == 0 ? QueuedSystemInfo::cpuCount()
+                                                          : process->nativeLimits().cpu;
+            return process->state() == QProcess::ProcessState::Running ? value + limit : value;
         });
     long long memory = std::accumulate(
-        tasks.cbegin(), tasks.cend(), 0,
-        [](long long value, QueuedProcess *process) {
-            auto limit = process->nativeLimits().memory == 0
-                             ? QueuedSystemInfo::memoryCount()
-                             : process->nativeLimits().memory;
-            return process->state() == QProcess::ProcessState::Running
-                       ? value + limit
-                       : value;
+        tasks.cbegin(), tasks.cend(), 0, [](long long value, QueuedProcess *process) {
+            auto limit = process->nativeLimits().memory == 0 ? QueuedSystemInfo::memoryCount()
+                                                             : process->nativeLimits().memory;
+            return process->state() == QProcess::ProcessState::Running ? value + limit : value;
         });
     long long storage = std::accumulate(
-        tasks.cbegin(), tasks.cend(), 0,
-        [](long long value, QueuedProcess *process) {
+        tasks.cbegin(), tasks.cend(), 0, [](long long value, QueuedProcess *process) {
             return process->state() == QProcess::ProcessState::Running
                        ? value + process->nativeLimits().storage
                        : value;
@@ -348,12 +328,11 @@ QueuedLimits::Limits QueuedProcessManager::usedLimits()
 /**
  * @fn taskFinished
  */
-void QueuedProcessManager::taskFinished(const int _exitCode,
-                                        const QProcess::ExitStatus _exitStatus,
+void QueuedProcessManager::taskFinished(const int _exitCode, const QProcess::ExitStatus _exitStatus,
                                         const long long _index)
 {
-    qCDebug(LOG_LIB) << "Process" << _index << "finished with code" << _exitCode
-                     << "and status" << _exitStatus;
+    qCDebug(LOG_LIB) << "Process" << _index << "finished with code" << _exitCode << "and status"
+                     << _exitStatus;
 
     auto pr = process(_index);
     if (pr) {

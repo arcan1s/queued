@@ -40,10 +40,8 @@ QueuedSettings::QueuedSettings(QObject *_parent, const QString _path)
 {
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
-    qRegisterMetaType<QueuedConfig::QueuedAdminSetup>(
-        "QueuedConfig::QueuedAdminSetup");
-    qRegisterMetaType<QueuedConfig::QueuedDBSetup>(
-        "QueuedConfig::QueuedDBSetup");
+    qRegisterMetaType<QueuedConfig::QueuedAdminSetup>("QueuedConfig::QueuedAdminSetup");
+    qRegisterMetaType<QueuedConfig::QueuedDBSetup>("QueuedConfig::QueuedDBSetup");
 }
 
 
@@ -79,8 +77,7 @@ QueuedConfig::QueuedDBSetup QueuedSettings::db() const
  */
 QString QueuedSettings::defaultPath()
 {
-    QString fileName
-        = QStandardPaths::locate(QStandardPaths::ConfigLocation, "queued.ini");
+    QString fileName = QStandardPaths::locate(QStandardPaths::ConfigLocation, "queued.ini");
     qCInfo(LOG_LIB) << "Found configuration file" << fileName;
 
     return fileName;
@@ -92,9 +89,9 @@ QString QueuedSettings::defaultPath()
  */
 QString QueuedSettings::defaultTokenPath()
 {
-    QString fileName = QString("%1/queued")
-                           .arg(QStandardPaths::writableLocation(
-                               QStandardPaths::GenericCacheLocation));
+    QString fileName
+        = QString("%1/queued")
+              .arg(QStandardPaths::writableLocation(QStandardPaths::GenericCacheLocation));
     qCInfo(LOG_LIB) << "Cache file location" << fileName;
 
     return fileName;
@@ -132,8 +129,7 @@ void QueuedSettings::readConfiguration()
     m_cfgDB.password = settings.value("Password").toString();
     // get standard path for temporary files
     QString defaultDB = QString("%1/queued.db")
-                            .arg(QStandardPaths::writableLocation(
-                                QStandardPaths::TempLocation));
+                            .arg(QStandardPaths::writableLocation(QStandardPaths::TempLocation));
     m_cfgDB.path = settings.value("Path", defaultDB).toString();
     m_cfgDB.port = settings.value("Port").toInt();
     m_cfgDB.username = settings.value("Username").toString();
