@@ -370,7 +370,7 @@ QueuedResult<QVariantHash> QueuedCorePrivate::pluginSettings(const QString &_plu
         return QueuedError("Not allowed", QueuedEnums::ReturnStatus::InsufficientPermissions);
 
     auto dbSettings = m_database->get(QueuedDB::SETTINGS_TABLE,
-                                      QString("WHERE key LIKE 'Plugin.%1.%'").arg(_plugin));
+                                      {{"key", QString("Plugin.%1.%").arg(_plugin), "LIKE"}});
     QVariantHash settings;
     std::for_each(dbSettings.cbegin(), dbSettings.cend(),
                   [&settings, &_plugin](const QVariantHash &value) {

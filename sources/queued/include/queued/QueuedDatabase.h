@@ -39,6 +39,22 @@ class QueuedDatabase : public QObject
 
 public:
     /**
+     * @struct QueuedDatabaseCondition
+     * @brief structure to define database condition payload
+     * @var key
+     * payload key
+     * @var value
+     * payload value
+     * @var operation
+     * comparison operation
+     */
+    struct QueuedDatabaseCondition {
+        QString key;
+        QVariant value;
+        QString operation;
+    };
+
+    /**
      * @brief QueuedDatabase class constructor
      * @param parent
      * pointer to parent item
@@ -88,7 +104,8 @@ public:
      * optional condition string
      * @return list of records from table
      */
-    QList<QVariantHash> get(const QString &_table, const QString &_condition = "");
+    QList<QVariantHash> get(const QString &_table, const QList<QueuedDatabaseCondition> &_condition
+                                                   = QList<QueuedDatabaseCondition>());
     /**
      * @brief get record from table with given id
      * @param _table
@@ -181,6 +198,13 @@ private:
      * @return list of columns in table
      */
     QStringList getColumnsInRecord(const QSqlRecord &_record) const;
+    /**
+     * @brief parse condition map to sql query
+     * @param _condition
+     * condition map
+     * @return sql query string part
+     */
+    QString getCondition(const QList<QueuedDatabaseCondition> &_condition) const;
     /**
      * @brief last insertion ID
      * @param _table

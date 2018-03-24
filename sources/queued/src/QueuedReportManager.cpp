@@ -60,7 +60,7 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
 {
     qCDebug(LOG_LIB) << "Build performance report from" << _from << "to" << _to;
 
-    QStringList conditions;
+    QList<QueuedDatabaseCondition> conditions;
     if (_from.isValid())
         conditions += QString("((datetime(startTime) > datetime('%1')) OR "
                               "(startTime IS NULL))")

@@ -131,7 +131,7 @@ void QueuedCorePrivate::initProcesses()
 
     m_processes = m_helper->initObject(m_processes);
     m_processes->setExitAction(onExitAction);
-    auto dbProcesses = m_database->get(QueuedDB::TASKS_TABLE, "WHERE endTime IS NULL");
+    auto dbProcesses = m_database->get(QueuedDB::TASKS_TABLE, {{"endTime", "NULL", "IS"}});
     m_processes->loadProcesses(dbProcesses);
 
     m_connections += connect(m_processes, &QueuedProcessManager::taskStartTimeReceived,
@@ -207,8 +207,7 @@ void QueuedCorePrivate::initUsers()
     m_users->setSalt(m_settings->admin().salt);
     m_users->setTokenExpiration(expiry);
     QString now = QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs);
-    auto dbTokens = m_database->get(
-        QueuedDB::TOKENS_TABLE, QString("WHERE datetime(validUntil) > datetime('%1')").arg(now));
+    auto dbTokens = m_database->get(QueuedDB::TOKENS_TABLE, {{"validUntil", now, ">"}});
     m_users->loadTokens(dbTokens);
     auto dbUsers = m_database->get(QueuedDB::USERS_TABLE);
     m_users->loadUsers(dbUsers);
