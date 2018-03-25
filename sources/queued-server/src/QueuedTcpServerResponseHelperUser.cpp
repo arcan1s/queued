@@ -134,7 +134,7 @@ QVariantHash QueuedTcpServerResponseHelperUser::getUser(const QString &_user,
                       output = {{"code", 500}, {"message", err.message().c_str()}};
                   });
     } else {
-        auto res = QueuedCoreAdaptor::getUser(userId, property);
+        auto res = QueuedCoreAdaptor::getUser(userId, property, _token);
         res.match(
             [&output, &property](const QVariant &val) {
                 output["properties"] = {{property, val}};

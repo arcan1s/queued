@@ -224,7 +224,7 @@ QueuedResult<bool> QueuedCorePrivate::editTask(const long long _id, const QVaria
     if (payload.contains("nice"))
         payload["nice"] = std::min(payload["nice"].toUInt(), authUser->priority());
 
-    return m_helper->editTaskPrivate(task, payload);
+    return m_helper->editTaskPrivate(task, payload, userAuthId);
 }
 
 
@@ -369,8 +369,9 @@ QueuedResult<QVariantHash> QueuedCorePrivate::pluginSettings(const QString &_plu
     if (!isAdmin)
         return QueuedError("Not allowed", QueuedEnums::ReturnStatus::InsufficientPermissions);
 
-    auto dbSettings = m_database->get(QueuedDB::SETTINGS_TABLE,
-                                      {{"key", QString("Plugin.%1.%").arg(_plugin), "LIKE"}});
+    auto optionName = QString("Plugin.%1.%").arg(_plugin);
+    auto dbSettings
+        = m_database->get(QueuedDB::SETTINGS_TABLE, "WHERE key LIKE :key", {{"key", optionName}});
     QVariantHash settings;
     std::for_each(dbSettings.cbegin(), dbSettings.cend(),
                   [&settings, &_plugin](const QVariantHash &value) {

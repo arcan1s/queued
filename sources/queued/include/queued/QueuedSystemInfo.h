@@ -55,7 +55,7 @@ long long memoryCount();
  * @return weight as proportion
  */
 double memoryWeight(const long long _memory);
-}
+} // namespace QueuedSystemInfo
 
 
 #endif /* QUEUEDSYSTEMINFO_H */

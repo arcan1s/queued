@@ -58,8 +58,6 @@ QueuedProcess::QueuedProcess(QObject *_parent, const QueuedProcessDefinitions &d
     setArguments(m_definitions.arguments);
     setWorkDirectory(m_definitions.workingDirectory);
 
-    updateLimits();
-
     connect(this, SIGNAL(started()), this, SLOT(applyCGroup()));
 }
 
@@ -87,19 +85,6 @@ void QueuedProcess::killChildren()
             ::kill(pid, SIGKILL);
         }
     }
-}
-
-
-/**
- * @fn updateLimits
- */
-void QueuedProcess::updateLimits()
-{
-    auto nl = nativeLimits();
-
-    m_cgroup->setCpuLimit(std::llround(QueuedSystemInfo::cpuWeight(nl.cpu) * 100.0));
-    m_cgroup->setMemoryLimit(
-        std::llround(QueuedSystemInfo::memoryWeight(nl.memory) * QueuedSystemInfo::memoryCount()));
 }
 
 
@@ -281,7 +266,6 @@ void QueuedProcess::setLimits(const QString &_limits)
     qCDebug(LOG_LIB) << "Set process limits" << _limits;
 
     m_definitions.limits = _limits;
-    updateLimits();
 }
 
 
@@ -372,6 +356,7 @@ bool QueuedProcess::operator==(const QueuedProcess &_other)
     return name() == _other.name();
 }
 
+
 /**
  * applyCGroup
  */
@@ -386,6 +371,14 @@ void QueuedProcess::applyCGroup()
  */
 void QueuedProcess::setupChildProcess()
 {
+    // configure cgroup here and apply limits
+    m_cgroup->createGroup();
+    auto nl = nativeLimits();
+    m_cgroup->setCpuLimit(std::llround(QueuedSystemInfo::cpuWeight(nl.cpu) * 100.0));
+    m_cgroup->setMemoryLimit(
+        std::llround(QueuedSystemInfo::memoryWeight(nl.memory) * QueuedSystemInfo::memoryCount()));
+
+    // setup child properties
     ::setuid(m_definitions.uid);
     ::setgid(m_definitions.gid);
 

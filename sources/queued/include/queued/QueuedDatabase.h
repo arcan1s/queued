@@ -27,6 +27,7 @@
 #include <QHash>
 #include <QObject>
 #include <QSqlDatabase>
+#include <QVariant>
 
 
 /**
@@ -38,22 +39,6 @@ class QueuedDatabase : public QObject
     Q_PROPERTY(QString path READ path)
 
 public:
-    /**
-     * @struct QueuedDatabaseCondition
-     * @brief structure to define database condition payload
-     * @var key
-     * payload key
-     * @var value
-     * payload value
-     * @var operation
-     * comparison operation
-     */
-    struct QueuedDatabaseCondition {
-        QString key;
-        QVariant value;
-        QString operation;
-    };
-
     /**
      * @brief QueuedDatabase class constructor
      * @param parent
@@ -102,10 +87,12 @@ public:
      * table name
      * @param _condition
      * optional condition string
+     * @param _params
+     * optional condition parameters
      * @return list of records from table
      */
-    QList<QVariantHash> get(const QString &_table, const QList<QueuedDatabaseCondition> &_condition
-                                                   = QList<QueuedDatabaseCondition>());
+    QList<QVariantHash> get(const QString &_table, const QString &_condition = "",
+                            const QVariantHash &_params = QVariantHash());
     /**
      * @brief get record from table with given id
      * @param _table
@@ -198,13 +185,6 @@ private:
      * @return list of columns in table
      */
     QStringList getColumnsInRecord(const QSqlRecord &_record) const;
-    /**
-     * @brief parse condition map to sql query
-     * @param _condition
-     * condition map
-     * @return sql query string part
-     */
-    QString getCondition(const QList<QueuedDatabaseCondition> &_condition) const;
     /**
      * @brief last insertion ID
      * @param _table

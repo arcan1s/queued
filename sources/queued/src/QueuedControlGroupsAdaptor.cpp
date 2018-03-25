@@ -38,7 +38,6 @@ QueuedControlGroupsAdaptor::QueuedControlGroupsAdaptor(QObject *_parent, QString
     qCDebug(LOG_LIB) << __PRETTY_FUNCTION__;
 
     m_name = std::move(_name);
-    createGroup();
 }
 
 

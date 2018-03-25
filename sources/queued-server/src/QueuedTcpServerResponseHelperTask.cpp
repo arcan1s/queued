@@ -100,7 +100,7 @@ QVariantHash QueuedTcpServerResponseHelperTask::getTask(const long long _id,
                       output = {{"code", 500}, {"message", err.message().c_str()}};
                   });
     } else {
-        auto res = QueuedCoreAdaptor::getTask(_id, property);
+        auto res = QueuedCoreAdaptor::getTask(_id, property, _token);
         res.match(
             [&output, &property](const QVariant &val) {
                 output["properties"] = {{property, val}};

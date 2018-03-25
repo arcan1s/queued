@@ -89,7 +89,7 @@ QString hashListToString(const QList<QVariantHash> &_list);
 void preprocess(const QStringList &_args, QCommandLineParser &_parser);
 void print(const QueuedctlResult &_result);
 QueuedctlResult process(QCommandLineParser &_parser, const QString &_cache, const QString &_user);
-};
+}; // namespace QueuedctlCommon
 
 
 #endif /* QUEUEDCTLCOMMON_H */

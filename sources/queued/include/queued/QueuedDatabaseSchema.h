@@ -39,6 +39,10 @@ namespace QueuedDB
  */
 static const char SETTINGS_TABLE[] = "settings";
 /**
+ * @brief tasks modifications table name
+ */
+static const char TASKS_MODS_TABLE[] = "tasks_modifications";
+/**
  * @brief tasks table name
  */
 static const char TASKS_TABLE[] = "tasks";
@@ -78,11 +82,17 @@ typedef QHash<QString, QHash<QString, QueuedDBField>> QueuedDBSchema;
  */
 static const QueuedDBSchema DBSchema
     = {{SETTINGS_TABLE,
-        {{"_id", {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
+        {{"_id", {"_id", "INT PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
          {"key", {"key", "TEXT NOT NULL DEFAULT '0'", QVariant::String, true}},
          {"value", {"value", "TEXT", QVariant::String, true}}}},
+       {TASKS_MODS_TABLE,
+        {{"_id", {"_id", "INT PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
+         {"task", {"task", "INT NOT NULL DEFAULT 0", QVariant::LongLong, true}},
+         {"time", {"time", "TEXT", QVariant::String, true}},
+         {"user", {"user", "INT NOT NULL DEFAULT 0", QVariant::LongLong, true}},
+         {"value", {"value", "TEXT", QVariant::String, true}}}},
        {TASKS_TABLE,
-        {{"_id", {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
+        {{"_id", {"_id", "INT PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
          {"user", {"user", "INT NOT NULL DEFAULT 0", QVariant::LongLong, true}},
          {"command", {"command", "TEXT", QVariant::String, false}},
          {"commandArguments", {"commandArguments", "TEXT", QVariant::String, false}},
@@ -91,15 +101,15 @@ static const QueuedDBSchema DBSchema
          {"uid", {"uid", "INT", QVariant::UInt, true}},
          {"gid", {"gid", "INT", QVariant::UInt, true}},
          {"limits", {"limits", "TEXT", QVariant::String, false}},
-         {"startTime", {"startTime", "INT", QVariant::LongLong, true}},
-         {"endTime", {"endTime", "INT", QVariant::LongLong, true}}}},
+         {"startTime", {"startTime", "TEXT", QVariant::String, true}},
+         {"endTime", {"endTime", "TEXT", QVariant::String, true}}}},
        {TOKENS_TABLE,
-        {{"_id", {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
+        {{"_id", {"_id", "INT PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
          {"token", {"token", "TEXT NOT NULL DEFAULT '0'", QVariant::String, true}},
          {"user", {"user", "TEXT NOT NULL DEFAULT '0'", QVariant::String, true}},
          {"validUntil", {"validUntil", "TEXT NOT NULL DEFAULT '0'", QVariant::String, true}}}},
        {USERS_TABLE,
-        {{"_id", {"_id", "INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
+        {{"_id", {"_id", "INT PRIMARY KEY AUTOINCREMENT UNIQUE", QVariant::LongLong, true}},
          {"name", {"name", "TEXT NOT NULL DEFAULT '0'", QVariant::String, true}},
          {"password", {"password", "TEXT", QVariant::String, false}},
          {"email", {"email", "TEXT", QVariant::String, false}},
@@ -107,6 +117,6 @@ static const QueuedDBSchema DBSchema
          {"limits", {"limits", "TEXT", QVariant::String, true}},
          {"permissions", {"permissions", "INT", QVariant::UInt, true}},
          {"priotiry", {"priority", "INT", QVariant::UInt, true}}}}};
-};
+}; // namespace QueuedDB
 
 #endif /* QUEUEDDATABASESCHEMA_H */

@@ -109,7 +109,7 @@ QueuedctlTask::getTask(const long long _id, const QString &_property, const QStr
             },
             [&output](const QueuedError &err) { output.output = err.message().c_str(); });
     } else {
-        auto res = QueuedCoreAdaptor::getTask(_id, _property);
+        auto res = QueuedCoreAdaptor::getTask(_id, _property, _token);
         res.match(
             [&output](const QVariant &val) {
                 output.status = val.isValid();

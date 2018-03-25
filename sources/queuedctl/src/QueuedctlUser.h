@@ -44,7 +44,7 @@ void parserSet(QCommandLineParser &_parser);
 QueuedctlCommon::QueuedctlResult setUser(const long long _id,
                                          const QueuedUser::QueuedUserDefinitions &_definitions,
                                          const QString &_token);
-};
+}; // namespace QueuedctlUser
 
 
 #endif /* QUEUEDCTLUSER_H */

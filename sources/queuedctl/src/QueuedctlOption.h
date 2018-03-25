@@ -29,7 +29,7 @@ QueuedctlCommon::QueuedctlResult editOption(const QString &_option, const QVaria
 QueuedctlCommon::QueuedctlResult getOption(const QString &_option, const QString &_token);
 void parserGet(QCommandLineParser &_parser);
 void parserSet(QCommandLineParser &_parser);
-};
+}; // namespace QueuedctlOption
 
 
 #endif /* QUEUEDCTLOPTION_H */

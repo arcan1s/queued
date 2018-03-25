@@ -30,7 +30,7 @@ QueuedctlCommon::QueuedctlResult getPluginOptions(const QString &_plugin, const 
 QueuedctlCommon::QueuedctlResult listPlugins();
 QueuedctlCommon::QueuedctlResult removePlugin(const QString &_plugin, const QString &_token);
 void parser(QCommandLineParser &_parser);
-};
+}; // namespace QueuedctlPlugins
 
 
 #endif /* QUEUEDCTLPLUGINS_H */

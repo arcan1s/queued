@@ -155,7 +155,7 @@ QueuedCorePrivateHelper::addTaskPrivate(const QString &_command, const QStringLi
     }
 
     // add to child object
-    processes()->add(properties, id);
+    processes()->add(properties, QList<QVariantHash>(), id);
     // notify plugins
     if (plugins())
         emit(plugins()->interface()->onAddTask(id));
@@ -282,9 +282,10 @@ QueuedResult<bool> QueuedCorePrivateHelper::editPluginPrivate(const QString &_pl
  * @fn editTaskPrivate
  */
 QueuedResult<bool> QueuedCorePrivateHelper::editTaskPrivate(QueuedProcess *_process,
-                                                            const QVariantHash &_taskData)
+                                                            const QVariantHash &_taskData,
+                                                            const int _userId)
 {
-    qCDebug(LOG_LIB) << "Edit task with ID" << _process->index();
+    qCDebug(LOG_LIB) << "Edit task with ID" << _process->index() << "from" << _userId;
 
     // modify record in database first
     bool status = database()->modify(QueuedDB::TASKS_TABLE, _process->index(), _taskData);
@@ -293,6 +294,14 @@ QueuedResult<bool> QueuedCorePrivateHelper::editTaskPrivate(QueuedProcess *_proc
                            << "in database, do not edit it in memory";
         return QueuedError("", QueuedEnums::ReturnStatus::Error);
     }
+    // store modification
+    for (auto &field : _taskData.keys())
+        database()->add(QueuedDB::TASKS_MODS_TABLE,
+                        {{"task", _process->index()},
+                         {"time", QDateTime::currentDateTimeUtc().toString(Qt::ISODateWithMs)},
+                         {"user", _userId},
+                         {"field", field},
+                         {"value", _taskData[field]}});
 
     // modify values stored in memory
     for (auto &property : _taskData.keys())
@@ -386,8 +395,11 @@ QueuedProcess *QueuedCorePrivateHelper::tryGetTask(const long long _id)
             qCWarning(LOG_LIB) << "Could not find task with ID" << _id;
             return nullptr;
         }
+        qCInfo(LOG_LIB) << "Try to get task" << _id << "modifications from database";
+        auto mods
+            = database()->get(QueuedDB::TASKS_MODS_TABLE, "WHERE task=:task", {{"task", _id}});
 
-        auto defs = QueuedProcessManager::parseDefinitions(data);
+        auto defs = QueuedProcessManager::parseDefinitions(data, mods);
         task = new QueuedProcess(this, defs, _id);
     }
 

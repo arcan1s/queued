@@ -29,7 +29,7 @@ QueuedctlCommon::QueuedctlResult addPermission(const long long _id, const QStrin
 QueuedctlCommon::QueuedctlResult removePermission(const long long _id, const QString &_permission,
                                                   const QString &_token);
 void parser(QCommandLineParser &_parser);
-};
+}; // namespace QueuedctlPermissions
 
 
 #endif /* QUEUEDCTLPERMISSIONS_H */

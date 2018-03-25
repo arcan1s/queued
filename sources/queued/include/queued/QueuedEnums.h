@@ -100,7 +100,7 @@ enum class ReturnStatus {
     InvalidToken = 1 << 4,
     InvalidPassword = 1 << 5
 };
-};
+}; // namespace QueuedEnums
 
 
 #endif /* QUEUEDENUMS_H */

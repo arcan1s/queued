@@ -175,7 +175,7 @@ Plugin readSpecification(const QString &_path);
  * @return initialized object
  */
 Plugin readSpecification(const QVariantHash &_map);
-};
+}; // namespace QueuedPluginSpecification
 
 
 #endif /* QUEUEDPLUGINSPECIFICATION_H */

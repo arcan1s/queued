@@ -71,19 +71,24 @@ public:
      * @brief parse task definitions from table data
      * @param _properties
      * map of task properties
+     * @param _modifications
+     * list of task modifications
      * @return data mapped to internal format
      */
     static QueuedProcess::QueuedProcessDefinitions
-    parseDefinitions(const QVariantHash &_properties);
+    parseDefinitions(const QVariantHash &_properties, const QList<QVariantHash> &_modifications);
     /**
      * @brief add task
      * @param _properties
      * task properties from database
+     * @param _modifications
+     * list of task modifications
      * @param _index
      * task index
      * @return pointer to created task
      */
-    QueuedProcess *add(const QVariantHash &_properties, const long long _index);
+    QueuedProcess *add(const QVariantHash &_properties, const QList<QVariantHash> &_modifications,
+                       const long long _index);
     /**
      * @brief add task
      * @param _definitions
@@ -94,12 +99,6 @@ public:
      */
     QueuedProcess *add(const QueuedProcess::QueuedProcessDefinitions &_definitions,
                        const long long _index);
-    /**
-     * @brief add tasks from database
-     * @param _processes
-     * database stored tasks
-     */
-    void loadProcesses(const QList<QVariantHash> &_processes);
     /**
      * @brief task
      * @param _index

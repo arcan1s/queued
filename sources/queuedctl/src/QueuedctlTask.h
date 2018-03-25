@@ -43,7 +43,7 @@ setTask(const long long _id, const QueuedProcess::QueuedProcessDefinitions &_def
         const QString &_token);
 QueuedctlCommon::QueuedctlResult startTask(const long long _id, const QString &_token);
 QueuedctlCommon::QueuedctlResult stopTask(const long long _id, const QString &_token);
-};
+}; // namespace QueuedctlTask
 
 
 #endif /* QUEUEDCTLTASK_H */

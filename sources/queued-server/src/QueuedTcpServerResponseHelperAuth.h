@@ -24,7 +24,7 @@ namespace QueuedTcpServerResponseHelperAuth
 {
 QVariantHash auth(const QVariantHash &_payload);
 bool tryAuth(const QString &_token);
-};
+}; // namespace QueuedTcpServerResponseHelperAuth
 
 
 #endif /* QUEUEDTCPSERVERRESPONSEHELPERAUTH_H */

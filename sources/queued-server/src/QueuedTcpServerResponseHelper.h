@@ -86,7 +86,7 @@ static const QHash<int, QByteArray> HTTPCodeMap = {{100, "Continue"},
 QVariantHash getData(const Request &_request, const QVariantHash &_data, const QString &_token);
 Request parsePath(const QString &_path);
 RequestPath pathToEnum(const QString &_path);
-};
+}; // namespace QueuedTcpServerResponseHelper
 
 
 #endif /* QUEUEDTCPSERVERRESPONSEHELPER_H */

@@ -157,6 +157,6 @@ static const QueuedSettingsDefaultMap QueuedSettingsDefaults = {
     {"ServerTimeout", {QueuedSettings::ServerTimeout, -1, false}},
     {"TokenExpiration", {QueuedSettings::TokenExpiration, 30, false}},
 };
-};
+}; // namespace QueuedConfig
 
 #endif /* QUEUEDCONFIGURATION_H */

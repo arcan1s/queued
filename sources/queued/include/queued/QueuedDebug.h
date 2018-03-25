@@ -83,7 +83,7 @@ QStringList getBuildData();
  * @brief additional method to get build details declared in version.h
  */
 QHash<QString, QHash<QString, QString>> getBuildMetaData();
-}
+} // namespace QueuedDebug
 
 
 #endif /* QUEUEDDEBUG_H */

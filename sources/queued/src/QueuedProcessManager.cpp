@@ -62,9 +62,11 @@ QueuedProcessManager::~QueuedProcessManager()
  * @fn parseDefinitions
  */
 QueuedProcess::QueuedProcessDefinitions
-QueuedProcessManager::parseDefinitions(const QVariantHash &_properties)
+QueuedProcessManager::parseDefinitions(const QVariantHash &_properties,
+                                       const QList<QVariantHash> &_modifications)
 {
-    qCDebug(LOG_LIB) << "Parse definitions from" << _properties;
+    qCDebug(LOG_LIB) << "Parse definitions from" << _properties << "with modifications"
+                     << _modifications;
 
     QueuedProcess::QueuedProcessDefinitions defs;
     // parameters
@@ -81,6 +83,17 @@ QueuedProcessManager::parseDefinitions(const QVariantHash &_properties)
     defs.startTime = QDateTime::fromString(_properties["startTime"].toString(), Qt::ISODateWithMs);
     defs.endTime = QDateTime::fromString(_properties["endTime"].toString(), Qt::ISODateWithMs);
 
+    // modifications
+    for (auto &mod : _modifications) {
+        QueuedProcess::QueuedProcessModDefinitions mods;
+        mods.field = mod["field"].toString();
+        mods.value = mod["value"];
+        mods.task = mod["task"].toLongLong();
+        mods.time = QDateTime::fromString(mod["time"].toString(), Qt::ISODateWithMs);
+        mods.user = mod["user"].toLongLong();
+        defs.modifications.append(mods);
+    }
+
     return defs;
 }
 
@@ -88,11 +101,14 @@ QueuedProcessManager::parseDefinitions(const QVariantHash &_properties)
 /**
  * @fn add
  */
-QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties, const long long _index)
+QueuedProcess *QueuedProcessManager::add(const QVariantHash &_properties,
+                                         const QList<QVariantHash> &_modifications,
+                                         const long long _index)
 {
-    qCDebug(LOG_LIB) << "Add new process" << _properties << "with index" << _index;
+    qCDebug(LOG_LIB) << "Add new process" << _properties << "with modifications" << _modifications
+                     << "with index" << _index;
 
-    return add(parseDefinitions(_properties), _index);
+    return add(parseDefinitions(_properties, _modifications), _index);
 }
 
 
@@ -120,18 +136,6 @@ QueuedProcessManager::add(const QueuedProcess::QueuedProcessDefinitions &_defini
     // check if we can start new task
     start();
     return process;
-}
-
-
-/**
- * @fn loadProcesses
- */
-void QueuedProcessManager::loadProcesses(const QList<QVariantHash> &_processes)
-{
-    qCDebug(LOG_LIB) << "Add tasks from" << _processes;
-
-    for (auto &processData : _processes)
-        add(processData, processData["_id"].toLongLong());
 }
 
 

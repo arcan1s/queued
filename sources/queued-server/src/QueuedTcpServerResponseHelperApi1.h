@@ -27,7 +27,7 @@ namespace QueuedTcpServerResponseHelperApi1
 QVariantHash getData(const QueuedTcpServerResponseHelper::RequestPath _request, const QString &_arg,
                      const QString &_type, const QVariantHash &_data, const QString &_token);
 QVariantHash getStatus();
-};
+}; // namespace QueuedTcpServerResponseHelperApi1
 
 
 #endif /* QUEUEDTCPSERVERRESPONSEHELPERAPI1_H */

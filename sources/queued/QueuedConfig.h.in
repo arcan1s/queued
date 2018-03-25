@@ -119,7 +119,7 @@ static const char CG_FS_PATH[] = "/sys/fs/cgroup";
  * @brief plugin interface name
  */
 static const char PLUGIN_INTERFACE[] = PLUGIN_INTERFACE_NAME;
-}
+} // namespace QueuedConfig
 
 
 #endif /* QUEUEDCONFIG_H */

@@ -180,11 +180,14 @@ private:
      * task object
      * @param _taskData
      * task data to edit
+     * @param _userId
+     * user id who send request to modify
      * @remark _taskData should contain only fields defined in schema, any other
      * fields will be ignored. No need to pass all properties here
      * @return true on successful task edition
      */
-    QueuedResult<bool> editTaskPrivate(QueuedProcess *_process, const QVariantHash &_taskData);
+    QueuedResult<bool> editTaskPrivate(QueuedProcess *_process, const QVariantHash &_taskData,
+                                       const int _userId);
     /**
      * @brief edit user
      * @param _id

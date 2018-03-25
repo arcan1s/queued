@@ -381,7 +381,7 @@ QueuedResult<T> sendRequest(const QString &_service, const QString &_path,
         return QueuedError(dbusResponse.error().message().toStdString());
     }
 };
-}
+} // namespace QueuedCoreAdaptor
 
 
 #endif /* QUEUEDCOREADAPTOR_H */

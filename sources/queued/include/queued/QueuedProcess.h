@@ -26,6 +26,7 @@
 
 #include <QDateTime>
 #include <QProcess>
+#include <QVariant>
 
 
 class QueuedControlGroupsAdaptor;
@@ -56,6 +57,27 @@ class QueuedProcess : public QProcess
     Q_PROPERTY(QString workDirectory READ workDirectory WRITE setWorkDirectory)
 
 public:
+    /**
+     * @struct QueuedProcessModDefinitions
+     * @brief structure to define process modifications
+     * @var QueuedProcessModDefinitions::field
+     * field name
+     * @var QueuedProcessModDefinitions::value
+     * new field value
+     * @var QueuedProcessModDefinitions::task
+     * task ID
+     * @var QueuedProcessModDefinitions::time
+     * modification time
+     * @var QueuedProcessModDefinitions::user
+     * user ID, who modified the task
+     */
+    struct QueuedProcessModDefinitions {
+        QString field;
+        QVariant value;
+        long long task = 0;
+        QDateTime time;
+        long long user = 0;
+    };
     /**
      * @struct QueuedProcessDefinition
      * @brief structure to define process
@@ -91,6 +113,7 @@ public:
         QDateTime endTime;
         long long user = 0;
         QString limits;
+        QList<QueuedProcessModDefinitions> modifications;
     };
 
     /**
@@ -112,10 +135,6 @@ public:
      * @brief force kill ald children
      */
     void killChildren();
-    /**
-     * @brief update cgroup limits
-     */
-    void updateLimits();
     // properties
     /**
      * @brief children processes

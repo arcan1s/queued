@@ -60,20 +60,21 @@ QList<QVariantHash> QueuedReportManager::performance(const QueuedCore *_core,
 {
     qCDebug(LOG_LIB) << "Build performance report from" << _from << "to" << _to;
 
-    QList<QueuedDatabaseCondition> conditions;
-    if (_from.isValid())
-        conditions += QString("((datetime(startTime) > datetime('%1')) OR "
-                              "(startTime IS NULL))")
-                          .arg(_from.toString(Qt::ISODateWithMs));
-    if (_to.isValid())
-        conditions += QString("((datetime(endTime) < datetime('%1')) AND "
-                              "(endTime NOT NULL))")
-                          .arg(_to.toString(Qt::ISODateWithMs));
+    QVariantHash params;
+    QStringList conditions;
+    if (_from.isValid()) {
+        conditions += "((datetime(startTime) > datetime(:startTime)) OR (startTime IS NULL))";
+        params["startTime"] = _from.toString(Qt::ISODateWithMs);
+    }
+    if (_to.isValid()) {
+        conditions += "((datetime(endTime) < datetime(:endTime)) AND (endTime NOT NULL))";
+        params["endTime"] = _to.toString(Qt::ISODateWithMs);
+    }
 
     QString condition
         = conditions.isEmpty() ? "" : QString("WHERE (%1)").arg(conditions.join(" AND "));
     qCInfo(LOG_LIB) << "Task condition select" << condition;
-    auto tasks = m_database->get(QueuedDB::TASKS_TABLE, condition);
+    auto tasks = m_database->get(QueuedDB::TASKS_TABLE, condition, params);
 
     // build hash first
     QHash<long long, QVariantHash> hashOutput;
@@ -131,23 +132,26 @@ QList<QVariantHash> QueuedReportManager::tasks(const long long _user, const QDat
 {
     qCDebug(LOG_LIB) << "Search for tasks in" << _user << _from << _to;
 
+    QVariantHash params;
     QStringList conditions;
-    if (_user > 0)
-        conditions += QString("(user = %1)").arg(_user);
-    if (_from.isValid())
-        conditions += QString("((datetime(startTime) > datetime('%1')) OR "
-                              "(startTime IS NULL))")
-                          .arg(_from.toString(Qt::ISODateWithMs));
-    if (_to.isValid())
-        conditions += QString("((datetime(endTime) < datetime('%1')) AND "
-                              "(endTime NOT NULL))")
-                          .arg(_to.toString(Qt::ISODateWithMs));
+    if (_user > 0) {
+        conditions += "(user = :user)";
+        params["user"] = _user;
+    }
+    if (_from.isValid()) {
+        conditions += "((datetime(startTime) > datetime(:startTime)) OR (startTime IS NULL))";
+        params["startTime"] = _from.toString(Qt::ISODateWithMs);
+    }
+    if (_to.isValid()) {
+        conditions += "((datetime(endTime) < datetime(:endTime)) AND (endTime NOT NULL))";
+        params["endTime"] = _to.toString(Qt::ISODateWithMs);
+    }
 
     QString condition
         = conditions.isEmpty() ? "" : QString("WHERE (%1)").arg(conditions.join(" AND "));
     qCInfo(LOG_LIB) << "Task condition select" << condition;
 
-    return m_database->get(QueuedDB::TASKS_TABLE, condition);
+    return m_database->get(QueuedDB::TASKS_TABLE, condition, params);
 }
 
 
@@ -159,18 +163,20 @@ QList<QVariantHash> QueuedReportManager::users(const QDateTime &_lastLogged,
 {
     qCDebug(LOG_LIB) << "Search for users in" << _lastLogged << static_cast<uint>(_permission);
 
+    QVariantHash params;
     QStringList conditions;
-    if (_lastLogged.isValid())
-        conditions += QString("((datetime(lastLogin) > datetime('%1')) AND "
-                              "(lastLogin NOT NULL))")
-                          .arg(_lastLogged.toString(Qt::ISODateWithMs));
-    if (_permission != QueuedEnums::Permission::Invalid)
-        conditions
-            += QString("((permissions & ~%1) != permissions)").arg(static_cast<uint>(_permission));
+    if (_lastLogged.isValid()) {
+        conditions += "((datetime(lastLogin) > datetime(:lastLogin)) AND (lastLogin NOT NULL))";
+        params["lastLogin"] = _lastLogged.toString(Qt::ISODateWithMs);
+    }
+    if (_permission != QueuedEnums::Permission::Invalid) {
+        conditions += "((permissions & ~:permission) != permissions)";
+        params["permission"] = static_cast<uint>(_permission);
+    }
 
     QString condition
         = conditions.isEmpty() ? "" : QString("WHERE (%1)").arg(conditions.join(" AND "));
     qCInfo(LOG_LIB) << "User condition select" << condition;
 
-    return m_database->get(QueuedDB::USERS_TABLE, condition);
+    return m_database->get(QueuedDB::USERS_TABLE, condition, params);
 }

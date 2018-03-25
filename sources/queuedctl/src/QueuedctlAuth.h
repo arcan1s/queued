@@ -30,7 +30,7 @@ void parser(QCommandLineParser &_parser);
 void setToken(const QString &_token, const QString &_user, const QString &_cache);
 QString token(const QString &_user, const QString &_cache);
 bool tryAuth(const QString &_token);
-};
+}; // namespace QueuedctlAuth
 
 
 #endif /* QUEUEDCTLAUTH_H */

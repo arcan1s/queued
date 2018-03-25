@@ -349,8 +349,11 @@ QueuedResult<QVariantHash> QueuedCoreAdaptor::getTask(const long long _id, const
     auto res = getTask(_id, "", _token);
 
     QueuedResult<QVariantHash> output;
-    res.match([&output](const QVariant &val) { output = toResult<QVariantHash>(val); },
-              [&output](const QueuedError &err) { output = err; });
+    res.match(
+        [&output](const QVariant &val) {
+            output = qdbus_cast<QVariantHash>(val.value<QDBusArgument>());
+        },
+        [&output](const QueuedError &err) { output = err; });
 
     return output;
 }
@@ -398,8 +401,11 @@ QueuedResult<QVariantHash> QueuedCoreAdaptor::getUser(const long long _id, const
     auto res = getUser(_id, "", _token);
 
     QueuedResult<QVariantHash> output;
-    res.match([&output](const QVariant &val) { output = toResult<QVariantHash>(val); },
-              [&output](const QueuedError &err) { output = err; });
+    res.match(
+        [&output](const QVariant &val) {
+            output = qdbus_cast<QVariantHash>(val.value<QDBusArgument>());
+        },
+        [&output](const QueuedError &err) { output = err; });
 
     return output;
 }
