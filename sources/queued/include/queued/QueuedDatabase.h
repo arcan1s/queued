@@ -82,6 +82,17 @@ public:
      */
     void createTable(const QString &_table);
     /**
+     * @brief execute arbitrary query
+     * @throw QueuedDatabaseException
+     * in case if error occurs
+     * @param _query
+     * sql query
+     * @param _params
+     * sql query parameters
+     * @return query result
+     */
+    QList<QVariantHash> execute(const QString &_query, const QVariantHash &_params);
+    /**
      * @brief get all records from table
      * @param _table
      * table name
@@ -191,7 +202,7 @@ private:
      * table name
      * @return last insertion id from table
      */
-    long long lastInsertionId(const QString &_table) const;
+    long long lastInsertionId(const QString &_table);
     /**
      * @brief additional function to get payload for query
      * @param _table
